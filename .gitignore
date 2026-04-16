@@ -1,0 +1,44 @@
+# Repo-local dependencies, caches, and cleanable outputs
+/node_modules/
+/.npm-cache/
+/dist/
+/artifacts/
+/coverage/
+/logs/
+/.vite/
+*.tsbuildinfo
+
+# Local runtime configuration generated or overridden per workstation
+/.env
+/.env.local
+/.env.*.local
+!/.env.example
+/.local/activation-generator/
+
+# Sensitive local credentials and Windows signing material
+*.pem
+*.key
+*.pfx
+*.p12
+*.crt
+*.cer
+*.der
+
+# Package manager and runtime logs
+*.log
+npm-debug.log*
+
+# Editor and OS files
+.vscode/
+.idea/
+.claude/
+Thumbs.db
+Desktop.ini
+.DS_Store
+~$*
+
+# Generated product collateral under docs/ is intentionally versioned.
+# /tooling contains repo-owned tracked helpers; ignore only observed local or vendor payloads under /tools.
+/tools/nssm/
+/tools/wix314-binaries/
+/tools/npm/

@@ -1,0 +1,125 @@
+{
+  "name": "onlyspeech",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Windows-first desktop kiosk for two-sided live speech translation.",
+  "author": "Danny Perondi",
+  "main": "dist/main/bootstrap.js",
+  "type": "module",
+  "scripts": {
+    "bootstrap": "powershell -ExecutionPolicy Bypass -File ./scripts/public/bootstrap.ps1",
+    "clean": "powershell -ExecutionPolicy Bypass -File ./scripts/public/clean.ps1",
+    "clean:workstation": "powershell -ExecutionPolicy Bypass -File ./scripts/public/clean-workstation.ps1",
+    "clean:repo": "powershell -ExecutionPolicy Bypass -File ./scripts/internal/workspace/clean-repo.ps1 -KeepDependencies -KeepEnvFile -KeepWorkstationData -KeepAutostart",
+    "clean:reset": "powershell -ExecutionPolicy Bypass -File ./scripts/internal/workspace/reset-repo.ps1",
+    "compile": "npm run build:renderer && npm run build:main",
+    "dev": "powershell -ExecutionPolicy Bypass -File ./scripts/public/dev.ps1",
+    "dev:workspace": "concurrently -k \"npm:dev:renderer\" \"npm:dev:main\" \"npm:dev:electron\"",
+    "dev:renderer": "vite",
+    "dev:main": "tsc -p tsconfig.main.json --watch",
+    "dev:electron": "wait-on tcp:5173 file:dist/main/bootstrap.js && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5173 electron .",
+    "build": "powershell -ExecutionPolicy Bypass -File ./scripts/public/build.ps1",
+    "build:renderer": "vite build",
+    "build:main": "tsc -p tsconfig.main.json",
+    "package": "powershell -ExecutionPolicy Bypass -File ./scripts/public/package.ps1",
+    "package:internal": "powershell -ExecutionPolicy Bypass -File ./scripts/internal/packaging/package-core.ps1 -Profile Internal",
+    "audit:packaging": "powershell -ExecutionPolicy Bypass -File ./scripts/internal/packaging/package-audit.ps1",
+    "commission:handover": "powershell -ExecutionPolicy Bypass -File ./scripts/internal/commissioning/write-commissioning-artifact.ps1 -TargetStationValidationPath ./artifacts/logs/target-station-validation.json",
+    "commission:template": "powershell -ExecutionPolicy Bypass -File ./scripts/internal/commissioning/write-commissioning-artifact.ps1 -OutputPath ./artifacts/build/commissioning-template/commissioning-evidence.json -SkipDoctor -SkipRuntimeLogExport -WriteTargetStationValidationTemplatePath ./artifacts/logs/target-station-validation.json",
+    "commission:automation": "powershell -ExecutionPolicy Bypass -File ./scripts/internal/commissioning/run-target-station-automation.ps1 -UpdateValidationPath ./artifacts/logs/target-station-validation.json",
+    "activation:template": "powershell -ExecutionPolicy Bypass -File ./scripts/internal/commissioning/write-activation-validation-artifact.ps1",
+    "speech:matrix-template": "powershell -ExecutionPolicy Bypass -File ./scripts/internal/commissioning/write-live-provider-speech-proof-artifact.ps1",
+    "verify:repo": "powershell -ExecutionPolicy Bypass -File ./scripts/internal/workspace/verify-repo.ps1",
+    "release:evidence": "powershell -ExecutionPolicy Bypass -File ./scripts/internal/packaging/write-release-evidence.ps1",
+    "release:compliance": "powershell -ExecutionPolicy Bypass -File ./scripts/internal/packaging/write-release-compliance-artifacts.ps1",
+    "release:customer-bundle": "powershell -ExecutionPolicy Bypass -File ./scripts/internal/packaging/package-release-artifacts.ps1",
+    "docs:screenshots": "powershell -ExecutionPolicy Bypass -File ./scripts/internal/docs/write-product-screenshots.ps1",
+    "release:tag-check": "powershell -ExecutionPolicy Bypass -File ./scripts/internal/packaging/assert-release-tag.ps1",
+    "release:signing-check": "powershell -ExecutionPolicy Bypass -File ./scripts/internal/packaging/check-windows-signing.ps1",
+    "license:keygen": "powershell -ExecutionPolicy Bypass -File ./scripts/public/license-keygen.ps1",
+    "start": "powershell -ExecutionPolicy Bypass -File ./scripts/public/start.ps1",
+    "test:e2e": "npm run compile && vitest run tests/electron-e2e.test.ts",
+    "test:packaged-lifecycle": "powershell -ExecutionPolicy Bypass -File ./scripts/internal/commissioning/test-packaged-install-lifecycle.ps1",
+    "test:packaged-automation": "powershell -ExecutionPolicy Bypass -File ./scripts/internal/commissioning/test-packaged-runtime-automation.ps1",
+    "test": "vitest run --exclude tests/electron-e2e.test.ts"
+  },
+  "keywords": [
+    "electron",
+    "translation",
+    "kiosk",
+    "azure-speech",
+    "openai"
+  ],
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22",
+    "npm": ">=10"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "microsoft-cognitiveservices-speech-sdk": "^1.48.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "uuid": "^13.0.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@rolldown/binding-win32-x64-msvc": "1.0.0-rc.12",
+    "@rollup/rollup-win32-x64-msvc": "4.60.1",
+    "lightningcss-win32-x64-msvc": "1.32.0",
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react": "^6.0.1",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "41.1.0",
+    "electron-builder": "26.8.2",
+    "jsdom": "^29.0.1",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.5",
+    "vitest": "^4.1.2",
+    "wait-on": "^9.0.1"
+  },
+  "overrides": {
+    "axios": "^1.15.0",
+    "follow-redirects": "^1.16.0"
+  },
+  "build": {
+    "appId": "com.onlyspeech.kiosk",
+    "productName": "OnlySpeech",
+    "copyright": "Copyright (c) 2026 Danny Perondi. All rights reserved.",
+    "asar": true,
+    "artifactName": "${productName}-${version}-${arch}.${ext}",
+    "directories": {
+      "output": "artifacts/packages"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "artifactName": "${productName}-${version}-${arch}-setup.${ext}",
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "OnlySpeech",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
+      "include": "build/installer.nsh"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-${arch}-portable.${ext}"
+    }
+  }
+}

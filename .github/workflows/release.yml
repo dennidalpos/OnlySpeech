@@ -1,0 +1,150 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  publish-windows-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Read package version
+        id: package
+        shell: pwsh
+        run: |
+          $version = node -p "require('./package.json').version"
+          "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Validate release tag against package version
+        shell: pwsh
+        run: npm run release:tag-check -- ${{ github.ref_name }}
+
+      - name: Validate Windows signing inputs
+        shell: pwsh
+        env:
+          ONLYSPEECH_REQUIRE_WINDOWS_SIGNING: "true"
+          WIN_CSC_LINK: ${{ secrets.WINDOWS_CSC_LINK }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CSC_KEY_PASSWORD }}
+        run: npm run release:signing-check
+
+      - name: Run canonical repository verification with diagnostics
+        shell: pwsh
+        env:
+          CI: "true"
+          GITHUB_REF_TYPE: tag
+          WIN_CSC_LINK: ${{ secrets.WINDOWS_CSC_LINK }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CSC_KEY_PASSWORD }}
+        run: |
+          $diagnosticsRoot = Join-Path $PWD "artifacts/logs/ci"
+          New-Item -ItemType Directory -Path $diagnosticsRoot -Force | Out-Null
+
+          $stdoutPath = Join-Path $diagnosticsRoot "verify.stdout.log"
+          $stderrPath = Join-Path $diagnosticsRoot "verify.stderr.log"
+          $exitCodePath = Join-Path $diagnosticsRoot "verify.exitcode.txt"
+          $summaryPath = Join-Path $diagnosticsRoot "verify.summary.txt"
+          $npmCommand = (Get-Command npm.cmd -ErrorAction Stop).Source
+
+          $process = Start-Process `
+            -FilePath $npmCommand `
+            -ArgumentList @("run", "verify:repo", "--", "-KeepOutputs", "-EnablePackagedAutomation") `
+            -WorkingDirectory $PWD `
+            -RedirectStandardOutput $stdoutPath `
+            -RedirectStandardError $stderrPath `
+            -PassThru `
+            -Wait `
+            -NoNewWindow
+
+          $exitCode = $process.ExitCode
+          Set-Content -LiteralPath $exitCodePath -Value "$exitCode" -Encoding utf8
+          Set-Content -LiteralPath $summaryPath -Value @(
+            "command=npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation"
+            "exit_code=$exitCode"
+            "stdout=artifacts/logs/ci/verify.stdout.log"
+            "stderr=artifacts/logs/ci/verify.stderr.log"
+          ) -Encoding utf8
+
+          if (Test-Path -LiteralPath $stdoutPath) {
+            Write-Host "::group::verify stdout"
+            Get-Content -LiteralPath $stdoutPath
+            Write-Host "::endgroup::"
+          }
+
+          if (Test-Path -LiteralPath $stderrPath) {
+            $stderrLines = Get-Content -LiteralPath $stderrPath
+            if ($stderrLines.Count -gt 0) {
+              Write-Host "::group::verify stderr"
+              $stderrLines | ForEach-Object { [Console]::Error.WriteLine($_) }
+              Write-Host "::endgroup::"
+            }
+          }
+
+          if ($exitCode -ne 0) {
+            Write-Host "::error::Canonical repository verification failed. Inspect the uploaded release diagnostics artifact for stdout, stderr, and partial artifacts."
+            exit $exitCode
+          }
+
+      - name: Upload retained release artifacts
+        id: upload_retained_release_artifacts
+        continue-on-error: true
+        uses: actions/upload-artifact@v6
+        with:
+          name: onlyspeech-release-${{ steps.package.outputs.version }}
+          path: |
+            artifacts/packages/*
+            artifacts/logs/release-evidence.json
+            artifacts/logs/third-party-notices.json
+            artifacts/logs/sbom.cdx.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Upload release diagnostics
+        id: upload_release_diagnostics
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v6
+        with:
+          name: onlyspeech-release-diagnostics-${{ steps.package.outputs.version }}
+          path: |
+            artifacts/logs/**
+            artifacts/build/**
+            .npm-cache/_logs/**
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Warn when retained release artifact upload is skipped
+        if: steps.upload_retained_release_artifacts.outcome == 'failure'
+        shell: pwsh
+        run: |
+          Write-Host "::warning::GitHub Actions retained artifact upload failed. The release job will continue so GitHub release assets can still be published; check repository or organization Actions storage quota if retained artifacts are required."
+
+      - name: Warn when release diagnostics upload is skipped
+        if: steps.upload_release_diagnostics.outcome == 'failure'
+        shell: pwsh
+        run: |
+          Write-Host "::warning::GitHub Actions release diagnostics upload failed. Verification output remains in the live job log, but stdout/stderr files and partial artifacts were not retained."
+
+      - name: Publish GitHub release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            artifacts/packages/*
+            artifacts/logs/release-evidence.json
+            artifacts/logs/third-party-notices.json
+            artifacts/logs/sbom.cdx.json

@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+    <title>OnlySpeech Marketplace Demo Video</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #07111f;
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+        font-family: "Segoe UI", "Aptos", sans-serif;
+      }
+
+      canvas {
+        width: 1920px;
+        height: 1080px;
+        background: linear-gradient(135deg, #07111f, #113a5c);
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="demo-canvas" width="1920" height="1080"></canvas>
+    <script>
+      const canvas = document.getElementById("demo-canvas");
+      const context = canvas.getContext("2d");
+      const width = canvas.width;
+      const height = canvas.height;
+
+      const timeline = [
+        {
+          id: "intro",
+          durationMs: 3200,
+          title: "OnlySpeech",
+          eyebrow: "Windows desktop communication aid",
+          description:
+            "AI-assisted two-display workflow for guided in-person conversations."
+        },
+        {
+          id: "stations",
+          durationMs: 3400,
+          image: "../../docs/product/screenshots/setup-stations.png",
+          title: "Two-display setup",
+          description:
+            "Assign both workstation screens and keep the kiosk layout aligned before go-live."
+        },
+        {
+          id: "languages",
+          durationMs: 3200,
+          image: "../../docs/product/screenshots/setup-languages-tts.png",
+          title: "Languages and playback",
+          description:
+            "Choose the provider, confirm supported languages, and validate provider-owned TTS."
+        },
+        {
+          id: "diagnostics",
+          durationMs: 3200,
+          image: "../../docs/product/screenshots/setup-diagnostics.png",
+          title: "Guided diagnostics",
+          description:
+            "Check monitors, microphones, and runtime readiness from one integrated setup wizard."
+        },
+        {
+          id: "operator",
+          durationMs: 3500,
+          image: "../../docs/product/screenshots/runtime-operator-view.png",
+          title: "Operator-side runtime",
+          description:
+            "The speaking side sees transcript, controls the session, and can reopen setup when needed."
+        },
+        {
+          id: "visitor",
+          durationMs: 3500,
+          image: "../../docs/product/screenshots/runtime-visitor-view.png",
+          title: "Visitor-side runtime",
+          description:
+            "The opposite screen receives translated output in the same shared conversation flow."
+        }
+      ];
+
+      const totalDurationMs = timeline.reduce(
+        (sum, scene) => sum + scene.durationMs,
+        0
+      );
+      const sceneTransitionsMs = 500;
+
+      function clamp(value, min, max) {
+        return Math.min(Math.max(value, min), max);
+      }
+
+      function easeOutCubic(value) {
+        return 1 - Math.pow(1 - value, 3);
+      }
+
+      function easeInOutCubic(value) {
+        return value < 0.5
+          ? 4 * value * value * value
+          : 1 - Math.pow(-2 * value + 2, 3) / 2;
+      }
+
+      function roundedRect(x, y, w, h, r) {
+        const radius = Math.min(r, w / 2, h / 2);
+        context.beginPath();
+        context.moveTo(x + radius, y);
+        context.arcTo(x + w, y, x + w, y + h, radius);
+        context.arcTo(x + w, y + h, x, y + h, radius);
+        context.arcTo(x, y + h, x, y, radius);
+        context.arcTo(x, y, x + w, y, radius);
+        context.closePath();
+      }
+
+      function drawBadge(x, y, label) {
+        context.font = "600 26px 'Segoe UI', sans-serif";
+        const textWidth = context.measureText(label).width;
+        roundedRect(x, y, textWidth + 34, 48, 24);
+        context.fillStyle = "rgba(6, 17, 33, 0.68)";
+        context.fill();
+        context.strokeStyle = "rgba(160, 215, 255, 0.28)";
+        context.lineWidth = 2;
+        context.stroke();
+        context.fillStyle = "#d4f3ff";
+        context.fillText(label, x + 17, y + 32);
+      }
+
+      function drawImageCover(image, zoom, panX, panY) {
+        const scale = Math.max(width / image.width, height / image.height) * zoom;
+        const drawWidth = image.width * scale;
+        const drawHeight = image.height * scale;
+        const x = (width - drawWidth) / 2 + panX;
+        const y = (height - drawHeight) / 2 + panY;
+
+        context.drawImage(image, x, y, drawWidth, drawHeight);
+      }
+
+      function drawBackground() {
+        const gradient = context.createLinearGradient(0, 0, width, height);
+        gradient.addColorStop(0, "#07111f");
+        gradient.addColorStop(0.58, "#12395a");
+        gradient.addColorStop(1, "#1c7aa0");
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, width, height);
+
+        context.fillStyle = "rgba(255, 255, 255, 0.045)";
+        context.beginPath();
+        context.arc(320, 220, 220, 0, Math.PI * 2);
+        context.fill();
+        context.beginPath();
+        context.arc(1540, 840, 280, 0, Math.PI * 2);
+        context.fill();
+      }
+
+      function drawChrome(scene, fade, titleYOffset) {
+        context.save();
+        context.globalAlpha = fade;
+        drawBadge(76, 64, "Windows desktop");
+        drawBadge(334, 64, "AI-assisted");
+        drawBadge(546, 64, "Two displays");
+
+        const panelX = 76;
+        const panelY = 794 + titleYOffset;
+        const panelWidth = 1768;
+        const panelHeight = 214;
+
+        roundedRect(panelX, panelY, panelWidth, panelHeight, 28);
+        context.fillStyle = "rgba(6, 17, 33, 0.76)";
+        context.fill();
+        context.strokeStyle = "rgba(173, 225, 255, 0.2)";
+        context.lineWidth = 2;
+        context.stroke();
+
+        context.fillStyle = "#9ce5ff";
+        context.font = "700 52px 'Segoe UI', sans-serif";
+        context.fillText(scene.title, panelX + 44, panelY + 84);
+
+        if (scene.eyebrow) {
+          context.font = "600 24px 'Segoe UI', sans-serif";
+          context.fillStyle = "rgba(223, 246, 255, 0.88)";
+          context.fillText(scene.eyebrow, panelX + 44, panelY + 124);
+        }
+
+        context.font = "500 31px 'Segoe UI', sans-serif";
+        context.fillStyle = "#f6fbff";
+        wrapText(scene.description, panelX + 44, panelY + 156, panelWidth - 88, 42);
+        context.restore();
+      }
+
+      function wrapText(text, x, y, maxWidth, lineHeight) {
+        const words = text.split(" ");
+        let line = "";
+        let cursorY = y;
+
+        for (const word of words) {
+          const candidate = line ? `${line} ${word}` : word;
+          if (context.measureText(candidate).width > maxWidth && line) {
+            context.fillText(line, x, cursorY);
+            line = word;
+            cursorY += lineHeight;
+          } else {
+            line = candidate;
+          }
+        }
+
+        if (line) {
+          context.fillText(line, x, cursorY);
+        }
+      }
+
+      function drawIntro(scene, sceneProgress) {
+        drawBackground();
+
+        const introGlow = context.createRadialGradient(
+          width * 0.48,
+          height * 0.44,
+          60,
+          width * 0.48,
+          height * 0.44,
+          640
+        );
+        introGlow.addColorStop(0, "rgba(163, 233, 255, 0.34)");
+        introGlow.addColorStop(1, "rgba(163, 233, 255, 0)");
+        context.fillStyle = introGlow;
+        context.fillRect(0, 0, width, height);
+
+        const icon = assets.icon;
+        const iconScale = 0.9 + 0.08 * easeOutCubic(sceneProgress);
+        const iconSize = 190 * iconScale;
+        const iconX = width / 2 - iconSize / 2;
+        const iconY = 176 - iconSize / 2;
+
+        roundedRect(width / 2 - 154, 140, 308, 308, 48);
+        context.fillStyle = "rgba(255, 255, 255, 0.08)";
+        context.fill();
+        context.drawImage(icon, iconX, iconY, iconSize, iconSize);
+
+        context.save();
+        context.translate(width / 2, 520);
+        const titleScale = 0.98 + 0.02 * easeOutCubic(sceneProgress);
+        context.scale(titleScale, titleScale);
+        context.textAlign = "center";
+        context.fillStyle = "#f7fcff";
+        context.font = "700 84px 'Segoe UI', sans-serif";
+        context.fillText(scene.title, 0, 0);
+        context.fillStyle = "#9ce5ff";
+        context.font = "600 36px 'Segoe UI', sans-serif";
+        context.fillText(scene.eyebrow, 0, 72);
+        context.restore();
+
+        drawChrome(scene, 1, 0);
+      }
+
+      function computeSceneAtTime(timeMs) {
+        let elapsed = 0;
+
+        for (let index = 0; index < timeline.length; index += 1) {
+          const scene = timeline[index];
+          const startsAt = elapsed;
+          const endsAt = elapsed + scene.durationMs;
+          if (timeMs <= endsAt || index === timeline.length - 1) {
+            return {
+              index,
+              scene,
+              localTimeMs: timeMs - startsAt,
+              sceneProgress: clamp((timeMs - startsAt) / scene.durationMs, 0, 1),
+              fadeIn:
+                index === 0
+                  ? 1
+                  : clamp((timeMs - startsAt) / sceneTransitionsMs, 0, 1),
+              fadeOut:
+                index === timeline.length - 1
+                  ? 1
+                  : clamp((endsAt - timeMs) / sceneTransitionsMs, 0, 1)
+            };
+          }
+          elapsed = endsAt;
+        }
+
+        return {
+          index: timeline.length - 1,
+          scene: timeline[timeline.length - 1],
+          localTimeMs: 0,
+          sceneProgress: 1,
+          fadeIn: 1,
+          fadeOut: 1
+        };
+      }
+
+      function drawImageScene(scene, sceneProgress, fade) {
+        drawBackground();
+        context.save();
+        context.globalAlpha = fade;
+
+        const image = assets[scene.id];
+        const zoom = 1.02 + 0.04 * easeInOutCubic(sceneProgress);
+        const panX = scene.id === "visitor" ? -42 * sceneProgress : 30 * sceneProgress;
+        const panY = scene.id === "operator" ? -22 * sceneProgress : -14 * sceneProgress;
+
+        context.save();
+        roundedRect(44, 44, width - 88, height - 88, 42);
+        context.clip();
+        drawImageCover(image, zoom, panX, panY);
+
+        const topShade = context.createLinearGradient(0, 0, 0, 360);
+        topShade.addColorStop(0, "rgba(7, 17, 31, 0.58)");
+        topShade.addColorStop(1, "rgba(7, 17, 31, 0)");
+        context.fillStyle = topShade;
+        context.fillRect(0, 0, width, 360);
+
+        const bottomShade = context.createLinearGradient(0, height, 0, height - 420);
+        bottomShade.addColorStop(0, "rgba(7, 17, 31, 0.9)");
+        bottomShade.addColorStop(1, "rgba(7, 17, 31, 0)");
+        context.fillStyle = bottomShade;
+        context.fillRect(0, 0, width, height);
+        context.restore();
+
+        context.strokeStyle = "rgba(209, 240, 255, 0.18)";
+        context.lineWidth = 2;
+        roundedRect(44, 44, width - 88, height - 88, 42);
+        context.stroke();
+
+        drawChrome(scene, 1, 0);
+        context.restore();
+      }
+
+      function drawFrame(timeMs) {
+        const state = computeSceneAtTime(timeMs);
+        const fade = clamp(Math.min(state.fadeIn, state.fadeOut), 0, 1);
+
+        context.clearRect(0, 0, width, height);
+
+        if (state.scene.id === "intro") {
+          drawIntro(state.scene, state.sceneProgress);
+          return;
+        }
+
+        if (state.index > 0) {
+          const previousScene = timeline[state.index - 1];
+          if (state.fadeIn < 1) {
+            const previousFade = 1 - state.fadeIn;
+            if (previousScene.id === "intro") {
+              drawIntro(previousScene, 1);
+              context.save();
+              context.globalAlpha = previousFade;
+              context.fillStyle = `rgba(7, 17, 31, ${state.fadeIn})`;
+              context.fillRect(0, 0, width, height);
+              context.restore();
+            } else {
+              drawImageScene(previousScene, 1, previousFade);
+            }
+          }
+        }
+
+        drawImageScene(state.scene, state.sceneProgress, fade);
+      }
+
+      function supportsMediaRecorderType() {
+        const preferredTypes = [
+          "video/mp4;codecs=avc1.42E01E",
+          "video/mp4",
+          "video/webm;codecs=vp9",
+          "video/webm;codecs=vp8",
+          "video/webm"
+        ];
+
+        for (const mimeType of preferredTypes) {
+          if (MediaRecorder.isTypeSupported(mimeType)) {
+            return mimeType;
+          }
+        }
+
+        return "";
+      }
+
+      function arrayBufferToBase64(buffer) {
+        const bytes = new Uint8Array(buffer);
+        const chunkSize = 0x8000;
+        let binary = "";
+
+        for (let index = 0; index < bytes.length; index += chunkSize) {
+          const slice = bytes.subarray(index, index + chunkSize);
+          binary += String.fromCharCode(...slice);
+        }
+
+        return btoa(binary);
+      }
+
+      function preloadImage(src) {
+        return new Promise((resolve, reject) => {
+          const image = new Image();
+          image.onload = () => resolve(image);
+          image.onerror = () =>
+            reject(new Error(`Unable to load marketplace demo asset: ${src}`));
+          image.src = src;
+        });
+      }
+
+      async function prepareAssets() {
+        const sources = {
+          icon: "../../build/icon.png",
+          stations: "../../docs/product/screenshots/setup-stations.png",
+          languages: "../../docs/product/screenshots/setup-languages-tts.png",
+          diagnostics: "../../docs/product/screenshots/setup-diagnostics.png",
+          operator: "../../docs/product/screenshots/runtime-operator-view.png",
+          visitor: "../../docs/product/screenshots/runtime-visitor-view.png"
+        };
+
+        const entries = await Promise.all(
+          Object.entries(sources).map(async ([key, src]) => [key, await preloadImage(src)])
+        );
+
+        return Object.fromEntries(entries);
+      }
+
+      const assetsPromise = prepareAssets();
+      let assets = null;
+
+      async function renderMarketplaceDemoVideo() {
+        assets = await assetsPromise;
+        const mimeType = supportsMediaRecorderType();
+        if (!mimeType) {
+          throw new Error("No supported MediaRecorder codec found.");
+        }
+
+        drawFrame(0);
+        const posterBase64 = canvas
+          .toDataURL("image/png")
+          .replace(/^data:image\/png;base64,/, "");
+
+        const stream = canvas.captureStream(30);
+        const chunks = [];
+        const recorder = new MediaRecorder(stream, {
+          mimeType,
+          videoBitsPerSecond: 4_500_000
+        });
+
+        recorder.addEventListener("dataavailable", (event) => {
+          if (event.data && event.data.size > 0) {
+            chunks.push(event.data);
+          }
+        });
+
+        const finished = new Promise((resolve, reject) => {
+          recorder.addEventListener("stop", async () => {
+            try {
+              const blob = new Blob(chunks, { type: mimeType });
+              const buffer = await blob.arrayBuffer();
+              resolve({
+                videoBase64: arrayBufferToBase64(buffer),
+                posterBase64,
+                durationMs: totalDurationMs,
+                mimeType,
+                sizeBytes: buffer.byteLength
+              });
+            } catch (error) {
+              reject(error);
+            }
+          });
+
+          recorder.addEventListener("error", (event) => {
+            reject(event.error ?? new Error("MediaRecorder error."));
+          });
+        });
+
+        recorder.start(250);
+
+        await new Promise((resolve) => {
+          const startedAt = performance.now();
+
+          function step(now) {
+            const elapsed = clamp(now - startedAt, 0, totalDurationMs);
+            drawFrame(elapsed);
+            if (elapsed >= totalDurationMs) {
+              resolve();
+              return;
+            }
+            requestAnimationFrame(step);
+          }
+
+          requestAnimationFrame(step);
+        });
+
+        await new Promise((resolve) => setTimeout(resolve, 350));
+        recorder.stop();
+        return finished;
+      }
+
+      window.renderMarketplaceDemoVideo = renderMarketplaceDemoVideo;
+    </script>
+  </body>
+</html>

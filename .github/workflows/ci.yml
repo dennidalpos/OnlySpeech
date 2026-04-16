@@ -1,0 +1,130 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  verify-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Read package version
+        id: package
+        shell: pwsh
+        run: |
+          $version = node -p "require('./package.json').version"
+          "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Run canonical repository verification with diagnostics
+        shell: pwsh
+        env:
+          CI: "true"
+        run: |
+          $diagnosticsRoot = Join-Path $env:RUNNER_TEMP "onlyspeech-ci-diagnostics"
+          New-Item -ItemType Directory -Path $diagnosticsRoot -Force | Out-Null
+
+          $stdoutPath = Join-Path $diagnosticsRoot "verify.stdout.log"
+          $stderrPath = Join-Path $diagnosticsRoot "verify.stderr.log"
+          $exitCodePath = Join-Path $diagnosticsRoot "verify.exitcode.txt"
+          $summaryPath = Join-Path $diagnosticsRoot "verify.summary.txt"
+          $npmCommand = (Get-Command npm.cmd -ErrorAction Stop).Source
+
+          $process = Start-Process `
+            -FilePath $npmCommand `
+            -ArgumentList @("run", "verify:repo", "--", "-KeepOutputs", "-EnablePackagedAutomation") `
+            -WorkingDirectory $PWD `
+            -RedirectStandardOutput $stdoutPath `
+            -RedirectStandardError $stderrPath `
+            -PassThru `
+            -Wait `
+            -NoNewWindow
+
+          $exitCode = $process.ExitCode
+          Set-Content -LiteralPath $exitCodePath -Value "$exitCode" -Encoding utf8
+          Set-Content -LiteralPath $summaryPath -Value @(
+            "command=npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation"
+            "exit_code=$exitCode"
+            "stdout=$stdoutPath"
+            "stderr=$stderrPath"
+          ) -Encoding utf8
+
+          if (Test-Path -LiteralPath $stdoutPath) {
+            Write-Host "::group::verify stdout"
+            Get-Content -LiteralPath $stdoutPath
+            Write-Host "::endgroup::"
+          }
+
+          if (Test-Path -LiteralPath $stderrPath) {
+            $stderrLines = Get-Content -LiteralPath $stderrPath
+            if ($stderrLines.Count -gt 0) {
+              Write-Host "::group::verify stderr"
+              $stderrLines | ForEach-Object { [Console]::Error.WriteLine($_) }
+              Write-Host "::endgroup::"
+            }
+          }
+
+          if ($exitCode -ne 0) {
+            Write-Host "::error::Canonical repository verification failed. Inspect the uploaded CI diagnostics artifact for stdout, stderr, and partial artifacts."
+            exit $exitCode
+          }
+
+      - name: Upload Windows verification artifacts
+        id: upload_verification_artifacts
+        if: success() && github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        continue-on-error: true
+        uses: actions/upload-artifact@v6
+        with:
+          name: onlyspeech-windows-${{ steps.package.outputs.version }}-${{ github.sha }}
+          path: |
+            artifacts/packages/*
+            artifacts/logs/release-evidence.json
+            artifacts/logs/third-party-notices.json
+            artifacts/logs/sbom.cdx.json
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Upload CI diagnostics
+        id: upload_ci_diagnostics
+        if: failure() || cancelled()
+        continue-on-error: true
+        uses: actions/upload-artifact@v6
+        with:
+          name: onlyspeech-ci-diagnostics-${{ steps.package.outputs.version }}-${{ github.sha }}
+          path: |
+            artifacts/logs/**
+            artifacts/build/**
+            .npm-cache/_logs/**
+            ${{ runner.temp }}/onlyspeech-ci-diagnostics/**
+          if-no-files-found: warn
+          retention-days: 1
+
+      - name: Warn when verification artifact retention upload is skipped
+        if: steps.upload_verification_artifacts.outcome == 'failure'
+        shell: pwsh
+        run: |
+          Write-Host "::warning::GitHub Actions artifact upload failed after verification completed. The most common external cause is exhausted artifact storage quota; release assets are unaffected by this CI retention step."
+
+      - name: Warn when CI diagnostics upload is skipped
+        if: steps.upload_ci_diagnostics.outcome == 'failure'
+        shell: pwsh
+        run: |
+          Write-Host "::warning::GitHub Actions CI diagnostics upload failed. Verification output remains in the live job log, but stdout/stderr files and partial artifacts were not retained."
