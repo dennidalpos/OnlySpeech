@@ -215,6 +215,7 @@ Repo-local generated outputs are ignored by `.gitignore`; tracked product screen
 The repository can be locally aligned and technically verified without claiming end-customer release readiness. Final rollout still depends on:
 
 - Windows code-signing credentials;
+- packaged activation validation on the real target workstation with customer activation inputs;
 - a physical target workstation with actual displays, microphones, speakers, and touch hardware;
 - previous signed installers for upgrade and rollback validation;
 - deployment-specific legal and privacy review outside the repository.

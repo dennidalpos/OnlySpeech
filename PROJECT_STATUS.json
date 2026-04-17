@@ -5,6 +5,7 @@
       "priority": 1,
       "title": "Configure Windows code-signing inputs for tagged releases",
       "status": "blocked",
+      "verification_state": "NON_VERIFIABLE",
       "scope": "core",
       "risk": "HIGH",
       "area": "release-signing",
@@ -29,7 +30,9 @@
         "Windows signing certificate material and password are not available in the local environment"
       ],
       "verification": {
-        "verified": [],
+        "verified": [
+          "VERIFICATO: ONLYSPEECH_REQUIRE_WINDOWS_SIGNING=true npm run release:signing-check fails locally because WIN_CSC_LINK/CSC_LINK and WIN_CSC_KEY_PASSWORD/CSC_KEY_PASSWORD are not available"
+        ],
         "inspected_only": [
           "ISPEZIONATO: release workflow, signing script, and PROJECT_SPEC release requirements"
         ],
@@ -49,6 +52,7 @@
       "priority": 2,
       "title": "Validate installer upgrade and rollback against retained comparison installers",
       "status": "blocked",
+      "verification_state": "NON_VERIFIABLE",
       "scope": "core",
       "risk": "HIGH",
       "area": "packaged-lifecycle",
@@ -70,10 +74,12 @@
         "Run the packaged lifecycle script with retained previous and rollback installers before treating the packaged release path as complete."
       ],
       "blocked_by": [
-        "Previous signed installer and rollback installer are not present in the repository context"
+        "Previous signed installer and rollback installer are not present in the local repository context or under artifacts/packages"
       ],
       "verification": {
-        "verified": [],
+        "verified": [
+          "VERIFICATO: artifacts/packages currently contains only the current 0.1.0 installer, portable executable, and unpacked archive; no retained previous or rollback installers are available locally"
+        ],
         "inspected_only": [
           "ISPEZIONATO: packaged lifecycle script, related test coverage, and release documentation"
         ],
@@ -93,6 +99,7 @@
       "priority": 3,
       "title": "Complete packaged activation validation on the target workstation",
       "status": "blocked",
+      "verification_state": "NON_VERIFIABLE",
       "scope": "core",
       "risk": "HIGH",
       "area": "commissioning",
@@ -105,7 +112,8 @@
       "evidence": [
         "docs/internal/testing/packaged-activation-commissioning-runbook.md defines the retained activation validation procedure",
         "package.json exposes npm run activation:template",
-        "src/main/trial-tombstone.ts and activation tests cover the local activation and trial mechanisms"
+        "src/main/trial-tombstone.ts and activation tests cover the local activation and trial mechanisms",
+        "artifacts/logs/activation-validation.json exists after npm run activation:template, but every packaged activation scenario is still pending"
       ],
       "impact": [
         "Packaged activation, reinstall, trial-expiry, and workstation-specific activation evidence remain incomplete."
@@ -114,10 +122,12 @@
         "Execute the packaged activation runbook on the real target workstation and retain the generated activation evidence artifact."
       ],
       "blocked_by": [
-        "Real packaged build, target workstation, purchased customer email, and activation code are required"
+        "Target workstation, purchased customer email, and activation code are still required for the packaged activation pass"
       ],
       "verification": {
-        "verified": [],
+        "verified": [
+          "VERIFICATO: npm run activation:template wrote artifacts/logs/activation-validation.json"
+        ],
         "inspected_only": [
           "ISPEZIONATO: packaged activation runbook, npm surface, and activation/trial code paths"
         ],
@@ -127,7 +137,6 @@
         ]
       },
       "acceptance_criteria": [
-        "npm run activation:template refreshes artifacts/logs/activation-validation.json",
         "Valid first activation is recorded as passed with retained evidence",
         "Invalid code and email mismatch checks are recorded with observed outcomes",
         "Startup blocking before activation and startup unlock after persisted activation are recorded",
@@ -142,6 +151,7 @@
       "priority": 4,
       "title": "Close target-station commissioning evidence",
       "status": "blocked",
+      "verification_state": "NON_VERIFIABLE",
       "scope": "core",
       "risk": "HIGH",
       "area": "commissioning",
@@ -154,29 +164,34 @@
       "evidence": [
         "docs/internal/testing/packaged-activation-commissioning-runbook.md defines the target-station close-out flow",
         "package.json exposes npm run commission:template, npm run commission:automation, and npm run commission:handover",
-        "scripts/internal/commissioning/write-commissioning-artifact.ps1 defines the target-station validation checks and remaining-check summary"
+        "scripts/internal/commissioning/write-commissioning-artifact.ps1 defines the target-station validation checks and remaining-check summary",
+        "artifacts/logs/target-station-validation.json and artifacts/build/commissioning-template/commissioning-evidence.json exist after npm run commission:template, but the retained validation summary still reports 10 pending checks"
       ],
       "impact": [
         "Commissioning evidence for the real workstation remains incomplete, so deployment handover cannot be closed from repository evidence alone."
       ],
       "recommended_action": [
-        "Run the commissioning template, automation, and handover flow on the target Windows workstation and close all remaining checks."
+        "Run the commissioning automation and handover flow on the target Windows workstation, then close all remaining manual checks."
       ],
       "blocked_by": [
-        "Real target Windows workstation with its actual displays, microphones, and touch hardware is required"
+        "Real target Windows workstation with its actual displays, microphones, and touch hardware is required; local automation did not complete the commissioning checks on the current workstation"
       ],
       "verification": {
-        "verified": [],
+        "verified": [
+          "VERIFICATO: npm run commission:template wrote artifacts/logs/target-station-validation.json and artifacts/build/commissioning-template/commissioning-evidence.json",
+          "VERIFICATO: npm run commission:automation timed out locally before the automation condition was satisfied, so the target-station validation file remains open"
+        ],
         "inspected_only": [
           "ISPEZIONATO: target-station runbook, npm commands, and commissioning artifact generator"
         ],
-        "not_verified": [],
+        "not_verified": [
+          "NON VERIFICATO: npm run commission:handover was not executed because target-station validation still has pending checks"
+        ],
         "non_verifiable": [
           "NON VERIFICABILE: target-station close-out without the real workstation hardware"
         ]
       },
       "acceptance_criteria": [
-        "npm run commission:template refreshes artifacts/logs/target-station-validation.json",
         "npm run commission:automation updates checks it can observe on the active workstation",
         "Manual display-side, microphone-side, provider-exchange, runtime-log, and touch-input checks are recorded as passed, failed, or not_applicable",
         "npm run commission:handover writes artifacts/logs/commissioning-evidence.json",
@@ -188,6 +203,7 @@
       "priority": 5,
       "title": "Complete live provider speech proof on real hardware",
       "status": "blocked",
+      "verification_state": "NON_VERIFIABLE",
       "scope": "core",
       "risk": "HIGH",
       "area": "speech-validation",
@@ -200,7 +216,8 @@
       "evidence": [
         "docs/internal/testing/language-speech-matrix.md defines the manual Microphone -> STT -> translation -> TTS validation matrix",
         "package.json exposes npm run speech:matrix-template",
-        "docs/PROJECT_SPEC.md keeps Azure and ChatGPT playback provider-owned with no local TTS fallback"
+        "docs/PROJECT_SPEC.md keeps Azure and ChatGPT playback provider-owned with no local TTS fallback",
+        "artifacts/logs/live-provider-speech-proof.json exists after npm run speech:matrix-template and currently records pending scenarios with chatgpt provider credentials not configured in the packaged runtime env"
       ],
       "impact": [
         "The live speech provider path is not yet closed with retained evidence on real hardware and real credentials."
@@ -209,10 +226,12 @@
         "Run the live provider speech matrix on the target workstation with provisioned credentials and attach the retained proof artifact."
       ],
       "blocked_by": [
-        "Configured provider credentials, microphones, speakers, and target workstation access are required"
+        "Configured provider credentials, microphones, speakers, and target workstation access are required; the current packaged runtime env does not have provider speech credentials configured"
       ],
       "verification": {
-        "verified": [],
+        "verified": [
+          "VERIFICATO: npm run speech:matrix-template wrote artifacts/logs/live-provider-speech-proof.json"
+        ],
         "inspected_only": [
           "ISPEZIONATO: live speech matrix runbook, npm template command, and provider-owned playback boundary"
         ],
@@ -222,7 +241,6 @@
         ]
       },
       "acceptance_criteria": [
-        "npm run speech:matrix-template refreshes artifacts/logs/live-provider-speech-proof.json",
         "Initial save behavior is recorded for supported-language and uncovered-language selections",
         "Provider translation validation is recorded for the selected provider",
         "Live microphone or final-turn speech validation is recorded for the selected provider",
@@ -235,6 +253,7 @@
       "priority": 6,
       "title": "Complete deployment-specific legal and privacy review",
       "status": "blocked",
+      "verification_state": "NON_VERIFIABLE",
       "scope": "supporting",
       "risk": "HIGH",
       "area": "commercial-readiness",
@@ -272,42 +291,6 @@
         "Customer-specific controller, processor, DPA, retention, and provider-region decisions are reviewed outside the repository",
         "Buyer-facing customer-bundle documents are accepted or amended for the target deployment",
         "Release notes or handover materials avoid claiming legal completion beyond the reviewed deployment scope"
-      ]
-    },
-    {
-      "id": "ts-pre-existing-test-type-errors",
-      "priority": 7,
-      "title": "Fix pre-existing TypeScript errors in test suite",
-      "status": "closed",
-      "scope": "supporting",
-      "risk": "LOW",
-      "area": "test-quality",
-      "category": "technical_debt",
-      "files": [
-        "tests/azure-text-to-speech-provider.test.ts",
-        "tests/bootstrap-flow.test.ts",
-        "tests/kiosk-display-runtime.test.ts",
-        "tests/operator-app-ui-smoke.test.tsx",
-        "tests/operator-setup-access.test.tsx",
-        "tests/packaged-runtime-automation.test.ts",
-        "tests/run-pack.test.ts",
-        "tests/session-store.test.ts",
-        "tests/setup-wizard-dom-test-helpers.ts",
-        "tests/setup-wizard-manager.test.ts",
-        "tests/setup-wizard-pages.test.ts",
-        "tests/setup-wizard-shared.test.ts",
-        "tests/write-live-provider-speech-proof-artifact.test.ts"
-      ],
-      "verification": {
-        "verified": [
-          "npx tsc --noEmit exits 0 after fixes applied"
-        ],
-        "inspected_only": [],
-        "not_verified": [],
-        "non_verifiable": []
-      },
-      "acceptance_criteria": [
-        "npx tsc --noEmit exits 0 with no errors in the test files listed above"
       ]
     }
   ]
