@@ -147,7 +147,7 @@ describe("setup wizard shared state", () => {
     expect(envText).toContain(
       `MIC_B_ID=${getPersistedMicrophoneId({ deviceId: "mic-b", groupId: "g2", label: "Mic B" }, [
         ...state.microphones,
-        { deviceId: "mic-b", groupId: "g2", label: "Mic B", assignedSides: ["B"] }
+        { deviceId: "mic-b", groupId: "g2", label: "Mic B" }
       ])}`
     );
     expect(envText).toContain("AZURE_SPEECH_REGION=westeurope");

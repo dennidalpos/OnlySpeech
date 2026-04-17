@@ -152,7 +152,7 @@ describe("package.json Windows packaging metadata", () => {
     const packageJson = JSON.parse(readFileSync(join(process.cwd(), "package.json"), "utf8")) as {
       build: {
         artifactName: string;
-        win: { icon: string };
+        win: { icon: string; target: string[] };
         nsis: Record<string, unknown>;
         portable: Record<string, unknown>;
       };

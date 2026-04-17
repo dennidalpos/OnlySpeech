@@ -273,6 +273,42 @@
         "Buyer-facing customer-bundle documents are accepted or amended for the target deployment",
         "Release notes or handover materials avoid claiming legal completion beyond the reviewed deployment scope"
       ]
+    },
+    {
+      "id": "ts-pre-existing-test-type-errors",
+      "priority": 7,
+      "title": "Fix pre-existing TypeScript errors in test suite",
+      "status": "closed",
+      "scope": "supporting",
+      "risk": "LOW",
+      "area": "test-quality",
+      "category": "technical_debt",
+      "files": [
+        "tests/azure-text-to-speech-provider.test.ts",
+        "tests/bootstrap-flow.test.ts",
+        "tests/kiosk-display-runtime.test.ts",
+        "tests/operator-app-ui-smoke.test.tsx",
+        "tests/operator-setup-access.test.tsx",
+        "tests/packaged-runtime-automation.test.ts",
+        "tests/run-pack.test.ts",
+        "tests/session-store.test.ts",
+        "tests/setup-wizard-dom-test-helpers.ts",
+        "tests/setup-wizard-manager.test.ts",
+        "tests/setup-wizard-pages.test.ts",
+        "tests/setup-wizard-shared.test.ts",
+        "tests/write-live-provider-speech-proof-artifact.test.ts"
+      ],
+      "verification": {
+        "verified": [
+          "npx tsc --noEmit exits 0 after fixes applied"
+        ],
+        "inspected_only": [],
+        "not_verified": [],
+        "non_verifiable": []
+      },
+      "acceptance_criteria": [
+        "npx tsc --noEmit exits 0 with no errors in the test files listed above"
+      ]
     }
   ]
 }

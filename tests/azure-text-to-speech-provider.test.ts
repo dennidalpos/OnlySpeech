@@ -89,7 +89,7 @@ function createStartCommand(language: string, overrides: Partial<StartTextToSpee
     requestId: "azure-tts-req-1",
     text: "مرحبا من OnlySpeech",
     language,
-    engine: "system",
+    engine: "azure",
     translationProvider: "azure",
     azureSpeechKey: "azure-key",
     azureSpeechRegion: "westeurope",

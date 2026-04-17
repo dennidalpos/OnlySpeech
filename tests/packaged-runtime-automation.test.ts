@@ -6,7 +6,6 @@ import { afterEach, describe, expect, it } from "vitest";
 import { createPersistedActivationState, persistActivationState } from "../src/main/activation-storage.js";
 import { getActivationStateFilePath } from "../src/main/runtime-paths.js";
 
-const repoRoot = process.cwd();
 const packagedExecutable = process.env.ONLYSPEECH_PACKAGED_EXECUTABLE ?? "";
 const describeWindowsPackaged =
   process.platform === "win32" && packagedExecutable.length > 0 && existsSync(packagedExecutable) ? describe : describe.skip;

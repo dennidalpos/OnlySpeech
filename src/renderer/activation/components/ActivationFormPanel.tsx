@@ -97,7 +97,7 @@ export function ActivationFormPanel({
         </ActivationField>
 
         <ActivationButtonBar className="activation-actions">
-          <button className="activation-submit" disabled={isSubmitting} type="submit">
+          <button className="activation-submit" disabled={isSubmitting || isTrialSubmitting} type="submit">
             {isSubmitting ? text.pendingLabel : text.submitLabel}
           </button>
           <button

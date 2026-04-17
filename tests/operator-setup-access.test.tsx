@@ -257,7 +257,7 @@ async function renderOperatorApp(harness: SetupAccessHarness): Promise<void> {
   root = ReactDOM.createRoot(container);
 
   await act(async () => {
-    root.render(<OperatorApp />);
+    root!.render(<OperatorApp />);
     await Promise.resolve();
   });
 

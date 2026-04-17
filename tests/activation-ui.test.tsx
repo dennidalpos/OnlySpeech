@@ -74,12 +74,12 @@ function createApi(overrides: Partial<OnlySpeechRendererApi> = {}): OnlySpeechRe
     getActivationGateState: vi.fn(async () => ({
       status: "required",
       message: "Activation is required before startup can continue."
-    })),
+    } as const)),
     submitActivation: vi.fn(async () => ({
       ok: true,
       status: "success",
       message: "Activation successful."
-    })),
+    } as const)),
     sendOperatorAction: vi.fn(),
     openSetupWizard: vi.fn(),
     sendDeviceProbe: vi.fn(),
@@ -109,7 +109,7 @@ describe("activation ui", () => {
       getActivationGateState: vi.fn(async () => ({
         status: "clock-rollback",
         message: "Local clock rollback exceeds the offline activation tolerance."
-      }))
+      } as const))
     }));
 
     expect(bodyText()).toContain("Local clock rollback exceeds the offline activation tolerance.");
@@ -167,7 +167,7 @@ describe("activation ui", () => {
         ok: false,
         status: "email-mismatch",
         message: "Activation code does not match the provided customer email."
-      }))
+      } as const))
     });
 
     await renderActivationApp(api);
@@ -189,7 +189,7 @@ describe("activation ui", () => {
         ok: false,
         status: "expired-license",
         message: "The stored activation is expired."
-      }))
+      } as const))
     });
 
     await renderActivationApp(api);
@@ -232,7 +232,7 @@ describe("activation ui", () => {
         ok: false,
         status: "trial-exhausted",
         message: "The trial has already been used on this device. Purchase a license to continue."
-      }))
+      } as const))
     });
 
     await renderActivationApp(api);

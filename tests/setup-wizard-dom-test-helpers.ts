@@ -1,5 +1,5 @@
-import { afterEach, vi } from "vitest";
-import { JSDOM } from "jsdom";
+import { afterEach, vi, type Mock } from "vitest";
+import { JSDOM, type DOMWindow } from "jsdom";
 import { assignDisplay, createInitialWizardState } from "../src/tools/setup-wizard/shared.js";
 import type { WizardState } from "../src/tools/setup-wizard/shared.js";
 import type {
@@ -8,34 +8,37 @@ import type {
   TrialAvailabilityState
 } from "../src/shared/types.js";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyMock = Mock<(...args: any[]) => any>;
+
 export interface WizardApiMock {
-  getState: ReturnType<typeof vi.fn>;
-  openMonitorSetup: ReturnType<typeof vi.fn>;
-  closeMonitorSetup: ReturnType<typeof vi.fn>;
-  assignDisplay: ReturnType<typeof vi.fn>;
-  assignMicrophone: ReturnType<typeof vi.fn>;
-  updateMicrophones: ReturnType<typeof vi.fn>;
-  updateSignalLevel: ReturnType<typeof vi.fn>;
-  updateEnvValues: ReturnType<typeof vi.fn>;
-  updateAutostart: ReturnType<typeof vi.fn>;
-  previewEnv: ReturnType<typeof vi.fn>;
-  saveEnv: ReturnType<typeof vi.fn>;
-  getAzureTextToSpeechCatalog: ReturnType<typeof vi.fn>;
-  openLogsFolder: ReturnType<typeof vi.fn>;
-  testProviderTranslation: ReturnType<typeof vi.fn>;
-  testProviderSpeech: ReturnType<typeof vi.fn>;
-  testTextToSpeech: ReturnType<typeof vi.fn>;
-  releaseTextToSpeech: ReturnType<typeof vi.fn>;
-  closeCurrentOverlay: ReturnType<typeof vi.fn>;
-  closeWizard: ReturnType<typeof vi.fn>;
-  getLicenseState: ReturnType<typeof vi.fn>;
-  getTrialAvailability: ReturnType<typeof vi.fn>;
-  submitNewLicense: ReturnType<typeof vi.fn>;
-  clearLicense: ReturnType<typeof vi.fn>;
-  submitTrial: ReturnType<typeof vi.fn>;
-  terminateApplication: ReturnType<typeof vi.fn>;
-  onState: ReturnType<typeof vi.fn>;
-  onTextToSpeechEvent: ReturnType<typeof vi.fn>;
+  getState: AnyMock;
+  openMonitorSetup: AnyMock;
+  closeMonitorSetup: AnyMock;
+  assignDisplay: AnyMock;
+  assignMicrophone: AnyMock;
+  updateMicrophones: AnyMock;
+  updateSignalLevel: AnyMock;
+  updateEnvValues: AnyMock;
+  updateAutostart: AnyMock;
+  previewEnv: AnyMock;
+  saveEnv: AnyMock;
+  getAzureTextToSpeechCatalog: AnyMock;
+  openLogsFolder: AnyMock;
+  testProviderTranslation: AnyMock;
+  testProviderSpeech: AnyMock;
+  testTextToSpeech: AnyMock;
+  releaseTextToSpeech: AnyMock;
+  closeCurrentOverlay: AnyMock;
+  closeWizard: AnyMock;
+  getLicenseState: AnyMock;
+  getTrialAvailability: AnyMock;
+  submitNewLicense: AnyMock;
+  clearLicense: AnyMock;
+  submitTrial: AnyMock;
+  terminateApplication: AnyMock;
+  onState: AnyMock;
+  onTextToSpeechEvent: AnyMock;
   emitState: (nextState: WizardState) => void;
   emitTextToSpeechEvent: (event: TextToSpeechEventPayload) => void;
 }
@@ -47,7 +50,7 @@ export interface Deferred<T> {
 }
 
 interface CreateDomOptions {
-  beforeParse?: (window: Window) => void;
+  beforeParse?: (window: DOMWindow) => void;
 }
 
 const openWindows: JSDOM[] = [];
@@ -325,12 +328,12 @@ export function createWizardApi(state: WizardState): WizardApiMock {
   };
 }
 
-export async function waitForScripts(window: Window): Promise<void> {
+export async function waitForScripts(window: DOMWindow): Promise<void> {
   await new Promise((resolve) => window.setTimeout(resolve, 0));
   await new Promise((resolve) => window.setTimeout(resolve, 0));
 }
 
-export function click(window: Window, selector: string): void {
+export function click(window: DOMWindow, selector: string): void {
   const element = window.document.querySelector(selector);
   if (!(element instanceof window.HTMLElement)) {
     throw new Error(`Element '${selector}' not found.`);
@@ -339,7 +342,7 @@ export function click(window: Window, selector: string): void {
   element.click();
 }
 
-export function setValue(window: Window, selector: string, value: string): void {
+export function setValue(window: DOMWindow, selector: string, value: string): void {
   const element = window.document.querySelector(selector);
   if (!(element instanceof window.HTMLInputElement || element instanceof window.HTMLSelectElement || element instanceof window.HTMLTextAreaElement)) {
     throw new Error(`Element '${selector}' not found or not editable.`);
@@ -349,7 +352,7 @@ export function setValue(window: Window, selector: string, value: string): void 
   element.dispatchEvent(new window.Event("change", { bubbles: true }));
 }
 
-export function setInputValue(window: Window, selector: string, value: string): void {
+export function setInputValue(window: DOMWindow, selector: string, value: string): void {
   const element = window.document.querySelector(selector);
   if (!(element instanceof window.HTMLInputElement || element instanceof window.HTMLTextAreaElement)) {
     throw new Error(`Element '${selector}' not found or not editable as input.`);

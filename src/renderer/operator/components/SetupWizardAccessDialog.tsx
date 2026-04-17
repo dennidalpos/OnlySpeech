@@ -20,12 +20,28 @@ export function SetupWizardAccessDialog(props: SetupWizardAccessDialogProps) {
   const [nextPassword, setNextPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const handleSubmit = () => {
+    props.onSubmit({
+      password,
+      nextPassword: props.mustChangePassword ? nextPassword : undefined,
+      confirmPassword: props.mustChangePassword ? confirmPassword : undefined
+    });
+  };
+
   return (
     <div className="dialog-backdrop" role="presentation">
       <div className="dialog-card" role="dialog" aria-modal="true" aria-label={props.title}>
         <h2>{props.title}</h2>
         <p>{props.description}</p>
-        <div className="setup-access-form">
+        <form
+          className="setup-access-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (!props.busy) {
+              handleSubmit();
+            }
+          }}
+        >
           <label className="setup-access-field">
             <span>{props.passwordLabel}</span>
             <input
@@ -59,26 +75,15 @@ export function SetupWizardAccessDialog(props: SetupWizardAccessDialogProps) {
             </>
           ) : null}
           {props.errorMessage ? <div className="setup-access-error">{props.errorMessage}</div> : null}
-        </div>
-        <div className="dialog-actions">
-          <button className="secondary-button" type="button" disabled={props.busy} onClick={props.onCancel}>
-            {props.cancelLabel}
-          </button>
-          <button
-            className="primary-button"
-            type="button"
-            disabled={props.busy}
-            onClick={() =>
-              props.onSubmit({
-                password,
-                nextPassword: props.mustChangePassword ? nextPassword : undefined,
-                confirmPassword: props.mustChangePassword ? confirmPassword : undefined
-              })
-            }
-          >
-            {props.submitLabel}
-          </button>
-        </div>
+          <div className="dialog-actions">
+            <button className="secondary-button" type="button" disabled={props.busy} onClick={props.onCancel}>
+              {props.cancelLabel}
+            </button>
+            <button className="primary-button" type="submit" disabled={props.busy}>
+              {props.submitLabel}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

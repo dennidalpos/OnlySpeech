@@ -225,7 +225,7 @@ describe("SetupWizardManager control window", () => {
     (manager as unknown as { registerIpcHandlers: () => void }).registerIpcHandlers();
 
     const saveHandler = electronMocks.ipcMain.handle.mock.calls.find(
-      ([channel]: [string]) => channel === "wizard:save-env"
+      ([channel]: string[]) => channel === "wizard:save-env"
     )?.[1] as (() => Promise<{
       envPath: string;
       preview: string;
@@ -301,7 +301,7 @@ describe("SetupWizardManager control window", () => {
     (manager as unknown as { registerIpcHandlers: () => void }).registerIpcHandlers();
 
     const updateAutostartHandler = electronMocks.ipcMain.handle.mock.calls.find(
-      ([channel]: [string]) => channel === "wizard:update-autostart"
+      ([channel]: string[]) => channel === "wizard:update-autostart"
     )?.[1] as ((_event: unknown, payload: { selectedEnabled: boolean }) => Promise<unknown> | unknown) | undefined;
 
     if (!updateAutostartHandler) {

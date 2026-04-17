@@ -102,6 +102,16 @@
   letter-spacing: 0.06em;
 }
 
+.notice.warn {
+  padding: 14px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 181, 74, 0.28);
+  background: linear-gradient(180deg, rgba(30, 18, 6, 0.94), rgba(20, 12, 4, 0.92));
+  color: var(--accent-warm);
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
 .dialog-backdrop {
   position: fixed;
   inset: 0;
@@ -117,6 +127,7 @@
 .dialog-card {
   position: relative;
   z-index: 1;
+  width: min(560px, 100%);
   max-height: min(calc(100dvh - 48px), 760px);
   overflow: auto;
 }
@@ -155,9 +166,15 @@
   font: inherit;
 }
 
+.setup-access-field input:focus-visible {
+  outline: 2px solid rgba(85, 214, 255, 0.7);
+  outline-offset: 2px;
+  border-color: rgba(85, 214, 255, 0.42);
+}
+
 .setup-access-error {
   border: 1px solid rgba(255, 107, 107, 0.35);
-  border-radius: 16px;
+  border-radius: 18px;
   background: rgba(255, 107, 107, 0.14);
   color: #ffd7d7;
   padding: 14px 16px;
@@ -168,4 +185,8 @@
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   margin-top: 28px;
+}
+
+.setup-access-form .dialog-actions {
+  margin-top: 0;
 }

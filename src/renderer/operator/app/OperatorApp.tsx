@@ -138,7 +138,6 @@ export function OperatorApp() {
           includeProviderExpansions: true
         })
       : null;
-  const preloadedBlockingIssues = appState?.health.blockingIssues ?? [];
   const preloadedLocalLanguageCommitted = preloadedLocalSide ? hasCommittedLanguageSelection(preloadedLocalSide) : false;
   const preloadedRemoteLanguageCommitted = preloadedRemoteSide
     ? hasCommittedLanguageSelection(preloadedRemoteSide)

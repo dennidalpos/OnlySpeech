@@ -870,7 +870,7 @@ describe("operator app mounted UI smoke coverage", () => {
       content: "transcript",
       requestId: "tts-1",
       status: "playing",
-      engine: "system",
+      engine: "azure",
       language: "en-US",
       voiceName: "English Voice",
       error: null
@@ -896,7 +896,7 @@ describe("operator app mounted UI smoke coverage", () => {
       content: "translation",
       requestId: null,
       status: "error",
-      engine: "system",
+      engine: "azure",
       language: "en-US",
       voiceName: null,
       error: "Speech synthesis failed."

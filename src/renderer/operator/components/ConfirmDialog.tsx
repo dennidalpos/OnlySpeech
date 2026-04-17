@@ -1,13 +1,25 @@
+import { useEffect } from "react";
+
 interface ConfirmDialogProps {
   title: string;
   description: string;
   confirmLabel: string;
   cancelLabel: string;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
   onCancel: () => void;
 }
 
 export function ConfirmDialog(props: ConfirmDialogProps) {
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        props.onCancel();
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [props.onCancel]);
+
   return (
     <div className="dialog-backdrop" role="presentation">
       <div className="dialog-card" role="dialog" aria-modal="true" aria-label={props.title}>

@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { DisplayAssignment, TechnicalIssue } from "../src/shared/types.js";
+import type { DisplayManager } from "../src/main/display-manager.js";
 
 const runtimeMocks = vi.hoisted(() => ({
   createOperatorWindow: vi.fn(),
@@ -98,7 +99,7 @@ describe("KioskDisplayRuntime", () => {
     runtimeMocks.createOperatorWindow.mockReturnValue(windowA);
 
     const runtime = new KioskDisplayRuntime({
-      displayManager,
+      displayManager: displayManager as unknown as DisplayManager,
       logger: { log: runtimeMocks.log } as never,
       getState: () => ({ sessionId: "session-1" }) as never
     });
@@ -144,7 +145,7 @@ describe("KioskDisplayRuntime", () => {
       .mockReturnValueOnce(windowB);
 
     const runtime = new KioskDisplayRuntime({
-      displayManager,
+      displayManager: displayManager as unknown as DisplayManager,
       logger: { log: runtimeMocks.log } as never,
       getState: () => ({ sessionId: "session-1" }) as never
     });

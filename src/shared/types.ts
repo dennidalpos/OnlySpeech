@@ -1,4 +1,5 @@
 import type { AppMode, MicrophonePttMode } from "./runtime-profiles.js";
+export type { AppMode };
 
 export type Side = "A" | "B";
 export type UiLanguage = string;

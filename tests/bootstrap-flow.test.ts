@@ -1,4 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { PersistedActivationState } from "../src/main/activation-storage.js";
+import type { ActivationStateEvaluationResult } from "../src/main/activation-state.js";
+import type { ActivationValidationResult } from "../src/main/activation-validator.js";
 
 const bootstrapMocks = vi.hoisted(() => {
   let readyResolver: (() => void) | null = null;
@@ -32,7 +35,7 @@ const bootstrapMocks = vi.hoisted(() => {
   const getActivationStateFilePath = vi.fn((userDataPath: string) => `${userDataPath}\\config\\activation-state.json`);
   const getRuntimeSecretsFilePath = vi.fn((userDataPath: string) => `${userDataPath}\\config\\runtime-secrets.json`);
   const getSetupWizardAccessFilePath = vi.fn((userDataPath: string) => `${userDataPath}\\config\\setup-wizard-access.json`);
-  const loadPersistedActivationState = vi.fn(() => ({
+  const loadPersistedActivationState = vi.fn((): PersistedActivationState | null => ({
     schemaVersion: 1 as const,
     activationToken: "OS1.payload.signature",
     claims: {
@@ -54,8 +57,8 @@ const bootstrapMocks = vi.hoisted(() => {
     lastValidatedAt: (state as { activatedAt?: string }).activatedAt ?? "2026-04-07T10:35:00.000Z",
     lastTrustedUtc: (state as { activatedAt?: string }).activatedAt ?? "2026-04-07T10:35:00.000Z"
   }));
-  const validateActivationCode = vi.fn(() => ({
-    ok: true as const,
+  const validateActivationCode = vi.fn((): ActivationValidationResult => ({
+    ok: true,
     canonicalEmail: "buyer@example.com",
     claims: {
       schemaVersion: 1 as const,
@@ -70,8 +73,8 @@ const bootstrapMocks = vi.hoisted(() => {
   const clearPersistedActivationState = vi.fn();
   const readTrialTombstone = vi.fn(() => null as string | null);
   const writeTrialTombstone = vi.fn();
-  const evaluatePersistedActivationState = vi.fn(({ state }: { state: unknown }) => ({
-    ok: true as const,
+  const evaluatePersistedActivationState = vi.fn(({ state }: { state: PersistedActivationState }): ActivationStateEvaluationResult => ({
+    ok: true,
     effectiveUtc: "2026-04-07T10:35:00.000Z",
     updatedState: state,
     shouldPersist: false
@@ -215,7 +218,7 @@ const bootstrapMocks = vi.hoisted(() => {
     writeTrialTombstone.mockClear();
     createPersistedActivationState.mockClear();
     evaluatePersistedActivationState.mockReset();
-    evaluatePersistedActivationState.mockImplementation(({ state }: { state: unknown }) => ({
+    evaluatePersistedActivationState.mockImplementation(({ state }: { state: PersistedActivationState }) => ({
       ok: true,
       effectiveUtc: "2026-04-07T10:35:00.000Z",
       updatedState: state,
@@ -543,7 +546,7 @@ describe("bootstrap integrated setup wizard flow", () => {
 
   it("persists the revalidated activation record before continuing packaged startup", async () => {
     bootstrapMocks.hasRuntimeEnvFile.mockReturnValue(false);
-    bootstrapMocks.evaluatePersistedActivationState.mockImplementation(({ state }: { state: Record<string, unknown> }) => ({
+    bootstrapMocks.evaluatePersistedActivationState.mockImplementation(({ state }: { state: PersistedActivationState }) => ({
       ok: true,
       effectiveUtc: "2026-04-08T07:00:00.000Z",
       updatedState: {
@@ -572,7 +575,7 @@ describe("bootstrap integrated setup wizard flow", () => {
   it("submits activation through the registered bindings, persists the unlock state, and continues startup", async () => {
     bootstrapMocks.loadPersistedActivationState.mockReturnValue(null);
     bootstrapMocks.hasRuntimeEnvFile.mockReturnValue(false);
-    bootstrapMocks.evaluatePersistedActivationState.mockImplementation(({ state }: { state: Record<string, unknown> }) => ({
+    bootstrapMocks.evaluatePersistedActivationState.mockImplementation(({ state }: { state: PersistedActivationState }) => ({
       ok: true,
       effectiveUtc: "2026-04-07T10:35:00.000Z",
       updatedState: {
@@ -688,7 +691,8 @@ describe("bootstrap integrated setup wizard flow", () => {
     bootstrapMocks.hasRuntimeEnvFile.mockReturnValue(true);
     bootstrapMocks.validateActivationCode.mockReturnValue({
       ok: false,
-      code: "invalid-code"
+      code: "invalid-code",
+      message: "Activation code is invalid."
     });
 
     await importBootstrap();
@@ -706,7 +710,7 @@ describe("bootstrap integrated setup wizard flow", () => {
       code: "expired",
       message: "Persisted activation is expired.",
       effectiveUtc: "2026-04-08T07:00:00.000Z",
-      updatedState: bootstrapMocks.loadPersistedActivationState(),
+      updatedState: bootstrapMocks.loadPersistedActivationState() as PersistedActivationState,
       shouldPersist: false
     });
 
@@ -725,7 +729,7 @@ describe("bootstrap integrated setup wizard flow", () => {
       code: "clock-rollback",
       message: "Local clock rollback exceeds the offline activation tolerance.",
       effectiveUtc: null,
-      updatedState: bootstrapMocks.loadPersistedActivationState(),
+      updatedState: bootstrapMocks.loadPersistedActivationState() as PersistedActivationState,
       shouldPersist: false
     });
 

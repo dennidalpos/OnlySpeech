@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { SessionStore } from "../src/services/session/session-store.js";
-import {
-  buildCommonProviderInteractionLanguageChoices,
-  buildInteractionLanguageChoices
-} from "../src/shared/language-flow.js";
+import { buildCommonProviderInteractionLanguageChoices } from "../src/shared/language-flow.js";
 import type { HealthState, RuntimeConfig } from "../src/shared/types.js";
 
 function createConfig(): RuntimeConfig {

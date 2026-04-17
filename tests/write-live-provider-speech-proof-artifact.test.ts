@@ -75,6 +75,7 @@ describe("New-LiveProviderSpeechProofArtifact", () => {
           azure: { speech_configured: boolean; translator_configured: boolean };
           chatgpt: { translation_configured: boolean; speech_configured: boolean; tts_configured: boolean };
         };
+        notes: string;
         scenarios: Array<{ id: string; provider: string; status: string }>;
       };
     };
