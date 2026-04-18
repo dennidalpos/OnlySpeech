@@ -132,6 +132,8 @@ const VISITOR_TECHNICAL_TEXT: Record<string, VisitorTechnicalText> = {
       "missing-microphone-a": () => "Mikrofon A wurde nicht erkannt.",
       "missing-microphone-b": (issue) =>
         requiresDistinctMicrophones(issue) ? "Es werden zwei unterschiedliche Mikrofone benotigt." : "Mikrofon B wurde nicht erkannt.",
+      "microphone-permission-denied": () => "Der Mikrofonzugriff ist blockiert. Bitten Sie den Operator, das Setup erneut zu offnen.",
+      "microphone-unavailable": () => "Das zugewiesene Mikrofon ist nicht verfugbar. Bitten Sie den Operator, das Setup erneut zu offnen.",
       "speech-config-missing": () => "Die Sprachkonfiguration fur den ausgewahlten Anbieter fehlt.",
       "translation-config-missing": () => "Die Ubersetzungskonfiguration fur den ausgewahlten Anbieter fehlt.",
       "translation-provider-failure": () => "Die Anfrage an den Ubersetzungsanbieter ist fehlgeschlagen.",
@@ -163,6 +165,8 @@ const VISITOR_TECHNICAL_TEXT: Record<string, VisitorTechnicalText> = {
       "missing-microphone-a": () => "No se detecto el microfono A.",
       "missing-microphone-b": (issue) =>
         requiresDistinctMicrophones(issue) ? "Se necesitan dos microfonos distintos." : "No se detecto el microfono B.",
+      "microphone-permission-denied": () => "El acceso al microfono esta bloqueado. Pide al operador que vuelva a abrir la configuracion.",
+      "microphone-unavailable": () => "El microfono asignado no esta disponible. Pide al operador que vuelva a abrir la configuracion.",
       "speech-config-missing": () => "Falta la configuracion de voz para el proveedor seleccionado.",
       "translation-config-missing": () => "Falta la configuracion de traduccion para el proveedor seleccionado.",
       "translation-provider-failure": () => "La solicitud al proveedor de traduccion fallo.",
@@ -193,6 +197,8 @@ const VISITOR_TECHNICAL_TEXT: Record<string, VisitorTechnicalText> = {
       "missing-microphone-a": () => "Le microphone A n'a pas ete detecte.",
       "missing-microphone-b": (issue) =>
         requiresDistinctMicrophones(issue) ? "Deux microphones distincts sont necessaires." : "Le microphone B n'a pas ete detecte.",
+      "microphone-permission-denied": () => "L'acces au microphone est bloque. Demandez a l'operateur de rouvrir la configuration.",
+      "microphone-unavailable": () => "Le microphone assigne n'est pas disponible. Demandez a l'operateur de rouvrir la configuration.",
       "speech-config-missing": () => "La configuration vocale du fournisseur selectionne est absente.",
       "translation-config-missing": () => "La configuration de traduction du fournisseur selectionne est absente.",
       "translation-provider-failure": () => "La requete au fournisseur de traduction a echoue.",
@@ -253,6 +259,8 @@ const VISITOR_TECHNICAL_TEXT: Record<string, VisitorTechnicalText> = {
       "missing-microphone-a": () => "Microfono A non rilevato.",
       "missing-microphone-b": (issue) =>
         requiresDistinctMicrophones(issue) ? "Servono due microfoni distinti." : "Microfono B non rilevato.",
+      "microphone-permission-denied": () => "L'accesso al microfono e bloccato. Chiedi all'operatore di riaprire la configurazione.",
+      "microphone-unavailable": () => "Il microfono assegnato non e disponibile. Chiedi all'operatore di riaprire la configurazione.",
       "speech-config-missing": () => "Configurazione speech mancante per il provider selezionato.",
       "translation-config-missing": () => "Configurazione traduzione mancante per il provider selezionato.",
       "translation-provider-failure": () => "Richiesta al provider traduzione non riuscita.",
@@ -554,6 +562,8 @@ const VISITOR_TECHNICAL_TEXT: Record<string, VisitorTechnicalText> = {
       "missing-microphone-a": () => "未检测到麦克风 A。",
       "missing-microphone-b": (issue) =>
         requiresDistinctMicrophones(issue) ? "需要两个不同的麦克风。" : "未检测到麦克风 B。",
+      "microphone-permission-denied": () => "麦克风访问已被阻止。请让操作员重新打开设置。",
+      "microphone-unavailable": () => "已分配的麦克风不可用。请让操作员重新打开设置。",
       "speech-config-missing": () => "所选提供方缺少语音配置。",
       "translation-config-missing": () => "所选提供方缺少翻译配置。",
       "translation-provider-failure": () => "向翻译提供方发出的请求失败。",

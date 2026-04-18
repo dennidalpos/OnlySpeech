@@ -45,8 +45,16 @@ interface KioskTextToSpeechControllerOptions {
   ) => void;
 }
 
-function resolveProviderEngine(provider: TranslationProvider): TextToSpeechEngine {
-  return provider === "azure" ? "azure" : "openai";
+function resolveProviderEngine(provider: TranslationProvider): TextToSpeechEngine | null {
+  if (provider === "azure") {
+    return "azure";
+  }
+
+  if (provider === "chatgpt") {
+    return "openai";
+  }
+
+  return null;
 }
 
 function createPlaybackState(
@@ -75,6 +83,30 @@ export class KioskTextToSpeechController {
   requestPlayback(request: TextToSpeechRequest): void {
     const text = request.text.trim();
     const engine = resolveProviderEngine(this.options.getState().translationProvider);
+    if (!engine) {
+      this.options.sessionStore.setTextToSpeechState({
+        side: request.side,
+        content: request.content,
+        requestId: null,
+        status: "unavailable",
+        engine: "openai",
+        language: request.language,
+        voiceName: null,
+        error: "The selected provider does not expose runtime text-to-speech playback."
+      });
+      this.options.logger.log({
+        session_id: this.options.getState().sessionId,
+        side: request.side,
+        event: "tts_blocked",
+        details: {
+          content: request.content,
+          reason: "provider_tts_unavailable"
+        }
+      });
+      this.options.broadcastState();
+      return;
+    }
+
     if (!this.options.getState().textToSpeechEnabled) {
       this.options.sessionStore.setTextToSpeechState({
         side: request.side,

@@ -10,6 +10,9 @@ describe("provider-language-matrix", () => {
     expect(getSupportedTranslationTargetLanguageCodes("azure", { includeProviderExpansions: true })).toHaveLength(101);
     expect(matrix.chatgpt.interaction).toHaveLength(70);
     expect(getSupportedTranslationTargetLanguageCodes("chatgpt", { includeProviderExpansions: true })).toHaveLength(70);
+    expect(matrix.ollama.interaction).toHaveLength(
+      getSupportedTranslationTargetLanguageCodes("ollama", { includeProviderExpansions: true }).length
+    );
 
     expect(
       matrix.chatgpt.interaction

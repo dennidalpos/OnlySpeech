@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  buildInteractionLanguageMacroAreaGroups,
-  type InteractionLanguageMacroAreaGroup
+  buildInteractionLanguageRegionGroups,
+  type InteractionLanguageRegionGroup
 } from "../../../shared/language-selector-map.js";
 import type { InteractionLanguageChoice } from "../../../shared/language-flow.js";
 import { InteractiveWorldMap } from "./InteractiveWorldMap.js";
@@ -21,9 +21,9 @@ interface WorldMapLanguageSelectorProps {
 }
 
 function findGroupByLanguage(
-  groups: InteractionLanguageMacroAreaGroup[],
+  groups: InteractionLanguageRegionGroup[],
   language: string | null | undefined
-): InteractionLanguageMacroAreaGroup | null {
+): InteractionLanguageRegionGroup | null {
   if (!language) {
     return null;
   }
@@ -32,10 +32,10 @@ function findGroupByLanguage(
 }
 
 function resolveInitialMacroArea(
-  groups: InteractionLanguageMacroAreaGroup[],
+  groups: InteractionLanguageRegionGroup[],
   selectedLanguage: string | null,
   initialMacroAreaLanguage: string | null | undefined
-): InteractionLanguageMacroAreaGroup | null {
+): InteractionLanguageRegionGroup | null {
   const selectedGroup = findGroupByLanguage(groups, selectedLanguage);
   const initialMacroAreaGroup = findGroupByLanguage(groups, initialMacroAreaLanguage);
 
@@ -45,10 +45,10 @@ function resolveInitialMacroArea(
 export function WorldMapLanguageSelector(props: WorldMapLanguageSelectorProps) {
   const preselectLanguage = props.preselectLanguage ?? true;
   const groups = useMemo(
-    () => buildInteractionLanguageMacroAreaGroups(props.choices, props.displayLanguage),
+    () => buildInteractionLanguageRegionGroups(props.choices, props.displayLanguage),
     [props.choices, props.displayLanguage]
   );
-  const [activeMacroArea, setActiveMacroArea] = useState<InteractionLanguageMacroAreaGroup | null>(
+  const [activeMacroArea, setActiveMacroArea] = useState<InteractionLanguageRegionGroup | null>(
     resolveInitialMacroArea(groups, props.selectedLanguage, props.initialMacroAreaLanguage)
   );
   const [selectedLanguage, setSelectedLanguage] = useState(
@@ -65,7 +65,7 @@ export function WorldMapLanguageSelector(props: WorldMapLanguageSelectorProps) {
 
   const visibleChoices = activeMacroArea?.choices ?? [];
 
-  function activateMacroArea(group: InteractionLanguageMacroAreaGroup) {
+  function activateMacroArea(group: InteractionLanguageRegionGroup) {
     setActiveMacroArea(group);
     setSelectedLanguage((currentValue) =>
       group.choices.some((choice) => choice.value === currentValue)
@@ -83,10 +83,10 @@ export function WorldMapLanguageSelector(props: WorldMapLanguageSelectorProps) {
           <InteractiveWorldMap />
           <div className="world-map-hit-area">
             {groups.map((group) => {
-              const isActive = activeMacroArea?.macroArea === group.macroArea;
+              const isActive = activeMacroArea?.regionId === group.regionId;
               return (
                 <button
-                  key={group.macroArea}
+                  key={group.regionId}
                   className={`world-map-hotspot${isActive ? " active" : ""}`}
                   type="button"
                   aria-label={`${group.label} (${group.choices.length})`}

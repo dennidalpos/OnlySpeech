@@ -13,8 +13,8 @@ The current repository supports:
 - one desktop/B2B workstation product for guided in-person conversations;
 - one workstation-local runtime profile under `%LOCALAPPDATA%\OnlySpeech` for packaged runs;
 - packaged app contents driven by `electron-builder` from `dist/**/*` plus `package.json`;
-- external service use only for `azure` and `chatgpt` provider modes;
-- provider-owned playback only: Azure mode stays on Azure TTS and ChatGPT mode stays on OpenAI TTS, with no workstation-managed local fallback.
+- external service use only for `azure`, `chatgpt`, and `ollama` provider modes;
+- provider-owned playback only: Azure mode stays on Azure TTS, ChatGPT mode stays on OpenAI TTS, Ollama remains translation-only with no playback path, and no workstation-managed local fallback is part of the contract.
 
 The repository does not define a browser SaaS product, multi-workstation orchestration layer, or internal plugin system.
 
@@ -36,6 +36,7 @@ The current prudent commercial baseline is:
 
 - direct demo-led desktop/B2B distribution for staffed or guided in-person deployments;
 - customer-provided Azure Speech or OpenAI credentials, depending on the selected provider mode;
+- customer-managed Ollama host configuration only for translation-only demo or diagnostic flows when that provider is intentionally selected;
 - Microsoft Store copy only as secondary trust and discovery collateral;
 - Product Hunt copy only as non-core awareness collateral;
 - provider-owned Azure/OpenAI playback treated as the active product baseline.
@@ -71,6 +72,12 @@ Vendored local tool copies under `tools/` are outside the automatically generate
 - The safest commercial posture documented here is customer-owned Azure credentials.
 - If a future rollout bundles or resells Azure consumption under the vendor agreement, that requires explicit external commercial and legal review.
 
+### Ollama
+
+- Ollama is used only in `TRANSLATION_PROVIDER=ollama` mode.
+- The current repository contract treats Ollama as translation-only and does not market it as a live speech-ready provider.
+- Host operations, model licensing, retention, and any network exposure for the Ollama server remain deployment-specific decisions outside the repository.
+
 ## Distribution Position
 
 OnlySpeech can support commercial distribution to the extent that:
@@ -79,6 +86,6 @@ OnlySpeech can support commercial distribution to the extent that:
 - packaged application behavior matches the documented privacy boundary;
 - the tagged release flow validates Windows signing inputs when release signing is required, and the shipped version retains release evidence and dependency notices;
 - customer-specific contractual and legal inputs are completed outside the repository;
-- Azure/OpenAI contracting stays aligned with the chosen customer-provided account model.
+- Azure/OpenAI contracting and any Ollama host operations stay aligned with the chosen customer deployment model.
 
 This repository supports technical commercial readiness, but it must not claim that all legal obligations are satisfied without deployment-specific review.

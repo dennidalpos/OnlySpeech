@@ -130,9 +130,10 @@ export function buildSuggestedEnv(
     "# Suggested OnlySpeech .env for this PC",
     "# Display IDs are mapped left-to-right as A then B.",
     "# Microphone IDs prefer endpoint fingerprints based on stable Windows audio-input metadata, then normalized labels, then raw device IDs.",
-    "# TRANSLATION_PROVIDER defaults to chatgpt. Fill only the matching provider credentials before production use.",
+    "# TRANSLATION_PROVIDER defaults to chatgpt. Fill only the matching provider settings before production use.",
     "# chatgpt requires CHATGPT_API_KEY, CHATGPT_MODEL, and CHATGPT_TRANSCRIBE_MODEL.",
-    "# azure requires AZURE_SPEECH_KEY and AZURE_SPEECH_REGION; normalized playback diagnostics also use AZURE_TRANSLATOR_KEY and AZURE_TRANSLATOR_REGION."
+    "# azure requires AZURE_SPEECH_KEY and AZURE_SPEECH_REGION; normalized playback diagnostics also use AZURE_TRANSLATOR_KEY and AZURE_TRANSLATOR_REGION.",
+    "# ollama requires OLLAMA_BASE_URL and OLLAMA_MODEL; it remains translation-only and cannot unlock live kiosk speech."
   ];
 
   if (!normalizedProbeResult.microphonePermissionGranted) {

@@ -1,4 +1,4 @@
-import { buildCommonProviderInteractionLanguageChoices } from "../../shared/language-flow.js";
+import { getSpeechReadyLanguages } from "../../shared/unified-language-registry.js";
 import type { StartTextToSpeechCommand } from "../../shared/types.js";
 import {
   ProviderPlayback,
@@ -32,10 +32,10 @@ interface OpenAiTextToSpeechProviderOptions {
 }
 
 function buildVoiceCandidates(): VoiceCandidate[] {
-  return buildCommonProviderInteractionLanguageChoices("chatgpt").map((choice) => ({
-    id: `${DEFAULT_OPENAI_TEXT_TO_SPEECH_VOICE}:${choice.value}`,
+  return getSpeechReadyLanguages("chatgpt").map((choice) => ({
+    id: `${DEFAULT_OPENAI_TEXT_TO_SPEECH_VOICE}:${choice.id}`,
     name: `OpenAI ${DEFAULT_OPENAI_TEXT_TO_SPEECH_VOICE}`,
-    locale: choice.sourceLocale
+    locale: choice.providerCapability.sourceLocale ?? choice.canonicalBcp47
   }));
 }
 

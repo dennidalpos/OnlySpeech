@@ -41,10 +41,12 @@
 .header-chip {
   min-width: 0;
   display: grid;
-  gap: 2px;
-  padding: 10px 14px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.08);
+  gap: 4px;
+  padding: 11px 14px;
+  border-radius: var(--surface-control-radius);
+  border: 1px solid var(--surface-border-strong);
+  background: var(--surface-fill);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
   color: var(--muted);
 }
 
@@ -104,9 +106,10 @@
 }
 
 .status-badge {
-  min-width: 170px;
-  padding: 12px 18px;
-  border-radius: 999px;
+  min-width: 152px;
+  padding: 10px 16px;
+  border-radius: var(--surface-pill-radius);
+  line-height: 1.2;
   text-align: center;
   font-size: 1rem;
   font-weight: 800;
@@ -118,10 +121,11 @@
   min-height: 60px;
   display: grid;
   place-items: center;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--surface-control-radius);
+  border: 1px solid var(--surface-border-strong);
+  background: var(--surface-fill);
   color: var(--text);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
   transition:
     transform 120ms ease,
     border-color 120ms ease,
@@ -131,7 +135,7 @@
 .icon-button:hover {
   transform: translateY(-1px);
   border-color: rgba(85, 214, 255, 0.42);
-  box-shadow: 0 18px 50px rgba(85, 214, 255, 0.12);
+  box-shadow: var(--elevated-control-shadow);
 }
 
 .icon-button-danger {
@@ -178,7 +182,7 @@
   grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 12px;
   min-height: 0;
-  border-radius: 28px;
+  border-radius: var(--surface-panel-radius);
   background: var(--panel);
   border: 1px solid var(--panel-border);
   padding: 18px 20px;
@@ -233,10 +237,11 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--surface-control-radius);
+  border: 1px solid var(--surface-border-strong);
+  background: var(--surface-fill);
   color: var(--text);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
   transition:
     transform 120ms ease,
     border-color 120ms ease,
@@ -247,7 +252,7 @@
 .speaker-button:hover:not(:disabled) {
   transform: translateY(-1px);
   border-color: rgba(85, 214, 255, 0.42);
-  box-shadow: 0 18px 50px rgba(85, 214, 255, 0.12);
+  box-shadow: var(--elevated-control-shadow);
 }
 
 .speaker-button:disabled {
@@ -329,8 +334,9 @@
   min-height: 36px;
   display: grid;
   place-items: center;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--surface-pill-radius);
+  border: 1px solid var(--surface-border-subtle);
+  background: var(--surface-fill);
   color: var(--text);
   font-size: 0.95rem;
   font-weight: 800;
@@ -356,8 +362,8 @@
   display: grid;
   gap: 8px;
   padding: 12px 14px;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--surface-control-radius);
+  border: 1px solid var(--surface-border-subtle);
 }
 
 .history-bubble-own {
@@ -395,8 +401,9 @@
   display: inline-grid;
   place-items: center;
   padding: 0 8px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--surface-pill-radius);
+  border: 1px solid var(--surface-border-subtle);
+  background: var(--surface-fill);
   color: var(--text);
   font-size: 0.78rem;
   font-weight: 800;
@@ -449,11 +456,11 @@
   display: grid;
   gap: 4px;
   padding: 12px 16px;
-  border-radius: 18px;
+  border-radius: var(--surface-control-radius);
   border: 1px solid rgba(85, 214, 255, 0.18);
   background: linear-gradient(180deg, rgba(14, 28, 44, 0.92), rgba(10, 20, 31, 0.96));
   color: var(--muted);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
 }
 
 .runtime-disclosure-card strong {
@@ -475,15 +482,15 @@
 }
 
 .inline-actions-single {
-  width: min(28vw, 220px);
+  width: min(25vw, 208px);
 }
 
 .action-area .secondary-button,
 .action-area .danger-button,
 .visitor-actions .secondary-button {
   min-height: 100%;
-  padding: 16px 18px;
-  font-size: 1rem;
+  padding: 14px 16px;
+  font-size: 0.98rem;
 }
 
 .ptt-button {

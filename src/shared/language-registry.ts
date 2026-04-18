@@ -84,12 +84,14 @@ const ALL_LANGUAGE_ENTRIES: readonly RegistryLanguageEntry[] = Object.freeze([
 
 const PROVIDER_INTERACTION_LANGUAGE_CODE_SETS = Object.freeze({
   azure: new Set(PROVIDER_INTERACTION_LANGUAGE_CATALOGS.azure.map((entry) => entry.code.toLowerCase())),
-  chatgpt: new Set(PROVIDER_INTERACTION_LANGUAGE_CATALOGS.chatgpt.map((entry) => entry.code.toLowerCase()))
+  chatgpt: new Set(PROVIDER_INTERACTION_LANGUAGE_CATALOGS.chatgpt.map((entry) => entry.code.toLowerCase())),
+  ollama: new Set(PROVIDER_INTERACTION_LANGUAGE_CATALOGS.ollama.map((entry) => entry.code.toLowerCase()))
 }) satisfies Readonly<Record<TranslationProvider, ReadonlySet<string>>>;
 
 const PROVIDER_TRANSLATION_TARGET_LANGUAGE_CODE_SETS = Object.freeze({
   azure: new Set(PROVIDER_TRANSLATION_TARGET_LANGUAGE_CODES.azure.map((code) => code.toLowerCase())),
-  chatgpt: new Set(PROVIDER_TRANSLATION_TARGET_LANGUAGE_CODES.chatgpt.map((code) => code.toLowerCase()))
+  chatgpt: new Set(PROVIDER_TRANSLATION_TARGET_LANGUAGE_CODES.chatgpt.map((code) => code.toLowerCase())),
+  ollama: new Set(PROVIDER_TRANSLATION_TARGET_LANGUAGE_CODES.ollama.map((code) => code.toLowerCase()))
 }) satisfies Readonly<Record<TranslationProvider, ReadonlySet<string>>>;
 
 const COMMON_PROVIDER_INTERACTION_LANGUAGE_CODES = Object.freeze(
@@ -397,6 +399,15 @@ function resolveProviderCapabilities(
   entry: RegistryLanguageEntry,
   provider: TranslationProvider
 ): TranslationProviderLanguageCapabilities {
+  if (provider === "ollama") {
+    return {
+      speechToText: false,
+      translationTarget: isCanonicalInteractionLanguage(entry),
+      preferredSourceLocale: isCanonicalInteractionLanguage(entry) ? entry.preferredSourceLocale : null,
+      targetCode: isCanonicalInteractionLanguage(entry) ? entry.code : null
+    };
+  }
+
   return { ...(PROVIDER_LANGUAGE_CAPABILITIES_BY_CODE[provider][entry.code.toLowerCase()] ?? entry.providers[provider]) };
 }
 
@@ -413,6 +424,10 @@ function supportsInteractionLanguage(
     return (["azure", "chatgpt"] as const).some((candidate) =>
       PROVIDER_INTERACTION_LANGUAGE_CODE_SETS[candidate].has(entry.code.toLowerCase())
     );
+  }
+
+  if (provider === "ollama") {
+    return true;
   }
 
   return PROVIDER_INTERACTION_LANGUAGE_CODE_SETS[provider].has(entry.code.toLowerCase());
@@ -494,6 +509,10 @@ export function getSupportedSpeechToTextLanguageCodes(
   provider: TranslationProvider,
   options?: InteractionLanguageQueryOptions
 ): string[] {
+  if (provider === "ollama") {
+    return [];
+  }
+
   return CANONICAL_INTERACTION_LANGUAGES.filter(
     (entry) =>
       PROVIDER_INTERACTION_LANGUAGE_CODE_SETS[provider].has(entry.code.toLowerCase()) &&
@@ -505,6 +524,10 @@ export function getSupportedTranslationTargetLanguageCodes(
   provider: TranslationProvider,
   options?: InteractionLanguageQueryOptions
 ): string[] {
+  if (provider === "ollama") {
+    return CANONICAL_INTERACTION_LANGUAGES.filter((entry) => isBaselineEntry(entry, options)).map((entry) => entry.code);
+  }
+
   return PROVIDER_TRANSLATION_TARGET_LANGUAGE_CODES[provider].filter((code) => {
     const entry = resolveRegistryEntry(code);
     if (!entry) {

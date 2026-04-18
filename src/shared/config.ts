@@ -1,9 +1,9 @@
 import { config as loadEnv } from "dotenv";
 import { z } from "zod";
 import {
-  findCommonProviderInteractionLanguageChoice
+  findInteractionLanguageChoice
 } from "./language-registry.js";
-import { resolveCommonProviderSynchronizedSourceLanguage } from "./language-flow.js";
+import { resolveSynchronizedSourceLanguage } from "./language-flow.js";
 import { normalizeVisitorLocalizationLanguageKey } from "./visitor-language-readiness.js";
 import {
   DEFAULT_APP_MODE,
@@ -70,7 +70,7 @@ const booleanFromEnv = (fallback: boolean) =>
     });
 
 const translationProvider = z
-  .enum(["azure", "chatgpt"] satisfies [TranslationProvider, ...TranslationProvider[]])
+  .enum(["azure", "chatgpt", "ollama"] satisfies [TranslationProvider, ...TranslationProvider[]])
   .catch(RUNTIME_ENV_DEFAULTS.TRANSLATION_PROVIDER as TranslationProvider);
 
 const setupUiLanguage = z
@@ -96,11 +96,13 @@ function resolveConfiguredTargetLanguage(
   value: string,
   translationProvider: TranslationProvider
 ): string {
-  const resolved = findCommonProviderInteractionLanguageChoice(value, translationProvider);
+  const resolved = findInteractionLanguageChoice(value, translationProvider, {
+    includeProviderExpansions: true
+  });
 
   if (!resolved) {
     throw new Error(
-      `${envKey}='${value}' is not supported by the shared user-facing speech catalog for translation provider '${translationProvider}'.`
+      `${envKey}='${value}' is not supported by the provider language registry for translation provider '${translationProvider}'.`
     );
   }
 
@@ -142,6 +144,11 @@ const schema = z.object({
   CHATGPT_API_KEY: z.string().optional().default(RUNTIME_ENV_DEFAULTS.CHATGPT_API_KEY),
   CHATGPT_MODEL: z.string().optional().default(RUNTIME_ENV_DEFAULTS.CHATGPT_MODEL),
   CHATGPT_TRANSCRIBE_MODEL: z.string().optional().default(RUNTIME_ENV_DEFAULTS.CHATGPT_TRANSCRIBE_MODEL),
+  OLLAMA_BASE_URL: z.string().optional().default(RUNTIME_ENV_DEFAULTS.OLLAMA_BASE_URL),
+  OLLAMA_MODEL: z.string().optional().default(RUNTIME_ENV_DEFAULTS.OLLAMA_MODEL),
+  OLLAMA_REQUEST_TIMEOUT_MS: numberFromEnv(Number(RUNTIME_ENV_DEFAULTS.OLLAMA_REQUEST_TIMEOUT_MS)),
+  OLLAMA_STREAMING_ENABLED: booleanFromEnv(RUNTIME_ENV_DEFAULTS.OLLAMA_STREAMING_ENABLED === "true"),
+  OLLAMA_API_KEY: z.string().optional().default(RUNTIME_ENV_DEFAULTS.OLLAMA_API_KEY),
   DEFAULT_TARGET_LANG_A: z.string().default(RUNTIME_ENV_DEFAULTS.DEFAULT_TARGET_LANG_A),
   DEFAULT_TARGET_LANG_B: z.string().default(RUNTIME_ENV_DEFAULTS.DEFAULT_TARGET_LANG_B),
   LOG_LEVEL: z.string().default(RUNTIME_ENV_DEFAULTS.LOG_LEVEL)
@@ -159,12 +166,12 @@ export function loadRuntimeConfig(env: NodeJS.ProcessEnv = process.env): Runtime
     parsed.DEFAULT_TARGET_LANG_B,
     parsed.TRANSLATION_PROVIDER
   );
-  const defaultSourceLangA = resolveCommonProviderSynchronizedSourceLanguage(
+  const defaultSourceLangA = resolveSynchronizedSourceLanguage(
     defaultTargetLangA,
     "en-US",
     parsed.TRANSLATION_PROVIDER
   );
-  const defaultSourceLangB = resolveCommonProviderSynchronizedSourceLanguage(
+  const defaultSourceLangB = resolveSynchronizedSourceLanguage(
     defaultTargetLangB,
     "en-US",
     parsed.TRANSLATION_PROVIDER
@@ -205,6 +212,11 @@ export function loadRuntimeConfig(env: NodeJS.ProcessEnv = process.env): Runtime
     chatGptApiKey: parsed.CHATGPT_API_KEY,
     chatGptModel: parsed.CHATGPT_MODEL,
     chatGptTranscribeModel: parsed.CHATGPT_TRANSCRIBE_MODEL,
+    ollamaBaseUrl: parsed.OLLAMA_BASE_URL,
+    ollamaModel: parsed.OLLAMA_MODEL,
+    ollamaRequestTimeoutMs: parsed.OLLAMA_REQUEST_TIMEOUT_MS,
+    ollamaStreamingEnabled: parsed.OLLAMA_STREAMING_ENABLED,
+    ollamaApiKey: parsed.OLLAMA_API_KEY,
     defaultTargetLangA,
     defaultTargetLangB,
     defaultSourceLangA: defaultSourceLangA ?? "en-US",
@@ -219,6 +231,8 @@ export function hasSpeechRecognitionConfig(config: RuntimeConfig): boolean {
       return Boolean(config.azureSpeechKey.trim() && config.azureSpeechRegion.trim());
     case "chatgpt":
       return Boolean(config.chatGptApiKey.trim() && config.chatGptTranscribeModel.trim());
+    case "ollama":
+      return false;
     default:
       return false;
   }
@@ -232,6 +246,8 @@ export function hasTranslationProviderConfig(config: RuntimeConfig): boolean {
       return Boolean(
         config.chatGptApiKey.trim() && config.chatGptModel.trim() && config.chatGptTranscribeModel.trim()
       );
+    case "ollama":
+      return Boolean(config.ollamaBaseUrl.trim() && config.ollamaModel.trim());
     default:
       return false;
   }

@@ -28,6 +28,12 @@ export function getSetupWizardProviderShellHtml(uiLanguage: SetupWizardUiLanguag
       chatGptApiKey: "ChatGPT API key",
       chatGptModel: "ChatGPT model",
       chatGptTranscribeModel: "ChatGPT transcribe model",
+      ollamaSettings: "Ollama settings",
+      ollamaBaseUrl: "Ollama base URL",
+      ollamaModel: "Ollama model",
+      ollamaRequestTimeoutMs: "Ollama request timeout (ms)",
+      ollamaStreamingEnabled: "Ollama streaming",
+      ollamaApiKey: "Ollama API key (optional)",
       catalogDisclosure: "Provider and language coverage details",
       catalogDisclosureBody:
         "Initial languages, playback validation, and live save gating all depend on the active provider and its supported catalog."
@@ -52,6 +58,12 @@ export function getSetupWizardProviderShellHtml(uiLanguage: SetupWizardUiLanguag
       chatGptApiKey: "Chiave API ChatGPT",
       chatGptModel: "Modello ChatGPT",
       chatGptTranscribeModel: "Modello trascrizione ChatGPT",
+      ollamaSettings: "Impostazioni Ollama",
+      ollamaBaseUrl: "URL base Ollama",
+      ollamaModel: "Modello Ollama",
+      ollamaRequestTimeoutMs: "Timeout richiesta Ollama (ms)",
+      ollamaStreamingEnabled: "Streaming Ollama",
+      ollamaApiKey: "Chiave API Ollama (opzionale)",
       catalogDisclosure: "Dettagli provider e copertura lingue",
       catalogDisclosureBody:
         "Lingue iniziali, test playback e blocchi di salvataggio live dipendono dal provider attivo e dal suo catalogo supportato."
@@ -76,6 +88,12 @@ export function getSetupWizardProviderShellHtml(uiLanguage: SetupWizardUiLanguag
       chatGptApiKey: "Clave API ChatGPT",
       chatGptModel: "Modelo ChatGPT",
       chatGptTranscribeModel: "Modelo de transcripcion ChatGPT",
+      ollamaSettings: "Configuracion Ollama",
+      ollamaBaseUrl: "URL base Ollama",
+      ollamaModel: "Modelo Ollama",
+      ollamaRequestTimeoutMs: "Timeout de Ollama (ms)",
+      ollamaStreamingEnabled: "Streaming Ollama",
+      ollamaApiKey: "Clave API Ollama (opcional)",
       catalogDisclosure: "Detalles del proveedor y cobertura de idiomas",
       catalogDisclosureBody:
         "Los idiomas iniciales, la validacion de reproduccion y el bloqueo de guardado live dependen del proveedor activo y de su catalogo."
@@ -100,6 +118,12 @@ export function getSetupWizardProviderShellHtml(uiLanguage: SetupWizardUiLanguag
       chatGptApiKey: "Cle API ChatGPT",
       chatGptModel: "Modele ChatGPT",
       chatGptTranscribeModel: "Modele de transcription ChatGPT",
+      ollamaSettings: "Parametres Ollama",
+      ollamaBaseUrl: "URL de base Ollama",
+      ollamaModel: "Modele Ollama",
+      ollamaRequestTimeoutMs: "Delai Ollama (ms)",
+      ollamaStreamingEnabled: "Streaming Ollama",
+      ollamaApiKey: "Cle API Ollama (optionnelle)",
       catalogDisclosure: "Details fournisseur et couverture langues",
       catalogDisclosureBody:
         "Les langues initiales, la validation de lecture et le blocage de sauvegarde live dependent du fournisseur actif et de son catalogue."
@@ -124,6 +148,12 @@ export function getSetupWizardProviderShellHtml(uiLanguage: SetupWizardUiLanguag
       chatGptApiKey: "ChatGPT-API-Schluessel",
       chatGptModel: "ChatGPT-Modell",
       chatGptTranscribeModel: "ChatGPT-Transkriptionsmodell",
+      ollamaSettings: "Ollama-Einstellungen",
+      ollamaBaseUrl: "Ollama-Basis-URL",
+      ollamaModel: "Ollama-Modell",
+      ollamaRequestTimeoutMs: "Ollama-Timeout (ms)",
+      ollamaStreamingEnabled: "Ollama-Streaming",
+      ollamaApiKey: "Ollama-API-Schluessel (optional)",
       catalogDisclosure: "Details zu Anbieter und Sprachabdeckung",
       catalogDisclosureBody:
         "Initialsprachen, Wiedergabevalidierung und Live-Save-Sperren haengen vom aktiven Anbieter und dessen Katalog ab."
@@ -148,6 +178,12 @@ export function getSetupWizardProviderShellHtml(uiLanguage: SetupWizardUiLanguag
       chatGptApiKey: "ChatGPT API 密钥",
       chatGptModel: "ChatGPT 模型",
       chatGptTranscribeModel: "ChatGPT 转写模型",
+      ollamaSettings: "Ollama 设置",
+      ollamaBaseUrl: "Ollama 基础 URL",
+      ollamaModel: "Ollama 模型",
+      ollamaRequestTimeoutMs: "Ollama 超时（毫秒）",
+      ollamaStreamingEnabled: "Ollama 流式输出",
+      ollamaApiKey: "Ollama API 密钥（可选）",
       catalogDisclosure: "服务商与语言覆盖详情",
       catalogDisclosureBody:
         "初始语言、播放校验和 live 保存阻塞都依赖当前服务商及其支持目录。"
@@ -202,7 +238,7 @@ ${getSetupWizardCardHeaderHtml({
   eyebrow: copy.providerSpecific,
   title: copy.providerSpecific
 })}
-          <div class="provider-grid">
+            <div class="provider-grid">
             <div class="provider-card hidden" data-provider-card="chatgpt">
 ${getSetupWizardCardHeaderHtml({
   eyebrow: copy.chatGptSettings,
@@ -217,6 +253,29 @@ ${getSetupWizardCardHeaderHtml({
                 </label>
                 <label class="full-span">${copy.chatGptTranscribeModel}
                   <select id="env-CHATGPT_TRANSCRIBE_MODEL" data-env-key="CHATGPT_TRANSCRIBE_MODEL"></select>
+                </label>
+              </div>
+            </div>
+            <div class="provider-card hidden" data-provider-card="ollama">
+${getSetupWizardCardHeaderHtml({
+  eyebrow: copy.ollamaSettings,
+  title: copy.ollamaSettings
+})}
+              <div class="form-grid">
+                <label>${copy.ollamaBaseUrl}
+                  <input id="env-OLLAMA_BASE_URL" data-env-key="OLLAMA_BASE_URL" />
+                </label>
+                <label>${copy.ollamaModel}
+                  <input id="env-OLLAMA_MODEL" data-env-key="OLLAMA_MODEL" />
+                </label>
+                <label>${copy.ollamaRequestTimeoutMs}
+                  <input id="env-OLLAMA_REQUEST_TIMEOUT_MS" data-env-key="OLLAMA_REQUEST_TIMEOUT_MS" />
+                </label>
+                <label>${copy.ollamaStreamingEnabled}
+                  <select id="env-OLLAMA_STREAMING_ENABLED" data-env-key="OLLAMA_STREAMING_ENABLED"></select>
+                </label>
+                <label class="full-span">${copy.ollamaApiKey}
+                  <input id="env-OLLAMA_API_KEY" data-env-key="OLLAMA_API_KEY" type="password" autocomplete="off" />
                 </label>
               </div>
             </div>

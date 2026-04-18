@@ -1,5 +1,5 @@
 const SENSITIVE_DIAGNOSTIC_PATTERN =
-  /(?:api[_ -]?key|authorization|bearer\s+\S+|secret|token|transcript|translation|audio[_ -]?(?:base64|payload)?)/i;
+  /(?:api[_ -]?key|authorization|bearer\s+\S+|secret|token|transcript|translation|chat[_ -]?text|audio[_ -]?(?:base64|payload)?)/i;
 
 const LONG_BASE64_PATTERN = /^[A-Za-z0-9+/=]{80,}$/;
 const REDACTED_DIAGNOSTIC = "[redacted]";

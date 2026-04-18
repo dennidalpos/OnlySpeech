@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { findSourceLanguageOption } from "../../../shared/language-options.js";
 import type { OnlySpeechRendererApi } from "../../../shared/onlyspeech-api.js";
-import { buildCommonProviderInteractionLanguageChoices } from "../../../shared/language-flow.js";
+import { buildInteractionLanguageChoices } from "../../../shared/language-flow.js";
 import {
   getInteractionLanguageCurrentLabel,
   getInteractionLanguageEnglishLabel,
@@ -17,6 +17,7 @@ import {
   getRuntimeDisclosureText
 } from "../../../shared/runtime-disclosure.js";
 import { getVisitorLocalizationBundle } from "../../../shared/visitor-localization-bundle.js";
+import { getVisitorEffectiveLanguageKey } from "../../../shared/visitor-localization.js";
 import type { Side } from "../../../shared/types.js";
 import { ConfirmDialog } from "../components/ConfirmDialog.js";
 import { LanguageSelection } from "../components/LanguageSelection.js";
@@ -73,6 +74,16 @@ function getLocalizedRoleLabels(language: string): { A: string; B: string } {
   }
 }
 
+const RTL_LANGUAGE_CODES = new Set(["ar", "fa", "he", "prs", "ps", "ur", "yi"]);
+
+function normalizeDocumentLanguage(language: string | null | undefined): string {
+  return getVisitorEffectiveLanguageKey(language);
+}
+
+function resolveDocumentDirection(language: string): "ltr" | "rtl" {
+  return RTL_LANGUAGE_CODES.has(normalizeDocumentLanguage(language).split("-")[0] ?? "") ? "rtl" : "ltr";
+}
+
 export function OperatorApp() {
   const side = useMemo(resolveSide, []);
   const fallbackUiLanguage = "en";
@@ -120,7 +131,9 @@ export function OperatorApp() {
       paragraphs={visitorDisclosureText.paragraphs}
     />
   ) : null;
-  const interactionLanguageChoices = buildCommonProviderInteractionLanguageChoices(appState?.translationProvider);
+  const interactionLanguageChoices = buildInteractionLanguageChoices(appState?.translationProvider, {
+    includeProviderExpansions: true
+  });
   const interactionLanguageChoicesByValue = new Map(
     interactionLanguageChoices.map((choice) => [choice.value, choice] as const)
   );
@@ -169,6 +182,21 @@ export function OperatorApp() {
     onlySpeechApi,
     side
   });
+  const preloadedViewMode = resolveOperatorViewMode({
+    appState,
+    side,
+    showLanguageSelector,
+    visitorLanguageCommitted: side === "B" ? preloadedLocalLanguageCommitted : true
+  });
+  const documentLanguage =
+    preloadedViewMode === "operator-language-selection"
+      ? operatorSelectorLanguage
+      : preloadedViewMode === "visitor-language-selection"
+        ? visitorSelectorLanguage
+        : isVisitorStation
+          ? preloadedLocalSide?.effectiveUiLanguage ?? uiLanguage
+          : uiLanguage;
+  const normalizedDocumentLanguage = normalizeDocumentLanguage(documentLanguage);
 
   useEffect(() => {
     let cancelled = false;
@@ -196,6 +224,11 @@ export function OperatorApp() {
       cancelled = true;
     };
   }, [onlySpeechApi]);
+
+  useLayoutEffect(() => {
+    document.documentElement.lang = normalizedDocumentLanguage;
+    document.documentElement.dir = resolveDocumentDirection(normalizedDocumentLanguage);
+  }, [normalizedDocumentLanguage]);
 
   if (!appState) {
     return <div className="boot-screen">{getUiText(fallbackUiLanguage).booting}</div>;
@@ -342,12 +375,6 @@ export function OperatorApp() {
         onDismiss={dismissTemporaryPassword}
       />
     ) : null;
-  const setupWizardOverlays = (
-    <>
-      {setupTemporaryPasswordNotice}
-      {setupAccessDialog}
-    </>
-  );
   const runtimeIssueBanner =
     blockingIssues.length > 0 && viewMode !== "technical-error" ? (
       <RuntimeIssueBanner
@@ -357,8 +384,15 @@ export function OperatorApp() {
         onRetry={() => {
           onlySpeechApi.sendOperatorAction({ type: "retry-health-check", side });
         }}
-        onOpenSetup={openSetupWizard}
-      />
+          onOpenSetup={openSetupWizard}
+        />
+      ) : null;
+  const topNoticeStack =
+    setupTemporaryPasswordNotice || runtimeIssueBanner ? (
+      <div className="top-notice-stack">
+        {setupTemporaryPasswordNotice}
+        {runtimeIssueBanner}
+      </div>
     ) : null;
   const shutdownNotice = shutdownFeedback ? (
     <div className="notice warn" role="alert">{shutdownFeedback}</div>
@@ -367,7 +401,8 @@ export function OperatorApp() {
   if (viewMode === "technical-error") {
     return (
       <>
-        {setupWizardOverlays}
+        {topNoticeStack}
+        {setupAccessDialog}
         <TechnicalErrorView
           language={uiLanguage}
           visitorLanguageCode={isVisitorStation ? localSide.effectiveUiLanguage : undefined}
@@ -384,8 +419,8 @@ export function OperatorApp() {
   if (viewMode === "operator-language-selection") {
     return (
       <>
-        {setupWizardOverlays}
-        {runtimeIssueBanner}
+        {topNoticeStack}
+        {setupAccessDialog}
         {shutdownNotice}
         <LanguageSelection
           language={operatorSelectorLanguage}
@@ -408,8 +443,8 @@ export function OperatorApp() {
   if (viewMode === "visitor-language-selection") {
     return (
       <>
-        {setupWizardOverlays}
-        {runtimeIssueBanner}
+        {topNoticeStack}
+        {setupAccessDialog}
         {shutdownNotice}
         <VisitorLanguageSelection
           languageCode={visitorSelectorLanguage}
@@ -427,8 +462,8 @@ export function OperatorApp() {
   if (isVisitorStation) {
     return (
       <>
-        {setupWizardOverlays}
-        {runtimeIssueBanner}
+        {topNoticeStack}
+        {setupAccessDialog}
         <VisitorSessionScreen
           appState={appState}
           canTalk={canTalk}
@@ -460,8 +495,8 @@ export function OperatorApp() {
 
   return (
     <>
-      {setupWizardOverlays}
-      {runtimeIssueBanner}
+      {topNoticeStack}
+      {setupAccessDialog}
       {shutdownNotice}
       <OperatorSessionScreen
         canShutdownComputer={canShutdownComputer}

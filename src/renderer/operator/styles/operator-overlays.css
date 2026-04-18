@@ -4,21 +4,35 @@
   margin: 24px 0;
 }
 
-.runtime-issue-banner {
+.top-notice-stack {
   position: fixed;
   top: 18px;
   left: 18px;
   right: 18px;
-  z-index: 35;
+  z-index: 40;
+  display: grid;
+  gap: 12px;
+}
+
+.top-notice-stack > * {
+  width: 100%;
+}
+
+.runtime-issue-banner,
+.setup-password-notice {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 16px;
   align-items: center;
   padding: 16px 18px;
-  border-radius: 24px;
+  border-radius: var(--overlay-radius);
+  box-shadow: var(--overlay-shadow);
+}
+
+.runtime-issue-banner {
   border: 1px solid rgba(255, 181, 74, 0.22);
   background: linear-gradient(180deg, rgba(15, 18, 28, 0.95), rgba(17, 26, 39, 0.92));
-  box-shadow: 0 20px 56px rgba(0, 0, 0, 0.34);
 }
 
 .runtime-issue-banner-copy {
@@ -42,6 +56,14 @@
   gap: 10px;
 }
 
+.runtime-issue-banner .secondary-button,
+.runtime-issue-banner .primary-button,
+.setup-password-notice .secondary-button {
+  min-height: 60px;
+  padding: 12px 18px;
+  font-size: 1rem;
+}
+
 .technical-error-item {
   display: grid;
   gap: 6px;
@@ -51,20 +73,8 @@
 }
 
 .setup-password-notice {
-  position: fixed;
-  top: 18px;
-  left: 18px;
-  right: 18px;
-  z-index: 40;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 16px;
-  align-items: center;
-  padding: 18px 20px;
-  border-radius: 24px;
   border: 1px solid rgba(255, 181, 74, 0.28);
   background: linear-gradient(180deg, rgba(33, 20, 8, 0.96), rgba(23, 14, 7, 0.94));
-  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.34);
 }
 
 .setup-password-notice-copy {

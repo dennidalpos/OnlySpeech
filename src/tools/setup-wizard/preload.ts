@@ -91,7 +91,7 @@ function emitWizardTextToSpeechEvent(event: TextToSpeechEventPayload): void {
   }
 }
 
-async function runLocalTextToSpeechPreview(
+async function runProviderTextToSpeechPreview(
   request: TextToSpeechTestRequest
 ): Promise<SetupWizardTextToSpeechPreviewResult> {
   const translationProvider = request.translationProvider ?? "chatgpt";
@@ -126,7 +126,7 @@ async function runLocalTextToSpeechPreview(
       }
 
       settled = true;
-      reject(new Error("Timed out while starting the local TTS preview."));
+      reject(new Error("Timed out while starting the provider playback preview."));
     }, 2000);
     const maybeResolve = (event: TextToSpeechEventPayload) => {
       if (
@@ -161,7 +161,7 @@ async function runLocalTextToSpeechPreview(
   });
 
   if (initialEvent.type !== "started") {
-    throw new Error(initialEvent.error || "Local TTS preview is unavailable.");
+    throw new Error(initialEvent.error || "Provider playback preview is unavailable.");
   }
 
   return {
@@ -229,7 +229,7 @@ const api = {
     request: TextToSpeechTestRequest
   ): Promise<SetupWizardTextToSpeechPreviewResult> {
     return ipcRenderer.invoke("wizard:get-state").then((currentState: WizardState) =>
-      runLocalTextToSpeechPreview({
+      runProviderTextToSpeechPreview({
         ...request,
         azureSpeechKey:
           request.azureSpeechKey ?? currentState?.envValues?.AZURE_SPEECH_KEY ?? "",

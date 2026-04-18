@@ -2,15 +2,15 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { FlagIcon } from "../../renderer/operator/components/FlagIcon.js";
 import {
-  buildCommonProviderInteractionLanguageChoices,
-  buildCommonProviderInteractionLanguageOptionGroups,
-  buildCommonProviderInteractionLanguageSourceLocaleMap,
-  buildCommonProviderSpeechSourceLanguageChoices,
-  buildInteractionLanguageChoices
+  buildInteractionLanguageChoices,
+  buildInteractionLanguageOptionGroups,
+  buildInteractionLanguageSourceLocaleMap,
+  buildProviderSpeechSourceLanguageChoices
 } from "../../shared/language-flow.js";
-import { buildInteractionLanguageMacroAreaGroups } from "../../shared/language-selector-map.js";
+import { findSourceLanguageOption } from "../../shared/language-options.js";
+import { buildInteractionLanguageRegionGroups } from "../../shared/language-selector-map.js";
 import {
-  buildCommonProviderTranslationTargetOptionGroups
+  buildTranslationTargetOptionGroups
 } from "../../shared/language-registry.js";
 import { getRuntimeDisclosureText } from "../../shared/runtime-disclosure.js";
 import {
@@ -39,7 +39,8 @@ const chatGptTranscribeModelOptions = [
 
 const translationProviders = [
   { value: "chatgpt", label: "ChatGPT" },
-  { value: "azure", label: "Azure Speech" }
+  { value: "azure", label: "Azure Speech" },
+  { value: "ollama", label: "Ollama" }
 ];
 
 const logLevelOptions = [
@@ -50,11 +51,11 @@ const logLevelOptions = [
 ];
 
 function buildInteractionLanguageFlagMarkupByProvider() {
-  const providers = ["chatgpt", "azure"] as const;
+  const providers = ["chatgpt", "azure", "ollama"] as const;
 
   return Object.fromEntries(
     providers.map((provider) => {
-      const entries = buildCommonProviderInteractionLanguageChoices(provider).map((choice) => [
+      const entries = buildInteractionLanguageChoices(provider, { includeProviderExpansions: true }).map((choice) => [
         choice.value,
         renderToStaticMarkup(
           createElement(FlagIcon, {
@@ -70,7 +71,7 @@ function buildInteractionLanguageFlagMarkupByProvider() {
 }
 
 function buildInteractionLanguageLabelsByProvider() {
-  const providers = ["chatgpt", "azure"] as const;
+  const providers = ["chatgpt", "azure", "ollama"] as const;
 
   return Object.fromEntries(
     providers.map((provider) => [
@@ -83,6 +84,24 @@ function buildInteractionLanguageLabelsByProvider() {
       )
     ])
   );
+}
+
+function buildTranslationSourceLanguageChoices(provider?: "chatgpt" | "azure" | "ollama") {
+  const seen = new Set<string>();
+
+  return buildInteractionLanguageChoices(provider, { includeProviderExpansions: true }).flatMap((choice) => {
+    if (!choice.sourceLocale || seen.has(choice.sourceLocale)) {
+      return [];
+    }
+
+    const option = findSourceLanguageOption(choice.sourceLocale);
+    if (!option) {
+      return [];
+    }
+
+    seen.add(choice.sourceLocale);
+    return [{ ...option }];
+  });
 }
 
 export function getSetupWizardControlPageData(uiLanguage: SetupWizardUiLanguage = "en") {
@@ -104,41 +123,50 @@ export function getSetupWizardControlPageData(uiLanguage: SetupWizardUiLanguage 
     wizardConfigurationIssuesFunction: getWizardConfigurationIssues.toString(),
     wizardRuntimeProfileFunction: getWizardRuntimeProfile.toString(),
     sourceLanguageOptionsByProvider: JSON.stringify({
-      chatgpt: buildCommonProviderSpeechSourceLanguageChoices("chatgpt"),
-      azure: buildCommonProviderSpeechSourceLanguageChoices("azure")
+      chatgpt: buildProviderSpeechSourceLanguageChoices("chatgpt", { includeProviderExpansions: true }),
+      azure: buildProviderSpeechSourceLanguageChoices("azure", { includeProviderExpansions: true }),
+      ollama: buildTranslationSourceLanguageChoices("ollama")
     }),
     chatGptModelOptions: JSON.stringify(chatGptModelOptions),
     chatGptTranscribeModelOptions: JSON.stringify(chatGptTranscribeModelOptions),
     translationProviders: JSON.stringify(translationProviders),
     interactionLanguageChoicesByProvider: JSON.stringify({
-      chatgpt: buildCommonProviderInteractionLanguageChoices("chatgpt"),
-      azure: buildCommonProviderInteractionLanguageChoices("azure")
+      chatgpt: buildInteractionLanguageChoices("chatgpt", { includeProviderExpansions: true }),
+      azure: buildInteractionLanguageChoices("azure", { includeProviderExpansions: true }),
+      ollama: buildInteractionLanguageChoices("ollama", { includeProviderExpansions: true })
     }),
     interactionLanguageOptionGroupsByProvider: JSON.stringify({
-      chatgpt: buildCommonProviderInteractionLanguageOptionGroups("chatgpt"),
-      azure: buildCommonProviderInteractionLanguageOptionGroups("azure")
+      chatgpt: buildInteractionLanguageOptionGroups("chatgpt", { includeProviderExpansions: true }),
+      azure: buildInteractionLanguageOptionGroups("azure", { includeProviderExpansions: true }),
+      ollama: buildInteractionLanguageOptionGroups("ollama", { includeProviderExpansions: true })
     }),
     interactionLanguageFlagMarkupByProvider: JSON.stringify(buildInteractionLanguageFlagMarkupByProvider()),
     interactionLanguageLabelsByProvider: JSON.stringify(buildInteractionLanguageLabelsByProvider()),
     interactionLanguageSupportedCodesByProvider: JSON.stringify({
-      chatgpt: buildCommonProviderInteractionLanguageChoices("chatgpt").map((choice) => choice.value),
-      azure: buildCommonProviderInteractionLanguageChoices("azure").map((choice) => choice.value)
+      chatgpt: buildInteractionLanguageChoices("chatgpt", { includeProviderExpansions: true }).map((choice) => choice.value),
+      azure: buildInteractionLanguageChoices("azure", { includeProviderExpansions: true }).map((choice) => choice.value),
+      ollama: buildInteractionLanguageChoices("ollama", { includeProviderExpansions: true }).map((choice) => choice.value)
     }),
     interactionLanguageMacroAreaGroupsByProvider: JSON.stringify({
-      chatgpt: buildInteractionLanguageMacroAreaGroups(
-        buildCommonProviderInteractionLanguageChoices("chatgpt")
+      chatgpt: buildInteractionLanguageRegionGroups(
+        buildInteractionLanguageChoices("chatgpt", { includeProviderExpansions: true })
       ),
-      azure: buildInteractionLanguageMacroAreaGroups(
-        buildCommonProviderInteractionLanguageChoices("azure")
+      azure: buildInteractionLanguageRegionGroups(
+        buildInteractionLanguageChoices("azure", { includeProviderExpansions: true })
+      ),
+      ollama: buildInteractionLanguageRegionGroups(
+        buildInteractionLanguageChoices("ollama", { includeProviderExpansions: true })
       )
     }),
     translationTargetOptionGroupsByProvider: JSON.stringify({
-      chatgpt: buildCommonProviderTranslationTargetOptionGroups("chatgpt"),
-      azure: buildCommonProviderTranslationTargetOptionGroups("azure")
+      chatgpt: buildTranslationTargetOptionGroups("chatgpt", { includeProviderExpansions: true }),
+      azure: buildTranslationTargetOptionGroups("azure", { includeProviderExpansions: true }),
+      ollama: buildTranslationTargetOptionGroups("ollama", { includeProviderExpansions: true })
     }),
     sourceLocaleByTargetLanguageByProvider: JSON.stringify({
-      chatgpt: buildCommonProviderInteractionLanguageSourceLocaleMap("chatgpt"),
-      azure: buildCommonProviderInteractionLanguageSourceLocaleMap("azure")
+      chatgpt: buildInteractionLanguageSourceLocaleMap("chatgpt", { includeProviderExpansions: true }),
+      azure: buildInteractionLanguageSourceLocaleMap("azure", { includeProviderExpansions: true }),
+      ollama: buildInteractionLanguageSourceLocaleMap("ollama", { includeProviderExpansions: true })
     }),
     runtimeDisclosureDefaultsByLanguage: JSON.stringify(runtimeDisclosureDefaultsByLanguage),
     logLevelOptions: JSON.stringify(logLevelOptions)

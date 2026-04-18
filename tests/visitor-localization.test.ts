@@ -164,6 +164,29 @@ describe("visitor-localization", () => {
     expect(getVisitorTechnicalErrorText("bg").technicalError).toBe("Техническа грешка");
   });
 
+  it("keeps dedicated visitor microphone recovery copy localized for supported languages", () => {
+    const permissionIssue = {
+      code: "microphone-permission-denied",
+      message: "Accesso al microfono bloccato.",
+      retryable: true
+    } as const;
+    const unavailableIssue = {
+      code: "microphone-unavailable",
+      message: "Il microfono assegnato non e disponibile.",
+      retryable: true
+    } as const;
+
+    expect(localizeVisitorTechnicalIssue(permissionIssue, "es").message).toBe(
+      "El acceso al microfono esta bloqueado. Pide al operador que vuelva a abrir la configuracion."
+    );
+    expect(localizeVisitorTechnicalIssue(unavailableIssue, "fr").message).toBe(
+      "Le microphone assigne n'est pas disponible. Demandez a l'operateur de rouvrir la configuration."
+    );
+    expect(localizeVisitorTechnicalIssue(permissionIssue, "zh").message).toBe(
+      "麦克风访问已被阻止。请让操作员重新打开设置。"
+    );
+  });
+
   it("uses the dedicated Albanian technical copy with full locale coverage", () => {
     const speechIssue = {
       code: "speech-stream-failure",

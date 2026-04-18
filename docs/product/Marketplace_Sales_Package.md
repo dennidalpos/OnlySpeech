@@ -125,13 +125,9 @@ The buyer must provide credentials for the selected Azure Speech or OpenAI provi
 - The support channel baseline is the repository issue tracker at <https://github.com/dennidalpos/OnlySpeech/issues>.
 - No uptime SLA, hosted-service SLA, or provider-consumption commitment is included in this marketplace baseline.
 
-## Visual Asset Checklist
+## Visual Asset Guidance
 
-- square application icon from `build/icon.png` or `build/icon.ico`
-- `docs/product/screenshots/runtime-operator-view.png`
-- `docs/product/screenshots/runtime-visitor-view.png`
-- `docs/product/screenshots/setup-stations.png`
-- `docs/product/screenshots/setup-languages-tts.png`
-- `docs/product/screenshots/setup-diagnostics.png`
-- one captioned image that states the product is desktop/B2B, two-screen, and AI-assisted
-- one silent marketplace demo video up to 20 seconds, generated with `scripts/internal/docs/write-product-demo-video.ps1` when marketplace video collateral is being prepared
+- Use the shipped application icon from `build/icon.png` or `build/icon.ico` as the canonical verified visual asset.
+- Use regenerated screenshots from `docs/product/screenshots/` only when `npm run docs:screenshots` has been run for the current repository state and the resulting images have been reviewed.
+- Use a silent marketplace demo video only when it has been explicitly regenerated for the current repository state with `scripts/internal/docs/write-product-demo-video.ps1`.
+- Do not market screenshots, posters, or demo video as repository-tracked collateral unless the corresponding files actually exist in the reviewed workspace.

@@ -42,6 +42,11 @@ const RUNTIME_ENV_DEFAULTS = Object.freeze({
   CHATGPT_API_KEY: "",
   CHATGPT_MODEL: "gpt-4.1-mini",
   CHATGPT_TRANSCRIBE_MODEL: "gpt-4o-mini-transcribe",
+  OLLAMA_BASE_URL: "http://localhost:11434/api",
+  OLLAMA_MODEL: "gemma3",
+  OLLAMA_REQUEST_TIMEOUT_MS: "45000",
+  OLLAMA_STREAMING_ENABLED: "false",
+  OLLAMA_API_KEY: "",
   DEFAULT_TARGET_LANG_A: "en",
   DEFAULT_TARGET_LANG_B: "en",
   LOG_LEVEL: "info"
@@ -89,6 +94,11 @@ const NUMERIC_ENV_RULES: Readonly<Partial<Record<RuntimeEnvKey, NumericRule>>> =
   },
   PROVIDER_REQUEST_TIMEOUT_MS: {
     fallback: RUNTIME_ENV_DEFAULTS.PROVIDER_REQUEST_TIMEOUT_MS,
+    integer: true,
+    min: 1
+  },
+  OLLAMA_REQUEST_TIMEOUT_MS: {
+    fallback: RUNTIME_ENV_DEFAULTS.OLLAMA_REQUEST_TIMEOUT_MS,
     integer: true,
     min: 1
   },

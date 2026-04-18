@@ -1,6 +1,6 @@
 # Provider Setup
 
-OnlySpeech supports two live speech providers: `azure` and `chatgpt`. This page documents only the repository-specific setup boundary and links to official provider documentation for account, billing, model, quota, and API details.
+OnlySpeech supports two live speech providers, `azure` and `chatgpt`, plus one translation-only provider, `ollama`. This page documents only the repository-specific setup boundary and links to official provider documentation for account, billing, model, quota, and API details.
 
 For deterministic validation without provider credentials, use `RUNTIME_MODE=demo`.
 
@@ -11,6 +11,7 @@ For deterministic validation without provider credentials, use `RUNTIME_MODE=dem
 - Validate provider changes on the target workstation before handover.
 - Treat official provider documentation as the source of truth for current API behavior.
 - Do not promise local text-to-speech fallback. Runtime playback is provider-owned.
+- `ollama` remains translation-only in the current product contract. It can be used for demo-side translation validation and diagnostics, but it does not satisfy live kiosk speech prerequisites because there is no Ollama STT or TTS path in OnlySpeech.
 
 ## Azure Provider
 
@@ -82,6 +83,44 @@ Official OpenAI links:
 - Speech API reference: <https://developers.openai.com/api/reference/resources/audio/subresources/speech/methods/create>
 - Models overview: <https://developers.openai.com/api/docs/models>
 
+## Ollama Provider
+
+Set `TRANSLATION_PROVIDER=ollama`.
+
+Required values:
+
+- `OLLAMA_BASE_URL`
+- `OLLAMA_MODEL`
+
+Optional values:
+
+- `OLLAMA_REQUEST_TIMEOUT_MS`
+- `OLLAMA_STREAMING_ENABLED`
+- `OLLAMA_API_KEY`
+
+Repository defaults:
+
+- `OLLAMA_BASE_URL=http://localhost:11434/api`
+- `OLLAMA_MODEL=gemma3`
+- `OLLAMA_REQUEST_TIMEOUT_MS=45000`
+- `OLLAMA_STREAMING_ENABLED=false`
+
+OnlySpeech uses Ollama only for translation requests and provider diagnostics. The setup wizard accepts Ollama for translation-only demo flows, but live kiosk speech remains blocked because the repository does not expose Ollama-backed STT or TTS.
+
+Ollama setup path:
+
+1. Install Ollama for Windows or provision a reachable Ollama host.
+2. Pull or otherwise install the model referenced by `OLLAMA_MODEL`.
+3. Set `OLLAMA_BASE_URL` to the host that serves the Ollama API.
+4. Enter the Ollama values in OnlySpeech.
+5. Run the setup-wizard provider test and confirm the version, model inventory, and translation checks before handover.
+
+Official Ollama links:
+
+- Ollama Windows install: <https://docs.ollama.com/windows>
+- Ollama API introduction: <https://docs.ollama.com/api>
+- Ollama quickstart: <https://docs.ollama.com/quickstart>
+
 ## Verification State
 
-Repository tests cover request shaping, provider policy, wizard gating, and runtime routing with local/test-double verification. Final live speech proof still requires real provider credentials, microphones, speakers, and a target-equivalent Windows workstation; that external work is tracked in `PROJECT_STATUS.json`.
+Repository tests cover request shaping, provider policy, wizard gating, and runtime routing with local/test-double verification. Final live speech proof still requires real provider credentials, microphones, speakers, and a target-equivalent Windows workstation for the `azure` and `chatgpt` paths. The `ollama` path separately still requires reachable-server validation against the configured host and model; if that follow-up is intentionally tracked, keep it in `PROJECT_STATUS.json`.

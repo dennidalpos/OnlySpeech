@@ -81,8 +81,8 @@ Packaged autostart is managed by the setup wizard through the current user's Win
 
 ### `scripts/internal/docs/`
 
-- `write-product-demo-video.ps1`: writes the marketplace demo video and poster under `media/marketplace-demo/` using repo-owned tooling.
-- `write-product-screenshots.ps1`: regenerates versioned product screenshots using repo-owned tooling.
+- `write-product-demo-video.ps1`: writes optional marketplace demo video collateral and poster under `media/marketplace-demo/` using repo-owned tooling.
+- `write-product-screenshots.ps1`: regenerates optional product screenshot collateral under `docs/product/screenshots/` using repo-owned tooling.
 
 ## Maintenance Rule
 

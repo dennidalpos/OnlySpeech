@@ -687,6 +687,54 @@ describe("operator app mounted UI smoke coverage", () => {
     });
   });
 
+  it("updates the runtime document language metadata to match the rendered visitor UI", async () => {
+    const appState = createAppState();
+    appState.sides.B.requestedUiLanguage = "es";
+    appState.sides.B.effectiveUiLanguage = "es";
+
+    await renderOperatorApp("B", appState);
+
+    expect(document.documentElement.lang).toBe("es");
+    expect(document.documentElement.dir).toBe("ltr");
+  });
+
+  it("switches the runtime document direction for rtl visitor surfaces", async () => {
+    const appState = createAppState();
+    appState.sides.B.selectedInteractionLanguage = "ar";
+    appState.sides.B.normalizedTargetLanguage = "ar";
+    appState.sides.B.selectedTargetLanguage = "ar";
+    appState.sides.B.requestedUiLanguage = "ar";
+    appState.sides.B.effectiveUiLanguage = "ar";
+
+    await renderOperatorApp("B", appState);
+
+    expect(document.documentElement.lang).toBe("ar");
+    expect(document.documentElement.dir).toBe("rtl");
+  });
+
+  it("keeps the visitor runtime banner localized for microphone permission errors on spanish surfaces", async () => {
+    const appState = createAppState();
+    const harness = await renderOperatorApp("B", appState);
+
+    appState.sides.B.requestedUiLanguage = "es";
+    appState.sides.B.effectiveUiLanguage = "es";
+    appState.health.blockingIssues = [
+      {
+        code: "microphone-permission-denied",
+        message: "Accesso al microfono bloccato per la postazione.",
+        retryable: true,
+        side: "B",
+        details: "NotAllowedError: Permission denied"
+      }
+    ];
+
+    await harness.emitState(appState);
+
+    expect(bodyText()).toContain("El acceso al microfono esta bloqueado.");
+    expect(bodyText()).toContain("Pide al operador que vuelva a abrir la configuracion.");
+    expect(bodyText()).not.toContain("Ask the operator to reopen setup.");
+  });
+
   it("offers setup repair from the operator blocking screen for microphone permission errors", async () => {
     const appState = createAppState();
     const harness = await renderOperatorApp("A", appState);

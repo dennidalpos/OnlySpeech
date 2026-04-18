@@ -4,38 +4,37 @@
 
 <p align="center"><strong>Windows-first desktop workstation for guided two-person speech translation.</strong></p>
 
-OnlySpeech is an Electron application for a single Windows workstation with two coordinated display surfaces. The repository includes the runtime UI, setup wizard, diagnostics, source launch scripts, Windows packaging, and retained verification artifacts for workstation handover.
+## Overview
 
-## What You See
+OnlySpeech is a Windows-first Electron desktop application for one workstation with two coordinated display surfaces. The repository currently supports the runtime UI, the integrated setup wizard, automated verification, Windows packaging, and the technical evidence used to validate the supported delivery path.
+
+## Verified Features
 
 - One operator-facing and one visitor-facing conversation surface on the same Windows PC.
 - Guided language confirmation before live speech starts.
-- Push-to-talk speech flow for either two dedicated microphones or one shared microphone profile.
-- Integrated setup for displays, microphones, providers, diagnostics, activation state, and startup preferences.
-- `demo` mode for deterministic validation without live provider credentials.
+- Push-to-talk speech flow with either two dedicated microphones or one shared microphone profile.
+- Integrated setup for displays, microphones, providers, diagnostics, activation, and packaged startup preferences.
+- Live speech provider paths for `azure` and `chatgpt`, plus translation-only `ollama` diagnostics and demo validation.
+- Deterministic `demo` mode for validation without live provider credentials.
 - Windows packaging outputs for installer, portable, and unpacked delivery.
 
-## Why It Matters
-
-The repository is structured for Windows-first delivery rather than a browser SaaS flow. It keeps runtime, packaging, commissioning, and release evidence in one codebase, with PowerShell wrappers and GitHub Actions workflows aligned to the same Windows verification path.
-
-## Windows-First Setup
+## Verified Windows-First Setup
 
 1. Use Windows x64 with Node.js 22+ and npm 10+.
 2. Run `npm run bootstrap`.
 3. Run `npm run dev` for the watch workspace, or `npm run start` for a direct source launch.
-4. Configure the runtime through the setup wizard or the runtime `.env` contract documented in the technical docs.
+4. Complete workstation configuration through the integrated setup wizard or the runtime `.env` contract described in the technical documentation.
 
 Live kiosk use still depends on the target workstation having two active displays and either two assignable microphones or one shared microphone profile.
 
 ## Current Status
 
-The repository currently provides source startup, automated tests, Windows CI, and packaged Windows outputs. Remaining release blockers are external or workstation-specific: release signing inputs, retained comparison installers for upgrade and rollback, packaged activation closure on the target machine, real-hardware commissioning and live speech proof, and deployment-specific legal/privacy review.
+The repository verifies source startup, automated tests, Windows CI, packaged outputs, and packaged install lifecycle from the repository itself. Release completion still depends on external or workstation-specific inputs such as Windows signing credentials, retained comparison installers for upgrade and rollback, target-workstation activation and commissioning evidence, live provider proof on real hardware, optional reachable-server Ollama validation, and deployment-specific legal/privacy review.
 
-## Technical Docs
+## Technical Documentation
 
-- [docs/README.md](docs/README.md) for the technical documentation map.
 - [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md) for runtime, verification, packaging, and release boundaries.
 - [scripts/README.md](scripts/README.md) for the PowerShell and npm command surface.
 - [docs/product/provider-setup.md](docs/product/provider-setup.md) for provider setup boundaries and official references.
-- [PROJECT_STATUS.json](PROJECT_STATUS.json) for the current residual backlog only.
+- [docs/product/Marketplace_Sales_Package.md](docs/product/Marketplace_Sales_Package.md) for seller-facing marketplace copy and delivery positioning.
+- [PROJECT_STATUS.json](PROJECT_STATUS.json) for residual documentation follow-up only.

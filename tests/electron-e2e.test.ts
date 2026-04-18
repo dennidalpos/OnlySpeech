@@ -1055,7 +1055,7 @@ describeWindows("Electron runtime end-to-end coverage", () => {
 
       expect(selectorInspect.selectorTitle).toBe(englishVisitorLabels.selectLanguageTitle);
       expect(selectorInspect.activeMacroAreaLabel).toBeTruthy();
-      expect(selectorInspect.macroAreaLabels).toContain("Asia");
+      expect(selectorInspect.macroAreaLabels).toContain("Europe");
       expect(selectorInspect.selectedLanguageTileLabel).toContain("ქართული");
 
       await fetchJson(port, "/kiosk/operator-action", {

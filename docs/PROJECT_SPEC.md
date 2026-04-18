@@ -9,10 +9,10 @@ OnlySpeech is a Windows-first Electron desktop translation workstation for assis
 This document is the long-form technical contract for the repository. It does not duplicate every script option or test assertion.
 
 - `README.md` is a GitHub-facing storefront summary only.
-- `docs/README.md` is the technical documentation map.
+- `docs/PROJECT_SPEC.md` is the primary technical contract; the rest of `docs/` contains the supporting runbooks, product notes, and buyer-facing collateral referenced from that contract.
 - `scripts/README.md` is the canonical script index and PowerShell side-effect map.
 - `.github/workflows/*.yml` are the canonical CI and tagged-release workflow definitions.
-- `PROJECT_STATUS.json` tracks current external blockers and residual verification work.
+- `PROJECT_STATUS.json` tracks only explicit residual follow-up that is intentionally left open after repository changes; it is not a changelog.
 
 ## Product Boundary
 
@@ -44,7 +44,7 @@ Not supported by the repository contract:
 - `MICROPHONE_PTT_MODE=dual-dedicated` assigns one live microphone per side.
 - `MICROPHONE_PTT_MODE=single-shared` mirrors one selected microphone to both sides and alternates push-to-talk ownership.
 - The speaking side sees transcript text; the opposite side sees translated text.
-- Text-to-speech is provider-owned only: Azure mode uses Azure TTS, ChatGPT mode uses OpenAI TTS, and no local TTS fallback is part of the product contract.
+- Text-to-speech is provider-owned only: Azure mode uses Azure TTS, ChatGPT mode uses OpenAI TTS, Ollama exposes no TTS path, and no local TTS fallback is part of the product contract.
 - Text-to-speech stops on reset, language change, shutdown, or live push-to-talk capture.
 - Changing language after session start creates a new shared session and clears active conversation state for both sides.
 - Conversation history stays disabled unless explicitly enabled.
@@ -65,7 +65,7 @@ Not supported by the repository contract:
 - `tooling`: repo-owned helper utilities.
 - `tools`: local or vendored tool payloads; not part of the packaged runtime contract unless a specific flow documents them.
 - `build`: icons and packaging assets.
-- `docs`: technical docs, buyer material, internal runbooks, product collateral, screenshots, and decisions.
+- `docs`: technical docs, buyer material, internal runbooks, product collateral, optional generated screenshot collateral when explicitly produced, and decisions.
 - `media`: tracked source or marketplace media that must stay versioned.
 
 ## Toolchain Baseline
@@ -82,19 +82,21 @@ Main process responsibilities include bootstrap, runtime root selection, activat
 
 Renderer responsibilities include the operator and visitor conversation surfaces, activation UI, setup-wizard access prompts, language selection, push-to-talk controls, runtime issue banners, and localized user-facing copy.
 
-Shared and service modules define config, language policy, provider language matrix, runtime diagnostics, logging, privacy/session behavior, media-device probing, Azure/OpenAI speech clients, and text-to-speech provider behavior.
+Shared and service modules define config, language policy, provider language matrix, runtime diagnostics, logging, privacy/session behavior, media-device probing, Azure/OpenAI/Ollama provider adapters, and text-to-speech provider behavior.
 
 The setup wizard persists workstation configuration, validates provider settings, manages packaged license state, manages current-user packaged autostart, and renders diagnostics. It is implemented across `src/main/setup-wizard-*` and `src/tools/setup-wizard/`.
 
 ## Runtime Modes
 
-`demo` mode runs a deterministic scripted loop. It is suitable for setup validation and screenshots without live provider credentials.
+`demo` mode runs a deterministic scripted loop. It is suitable for setup validation and optional collateral capture without live provider credentials.
 
 `kiosk` mode runs live speech translation once displays, microphones, provider credentials, and language confirmations are ready.
 
 `azure` provider mode uses Azure Speech for speech recognition/translation and Azure TTS for playback. Optional Azure Translator credentials are used only for diagnostics that require them.
 
 `chatgpt` provider mode uses OpenAI transcription/translation and OpenAI TTS for playback.
+
+`ollama` provider mode uses an Ollama server for translation-only chat validation and demo-side diagnostics. It does not provide live speech capture or playback, so full live kiosk speech remains blocked when `TRANSLATION_PROVIDER=ollama`.
 
 Provider account setup boundaries and official documentation links live in `docs/product/provider-setup.md`.
 
@@ -113,10 +115,10 @@ The supported runtime keys, key order, secure-key metadata, provider validation,
 Important externalized choices include:
 
 - `RUNTIME_MODE`: `kiosk` or `demo`;
-- `TRANSLATION_PROVIDER`: `azure` or `chatgpt`;
+- `TRANSLATION_PROVIDER`: `azure`, `chatgpt`, or `ollama`;
 - microphone profile and side assignments;
 - operator and visitor default languages;
-- provider credentials and model overrides;
+- provider credentials, server endpoints, and model overrides;
 - conversation history setting;
 - setup access and packaged startup preferences.
 
@@ -198,7 +200,7 @@ Release-side scripts produce `artifacts/logs/release-evidence.json`, `artifacts/
 - `artifacts/build/`: transient install lifecycle and script-audit working data.
 - `%LOCALAPPDATA%\OnlySpeech\logs`: workstation runtime logs.
 
-Repo-local generated outputs are ignored by `.gitignore`; tracked product screenshots and marketplace media are intentionally versioned.
+Repo-local generated outputs are ignored by `.gitignore`. Optional screenshot and marketplace-demo collateral can be regenerated through the documented scripts when that collateral is intentionally being prepared and reviewed.
 
 ## Supporting Documentation
 
@@ -218,4 +220,5 @@ The repository can be locally aligned and technically verified without claiming 
 - packaged activation validation on the real target workstation with customer activation inputs;
 - a physical target workstation with actual displays, microphones, speakers, and touch hardware;
 - previous signed installers for upgrade and rollback validation;
+- for `TRANSLATION_PROVIDER=ollama`, a reachable Ollama host and installed model matching `OLLAMA_BASE_URL` and `OLLAMA_MODEL`;
 - deployment-specific legal and privacy review outside the repository.

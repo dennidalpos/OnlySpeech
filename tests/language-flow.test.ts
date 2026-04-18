@@ -37,6 +37,8 @@ describe("language-flow", () => {
       regionCode: "IT",
       sourceLocale: "it-IT"
     });
+    expect(choices.every((choice) => choice.regionIds.length > 0)).toBe(true);
+    expect(choices.every((choice) => choice.regionIds.includes(choice.primaryRegionId))).toBe(true);
   });
 
   it("exposes the same centralized source-locale mapping used by the wizard", () => {

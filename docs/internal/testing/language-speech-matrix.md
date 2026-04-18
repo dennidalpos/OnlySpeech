@@ -6,6 +6,8 @@ Manual operator matrix for the end-to-end speech path:
 
 Use this page for manual validation on a real workstation after setup or packaging changes.
 
+This matrix applies only to the live speech-ready providers, `azure` and `chatgpt`. `ollama` is intentionally excluded because the current repository treats it as translation-only with no STT or TTS path.
+
 ## Preconditions
 
 - the setup wizard has already saved monitor, microphone, provider, and initial language selections;
@@ -44,6 +46,7 @@ Record the operator proof directly in `artifacts/logs/live-provider-speech-proof
 
 - Azure mode is Azure-TTS-only for supported languages and does not use local system-voice fallback.
 - ChatGPT mode is OpenAI-TTS-only for the shared kiosk catalog and does not use workstation-managed fallback speech.
+- Ollama remains outside this matrix because OnlySpeech does not expose Ollama-backed live speech capture or playback.
 - Windows speech packs and other workstation-global voices remain outside the product playback surface.
 
 ## Tracking Notes

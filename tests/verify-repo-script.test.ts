@@ -14,9 +14,8 @@ const releaseWorkflowPath = join(repoRoot, ".github", "workflows", "release.yml"
 const publicBootstrapScriptPath = join(repoRoot, "scripts", "public", "bootstrap.ps1");
 const publicCleanWorkstationScriptPath = join(repoRoot, "scripts", "public", "clean-workstation.ps1");
 const publicLicenseKeygenScriptPath = join(repoRoot, "scripts", "public", "license-keygen.ps1");
-const docsReadmePath = join(repoRoot, "docs", "README.md");
 const projectSpecPath = join(repoRoot, "docs", "PROJECT_SPEC.md");
-const marketplaceDemoReadmePath = join(repoRoot, "media", "marketplace-demo", "README.md");
+const marketplaceSalesPackagePath = join(repoRoot, "docs", "product", "Marketplace_Sales_Package.md");
 const readmePath = join(repoRoot, "README.md");
 
 describeWindows("verify-repo.ps1", () => {
@@ -206,39 +205,42 @@ describeWindows("verify-repo.ps1", () => {
 
   it("keeps marketplace demo generation documented against the real script surface", () => {
     const scriptsReadme = readFileSync(scriptsReadmePath, "utf8");
-    const marketplaceDemoReadme = readFileSync(marketplaceDemoReadmePath, "utf8");
+    const marketplaceSalesPackage = readFileSync(marketplaceSalesPackagePath, "utf8");
 
     expect(scriptsReadme).toContain("write-product-demo-video.ps1");
-    expect(scriptsReadme).toContain("writes the marketplace demo video and poster");
-    expect(marketplaceDemoReadme).toContain("write-product-demo-video.ps1");
-    expect(marketplaceDemoReadme).toContain("generated MP4/poster files should be added only when preparing marketplace video collateral");
+    expect(scriptsReadme).toContain("writes optional marketplace demo video collateral and poster");
+    expect(marketplaceSalesPackage).toContain("write-product-demo-video.ps1");
+    expect(marketplaceSalesPackage).toContain("silent marketplace demo video");
   });
 
   it("keeps the repo summary as a storefront instead of a technical command matrix", () => {
     const readme = readFileSync(readmePath, "utf8");
 
     expect(readme).toContain("build/icon.png");
-    expect(readme).toContain("What You See");
-    expect(readme).toContain("Why It Matters");
+    expect(readme).toContain("## Overview");
+    expect(readme).toContain("## Verified Features");
+    expect(readme).toContain("## Verified Windows-First Setup");
+    expect(readme).toContain("## Current Status");
+    expect(readme).toContain("## Technical Documentation");
     expect(readme).toContain("npm run bootstrap");
     expect(readme).toContain("npm run dev");
     expect(readme).toContain("npm run start");
-    expect(readme).toContain("docs/README.md");
+    expect(readme).toContain("docs/PROJECT_SPEC.md");
     expect(readme).not.toContain("## Stable Commands");
     expect(readme).not.toContain("npm run clean:workstation");
     expect(readme).not.toContain("npm run release:customer-bundle");
     expect(readme).not.toContain("npm run release:evidence");
   });
 
-  it("keeps docs/README.md as the technical map and marks the root README as non-normative", () => {
-    const docsReadme = readFileSync(docsReadmePath, "utf8");
+  it("keeps docs/PROJECT_SPEC.md as the primary technical contract and marks the root README as non-normative", () => {
+    const projectSpec = readFileSync(projectSpecPath, "utf8");
 
-    expect(docsReadme).toContain("GitHub-facing storefront summary only");
-    expect(docsReadme).toContain("docs/PROJECT_SPEC.md");
-    expect(docsReadme).toContain("scripts/README.md");
-    expect(docsReadme).toContain(".github/workflows/");
-    expect(docsReadme).toContain("docs/customer-bundle/");
-    expect(docsReadme).toContain("docs/product/Marketplace_Sales_Package.md");
+    expect(projectSpec).toContain("README.md` is a GitHub-facing storefront summary only");
+    expect(projectSpec).toContain("docs/PROJECT_SPEC.md` is the primary technical contract");
+    expect(projectSpec).toContain("scripts/README.md");
+    expect(projectSpec).toContain(".github/workflows/*.yml");
+    expect(projectSpec).toContain("docs/customer-bundle/*");
+    expect(projectSpec).toContain("docs/product/Marketplace_Sales_Package.md");
   });
 
   it("keeps the public bootstrap wrapper pointed at the deterministic npm ci flow", () => {

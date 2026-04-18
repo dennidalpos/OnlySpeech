@@ -795,7 +795,7 @@ describe("setup wizard executable DOM interactions", () => {
     expect(window.document.querySelector("#save-review-strip")?.textContent).toContain("Notice disabled");
   });
 
-  it("runs the local TTS test with the Azure backend when the active provider exposes an exact voice", async () => {
+  it("runs the provider playback test with the Azure backend when the active provider exposes an exact voice", async () => {
     const state = createWizardState();
     state.envValues.TRANSLATION_PROVIDER = "azure";
     const api = createWizardApi(state);
@@ -943,11 +943,11 @@ describe("setup wizard executable DOM interactions", () => {
     expect(window.document.querySelector("#save-feedback")?.textContent).toContain("TEMP-PASS-02");
   });
 
-  it("keeps the local TTS failure visible in the test output instead of leaving the in-progress message", async () => {
+  it("keeps the provider playback failure visible in the test output instead of leaving the in-progress message", async () => {
     const state = createWizardState();
     state.envValues.TRANSLATION_PROVIDER = "azure";
     const api = createWizardApi(state);
-    api.testTextToSpeech.mockRejectedValueOnce(new Error("Timed out while starting the local TTS preview."));
+    api.testTextToSpeech.mockRejectedValueOnce(new Error("Timed out while starting the provider playback preview."));
 
     const dom = await createDom(getSetupWizardControlHtml(), api, "http://127.0.0.1/control");
     const { window } = dom;
@@ -956,10 +956,10 @@ describe("setup wizard executable DOM interactions", () => {
     await waitForScripts(window);
 
     expect(window.document.querySelector("#tts-test-result")?.textContent).toContain(
-      "Timed out while starting the local TTS preview."
+      "Timed out while starting the provider playback preview."
     );
     expect(window.document.querySelector("#status-message")?.textContent).toContain(
-      "Timed out while starting the local TTS preview."
+      "Timed out while starting the provider playback preview."
     );
   });
 

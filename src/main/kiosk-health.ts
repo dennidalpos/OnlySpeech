@@ -1,7 +1,19 @@
 import { hasSpeechRecognitionConfig, hasTranslationProviderConfig } from "../shared/config.js";
 import type { HealthState, RuntimeConfig, TechnicalIssue } from "../shared/types.js";
+import { getProviderAdapter } from "../services/speech/provider-adapters.js";
 
 export function getSpeechIssues(config: RuntimeConfig): TechnicalIssue[] {
+  const provider = getProviderAdapter(config.translationProvider);
+  if (!provider.supportsStt) {
+    return [
+      {
+        code: "speech-config-missing",
+        message: `${provider.label} does not expose speech-to-text for the live kiosk path.`,
+        retryable: false
+      }
+    ];
+  }
+
   if (hasSpeechRecognitionConfig(config)) {
     return [];
   }
@@ -19,6 +31,17 @@ export function getSpeechIssues(config: RuntimeConfig): TechnicalIssue[] {
 }
 
 export function getTranslationIssues(config: RuntimeConfig): TechnicalIssue[] {
+  const provider = getProviderAdapter(config.translationProvider);
+  if (!provider.supportsTranslation) {
+    return [
+      {
+        code: "translation-config-missing",
+        message: `${provider.label} does not expose translation for the active runtime path.`,
+        retryable: false
+      }
+    ];
+  }
+
   if (hasTranslationProviderConfig(config)) {
     return [];
   }

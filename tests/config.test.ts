@@ -108,7 +108,7 @@ describe("loadRuntimeConfig", () => {
         DEFAULT_TARGET_LANG_B: "still-invalid"
       })
     ).toThrow(
-      "DEFAULT_TARGET_LANG_A='invalid-target' is not supported by the shared user-facing speech catalog for translation provider 'chatgpt'."
+      "DEFAULT_TARGET_LANG_A='invalid-target' is not supported by the provider language registry for translation provider 'chatgpt'."
     );
   });
 
@@ -119,7 +119,7 @@ describe("loadRuntimeConfig", () => {
         DEFAULT_TARGET_LANG_B: "tlh-Latn"
       })
     ).toThrow(
-      "DEFAULT_TARGET_LANG_A='prs' is not supported by the shared user-facing speech catalog for translation provider 'chatgpt'."
+      "DEFAULT_TARGET_LANG_A='prs' is not supported by the provider language registry for translation provider 'chatgpt'."
     );
   });
 

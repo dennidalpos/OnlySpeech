@@ -40,6 +40,11 @@ export const RUNTIME_ENV_FIELDS = [
   { key: "CHATGPT_API_KEY", defaultValue: "", secret: true },
   { key: "CHATGPT_MODEL", defaultValue: "gpt-4.1-mini" },
   { key: "CHATGPT_TRANSCRIBE_MODEL", defaultValue: "gpt-4o-mini-transcribe" },
+  { key: "OLLAMA_BASE_URL", defaultValue: "http://localhost:11434/api" },
+  { key: "OLLAMA_MODEL", defaultValue: "gemma3" },
+  { key: "OLLAMA_REQUEST_TIMEOUT_MS", defaultValue: "45000" },
+  { key: "OLLAMA_STREAMING_ENABLED", defaultValue: "false" },
+  { key: "OLLAMA_API_KEY", defaultValue: "", secret: true },
   { key: "DEFAULT_TARGET_LANG_A", defaultValue: "en" },
   { key: "DEFAULT_TARGET_LANG_B", defaultValue: "en" },
   { key: "LOG_LEVEL", defaultValue: "info" }
@@ -80,6 +85,12 @@ const ENV_EXAMPLE_INLINE_COMMENTS: Readonly<Partial<Record<RuntimeEnvKey, readon
   ],
   VISITOR_CONVERSATION_HISTORY_ENABLED: [
     "# Keep disabled for privacy-first deployments unless the setup wizard is intentionally used to enable on-screen history."
+  ],
+  OLLAMA_BASE_URL: [
+    "# Local Ollama defaults to http://localhost:11434/api; keep this as runtime configuration, not a secret."
+  ],
+  OLLAMA_STREAMING_ENABLED: [
+    "# Enable only when the selected Ollama workflow is ready to consume NDJSON streaming responses."
   ]
 });
 

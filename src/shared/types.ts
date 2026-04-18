@@ -4,7 +4,7 @@ export type { AppMode };
 export type Side = "A" | "B";
 export type UiLanguage = string;
 
-export type TranslationProvider = "azure" | "chatgpt";
+export type TranslationProvider = "azure" | "chatgpt" | "ollama";
 export type RuntimeDisclosureMode = "standard" | "custom" | "disabled";
 export type TextToSpeechEngine = "openai" | "azure";
 export type TextToSpeechContent = "transcript" | "translation" | "technical";
@@ -70,7 +70,7 @@ export type TextToSpeechSynthesisResponse =
 export type ProviderTextToSpeechEngine = TextToSpeechEngine;
 
 export interface ProviderTextToSpeechPolicy {
-  primaryEngine: ProviderTextToSpeechEngine;
+  primaryEngine: ProviderTextToSpeechEngine | null;
   fallbackEngine: ProviderTextToSpeechEngine | null;
   blockOnMissing: boolean;
 }
@@ -157,6 +157,37 @@ export interface TranslationProviderLanguageCapabilities {
   translationTarget: boolean;
   preferredSourceLocale: string | null;
   targetCode: string | null;
+}
+
+export interface ProviderLanguageCapability {
+  languageId: string;
+  stt: boolean;
+  translation: boolean;
+  tts: boolean;
+  sourceLocale: string | null;
+  targetCode: string | null;
+  defaultVoice: string | null;
+  notes: string[];
+  limitations: string[];
+}
+
+export interface ProviderDiagnosticCheck {
+  id: string;
+  label: string;
+}
+
+export interface ProviderAdapter {
+  provider: TranslationProvider;
+  label: string;
+  supportsStt: boolean;
+  supportsTranslation: boolean;
+  supportsTts: boolean;
+  supportsStreaming: boolean;
+  requiresCredentials: boolean;
+  requiresNetworkServer: boolean;
+  supportedLanguages: string[];
+  supportedVoices: string[];
+  diagnosticChecks: ProviderDiagnosticCheck[];
 }
 
 export type OperatorStatus =
@@ -468,6 +499,11 @@ export interface RuntimeConfig {
   chatGptApiKey: string;
   chatGptModel: string;
   chatGptTranscribeModel: string;
+  ollamaBaseUrl: string;
+  ollamaModel: string;
+  ollamaRequestTimeoutMs: number;
+  ollamaStreamingEnabled: boolean;
+  ollamaApiKey: string;
   defaultTargetLangA: string;
   defaultTargetLangB: string;
   defaultSourceLangA: string;

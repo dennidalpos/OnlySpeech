@@ -4,6 +4,9 @@
   --bg-end: #17344a;
   --panel: rgba(8, 18, 30, 0.84);
   --panel-border: rgba(255, 255, 255, 0.12);
+  --surface-border-subtle: rgba(255, 255, 255, 0.08);
+  --surface-border-strong: rgba(255, 255, 255, 0.12);
+  --surface-fill: rgba(255, 255, 255, 0.08);
   --text: #f4f7fb;
   --muted: #bfd2de;
   --accent-warm: #ffb54a;
@@ -11,6 +14,15 @@
   --danger: #ff6a63;
   --success: #5ce4a7;
   --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+  --elevated-control-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+  --overlay-shadow: 0 20px 56px rgba(0, 0, 0, 0.34);
+  --card-padding: 40px;
+  --surface-card-radius: 32px;
+  --surface-panel-radius: 28px;
+  --surface-control-radius: 18px;
+  --surface-pill-radius: 999px;
+  --button-radius: 24px;
+  --overlay-radius: 22px;
   font-family: "Segoe UI", "Arial Nova", sans-serif;
 }
 
@@ -38,7 +50,7 @@ body {
 
 button {
   border: none;
-  border-radius: 24px;
+  border-radius: var(--button-radius);
   cursor: pointer;
   font: inherit;
 }
@@ -66,8 +78,8 @@ button:focus-visible {
   border: 1px solid var(--panel-border);
   background: rgba(7, 15, 25, 0.92);
   box-shadow: var(--shadow);
-  border-radius: 32px;
-  padding: 40px;
+  border-radius: var(--surface-card-radius);
+  padding: var(--card-padding);
 }
 
 .language-card h1,

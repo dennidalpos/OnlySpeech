@@ -182,7 +182,7 @@ describe("operator renderer view state", () => {
     expect(html).toContain("world-map-hotspot active");
     expect(html).toContain("visitor-language-tile selected");
     expect(html).toContain('aria-label="Flag AL"');
-    expect(html).toContain("Evropë");
+    expect(html).toContain("Europe");
     expect(html).toContain("shqip");
     expect(html.match(/visitor-language-tile/g)?.length).toBe(europeanChoices.length);
   });

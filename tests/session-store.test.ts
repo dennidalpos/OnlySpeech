@@ -30,6 +30,11 @@ function createConfig(): RuntimeConfig {
     chatGptModel: "gpt-4.1-mini",
     chatGptTranscribeModel: "gpt-4o-mini-transcribe",
     chatGptSilenceRmsThreshold: 0.02,
+    ollamaBaseUrl: "http://localhost:11434/api",
+    ollamaModel: "gemma3",
+    ollamaRequestTimeoutMs: 45000,
+    ollamaStreamingEnabled: false,
+    ollamaApiKey: "",
     defaultTargetLangA: "it",
     defaultTargetLangB: "en",
     defaultSourceLangA: "it-IT",
@@ -233,7 +238,7 @@ describe("SessionStore", () => {
     }
   });
 
-  it("normalizes provider-only requested languages directly to the shared active language", () => {
+  it("keeps provider-specific requested languages when the active provider supports them", () => {
     const azureStore = new SessionStore({
       ...createConfig(),
       translationProvider: "azure"
@@ -241,9 +246,9 @@ describe("SessionStore", () => {
     azureStore.setTargetLanguage("B", "am");
 
     expect(azureStore.getState().sides.B).toMatchObject({
-      selectedInteractionLanguage: "en",
-      selectedTargetLanguage: "en",
-      sourceLanguage: "en-US"
+      selectedInteractionLanguage: "am",
+      selectedTargetLanguage: "am",
+      sourceLanguage: "am-ET"
     });
 
     const chatGptStore = new SessionStore({
@@ -253,9 +258,9 @@ describe("SessionStore", () => {
     chatGptStore.setTargetLanguage("B", "be");
 
     expect(chatGptStore.getState().sides.B).toMatchObject({
-      selectedInteractionLanguage: "en",
-      selectedTargetLanguage: "en",
-      sourceLanguage: "en-US"
+      selectedInteractionLanguage: "be",
+      selectedTargetLanguage: "be",
+      sourceLanguage: "be-BY"
     });
   });
 

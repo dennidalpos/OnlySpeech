@@ -20,7 +20,8 @@ export function getSetupWizardControlEnvScript(): string {
             providerSpeechAzureListening: "Azure live STT e traduzione stanno ascoltando dal microfono selezionato.",
             providerSpeechAzureReady: "Azure supporta un percorso di validazione live sul microfono selezionato.",
             providerSpeechChatGptRecording: "ChatGPT sta registrando localmente un clip final-turn. Premi di nuovo per inviarlo.",
-            providerSpeechChatGptReady: "ChatGPT usa il caricamento audio final-turn invece dello streaming live nel setup wizard."
+            providerSpeechChatGptReady: "ChatGPT usa il caricamento audio final-turn invece dello streaming live nel setup wizard.",
+            providerSpeechOllamaUnavailable: "Ollama e' disponibile solo per traduzione testuale e diagnostica modello. I test vocali live non sono supportati."
           },
         en: {
             runtimeDisclosureHidden: "The AI notice is hidden in runtime and setup.",
@@ -42,7 +43,8 @@ export function getSetupWizardControlEnvScript(): string {
             providerSpeechAzureListening: "Azure live STT and translation are listening on the selected microphone.",
             providerSpeechAzureReady: "Azure supports a live microphone validation path on the selected microphone.",
             providerSpeechChatGptRecording: "ChatGPT is recording a final-turn clip locally. Press again to upload it.",
-            providerSpeechChatGptReady: "ChatGPT uses final-turn audio upload instead of live streaming in the setup wizard."
+            providerSpeechChatGptReady: "ChatGPT uses final-turn audio upload instead of live streaming in the setup wizard.",
+            providerSpeechOllamaUnavailable: "Ollama is available for text translation and model diagnostics only. Live speech tests are not supported."
           }
       };
       envCopyByLanguage.es = {
@@ -518,6 +520,17 @@ export function getSetupWizardControlEnvScript(): string {
         document.getElementById("env-CHATGPT_TRANSCRIBE_MODEL").innerHTML = genericOptionsHtml(chatGptTranscribeModelOptions, state.envValues.CHATGPT_TRANSCRIBE_MODEL || "gpt-4o-mini-transcribe");
         document.getElementById("env-CHATGPT_MODEL").value = state.envValues.CHATGPT_MODEL || "gpt-4.1-mini";
         document.getElementById("env-CHATGPT_TRANSCRIBE_MODEL").value = state.envValues.CHATGPT_TRANSCRIBE_MODEL || "gpt-4o-mini-transcribe";
+        document.getElementById("env-OLLAMA_BASE_URL").value = state.envValues.OLLAMA_BASE_URL || "http://localhost:11434/api";
+        document.getElementById("env-OLLAMA_MODEL").value = state.envValues.OLLAMA_MODEL || "gemma3";
+        document.getElementById("env-OLLAMA_REQUEST_TIMEOUT_MS").value = state.envValues.OLLAMA_REQUEST_TIMEOUT_MS || "45000";
+        document.getElementById("env-OLLAMA_STREAMING_ENABLED").innerHTML = booleanOptionsHtml(
+          normalizeBooleanEnv(state.envValues.OLLAMA_STREAMING_ENABLED, "false")
+        );
+        document.getElementById("env-OLLAMA_STREAMING_ENABLED").value = normalizeBooleanEnv(
+          state.envValues.OLLAMA_STREAMING_ENABLED,
+          "false"
+        );
+        document.getElementById("env-OLLAMA_API_KEY").value = state.envValues.OLLAMA_API_KEY || "";
         syncWizardUiLanguageControls(state.envValues.SETUP_UI_LANGUAGE || wizardUiLanguage);
         selectorUiLanguageASelect.innerHTML = genericOptionsHtml(
           selectorUiLanguageOptions,
@@ -605,7 +618,7 @@ export function getSetupWizardControlEnvScript(): string {
 
         renderProviderValidationNotices();
 
-        ["SELECTOR_UI_LANGUAGE_A","SELECTOR_UI_LANGUAGE_B","LOG_LEVEL","AZURE_SPEECH_KEY","AZURE_SPEECH_REGION","AZURE_TRANSLATOR_KEY","AZURE_TRANSLATOR_REGION","AZURE_TRANSLATOR_ENDPOINT","TEXT_TO_SPEECH_ENABLED","VISITOR_CONVERSATION_HISTORY_ENABLED","AUDIO_ECHO_CANCELLATION","AUDIO_NOISE_SUPPRESSION","CHATGPT_MODEL","CHATGPT_TRANSCRIBE_MODEL","DEMO_SLIDE_INTERVAL_SECONDS"].forEach((key) => {
+        ["SELECTOR_UI_LANGUAGE_A","SELECTOR_UI_LANGUAGE_B","LOG_LEVEL","AZURE_SPEECH_KEY","AZURE_SPEECH_REGION","AZURE_TRANSLATOR_KEY","AZURE_TRANSLATOR_REGION","AZURE_TRANSLATOR_ENDPOINT","TEXT_TO_SPEECH_ENABLED","VISITOR_CONVERSATION_HISTORY_ENABLED","AUDIO_ECHO_CANCELLATION","AUDIO_NOISE_SUPPRESSION","CHATGPT_MODEL","CHATGPT_TRANSCRIBE_MODEL","OLLAMA_BASE_URL","OLLAMA_MODEL","OLLAMA_REQUEST_TIMEOUT_MS","OLLAMA_STREAMING_ENABLED","OLLAMA_API_KEY","DEMO_SLIDE_INTERVAL_SECONDS"].forEach((key) => {
           const element = document.getElementById("env-" + key);
           element.oninput = () => {
             const nextValue =
@@ -661,7 +674,8 @@ export function getSetupWizardControlEnvScript(): string {
           };
         });
         const providerKeys = {
-          chatgpt: ["CHATGPT_API_KEY", "CHATGPT_MODEL", "CHATGPT_TRANSCRIBE_MODEL"]
+          chatgpt: ["CHATGPT_API_KEY", "CHATGPT_MODEL", "CHATGPT_TRANSCRIBE_MODEL"],
+          ollama: ["OLLAMA_BASE_URL", "OLLAMA_MODEL", "OLLAMA_REQUEST_TIMEOUT_MS", "OLLAMA_STREAMING_ENABLED", "OLLAMA_API_KEY"]
         };
         let visibleProviderCardCount = 0;
         Object.entries(providerKeys).forEach(([provider, keys]) => {
@@ -676,7 +690,18 @@ export function getSetupWizardControlEnvScript(): string {
           keys.forEach((key) => {
             const input = document.getElementById("env-" + key);
             if (input) {
-              input.value = state.envValues[key] || "";
+              if (key === "OLLAMA_STREAMING_ENABLED") {
+                input.innerHTML = booleanOptionsHtml(normalizeBooleanEnv(state.envValues[key], "false"));
+                input.value = normalizeBooleanEnv(state.envValues[key], "false");
+              } else if (key === "OLLAMA_BASE_URL") {
+                input.value = state.envValues[key] || "http://localhost:11434/api";
+              } else if (key === "OLLAMA_MODEL") {
+                input.value = state.envValues[key] || "gemma3";
+              } else if (key === "OLLAMA_REQUEST_TIMEOUT_MS") {
+                input.value = state.envValues[key] || "45000";
+              } else {
+                input.value = state.envValues[key] || "";
+              }
               input.oninput = () => {
                 stageEnvValue({ [key]: input.value });
               };
@@ -750,7 +775,9 @@ export function getSetupWizardControlEnvScript(): string {
         const notices = [];
         const selectedProvider = state.envValues.TRANSLATION_PROVIDER || "chatgpt";
         const disabledState = currentProviderSpeechDisabledState();
-        if (!state.microphonePermissionGranted) {
+        if (selectedProvider === "ollama") {
+          notices.push('<div class="notice info">' + escapeHtml(envCopy.providerSpeechOllamaUnavailable) + '</div>');
+        } else if (!state.microphonePermissionGranted) {
           notices.push('<div class="notice warn">' + escapeHtml(envCopy.providerSpeechGrantPermission) + '</div>');
         } else if (state.microphones.length === 0) {
           notices.push('<div class="notice warn">' + escapeHtml(envCopy.providerSpeechNoMicrophone) + '</div>');

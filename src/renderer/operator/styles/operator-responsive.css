@@ -5,6 +5,7 @@
   .dialog-actions,
   .action-area,
   .visitor-actions,
+  .runtime-issue-banner,
   .setup-password-notice {
     grid-template-columns: 1fr;
   }

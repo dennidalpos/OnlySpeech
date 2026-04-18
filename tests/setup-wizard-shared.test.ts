@@ -163,6 +163,9 @@ describe("setup wizard shared state", () => {
     expect(envText).toContain(
       "# azure requires AZURE_SPEECH_KEY and AZURE_SPEECH_REGION; normalized playback diagnostics also use AZURE_TRANSLATOR_KEY and AZURE_TRANSLATOR_REGION."
     );
+    expect(envText).toContain(
+      "# ollama requires OLLAMA_BASE_URL and OLLAMA_MODEL; it remains translation-only and cannot unlock live kiosk speech."
+    );
   });
 
   it("redacts provider secrets from packaged release env previews", () => {
@@ -205,12 +208,15 @@ describe("setup wizard shared state", () => {
     const envText = buildWizardEnv(state, { secureSecretStorage: true });
 
     expect(envText).toContain("# Ambiente OnlySpeech generato dal setup wizard.");
-    expect(envText).toContain("# Compila solo le credenziali richieste dal provider traduzione selezionato prima dell'uso in produzione.");
+    expect(envText).toContain("# Compila solo le impostazioni richieste dal provider traduzione selezionato prima dell'uso in produzione.");
     expect(envText).toContain("# La riproduzione TTS runtime e' disattivata; diagnostica e manutenzione del wizard restano disponibili.");
     expect(envText).toContain("# Gli avvisi AI runtime e wizard sono disattivati.");
     expect(envText).toContain("# I segreti provider vengono archiviati nello storage locale sicuro di Windows per le installazioni pacchettizzate.");
     expect(envText).toContain(
       "# azure richiede AZURE_SPEECH_KEY e AZURE_SPEECH_REGION; il test playback con normalizzazione testo usa anche AZURE_TRANSLATOR_KEY e AZURE_TRANSLATOR_REGION."
+    );
+    expect(envText).toContain(
+      "# ollama richiede OLLAMA_BASE_URL e OLLAMA_MODEL; resta solo traduzione e non abilita il kiosk live speech."
     );
   });
 

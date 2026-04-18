@@ -20,7 +20,7 @@ export function getSetupWizardControlLanguageScript(): string {
             microphoneRecordingFailed: "Registrazione microfono fallita.",
             initialLanguagesReady: "Le lingue iniziali runtime sono pronte per il provider attivo.",
             initialLanguagesAttention: "La copertura lingue runtime iniziale richiede attenzione prima di Applica e chiudi in live mode.",
-            languageCoverageSharedCatalog: "Il provider attivo controlla il catalogo condiviso usato per setup live iniziale e validazione playback.",
+            languageCoverageSharedCatalog: "Il provider attivo controlla il registry lingue e capacita' usato per setup live iniziale e validazione playback.",
             azureCoverageMissing: "La copertura voce Azure non e' ancora risolta per questa lingua.",
             azureCoverageReady: "Voce Azure pronta: ",
             azureCoverageCatalogLoading: "Il catalogo voci Azure e' ancora in caricamento o non disponibile."
@@ -45,7 +45,7 @@ export function getSetupWizardControlLanguageScript(): string {
             microphoneRecordingFailed: "Microphone recording failed.",
             initialLanguagesReady: "Initial runtime languages are ready for the active provider.",
             initialLanguagesAttention: "Initial runtime language coverage needs attention before live Apply and Close.",
-            languageCoverageSharedCatalog: "The active provider controls the shared language catalog used for initial live setup and playback validation.",
+            languageCoverageSharedCatalog: "The active provider controls the language capability registry used for initial live setup and playback validation.",
             azureCoverageMissing: "Azure voice coverage is still unresolved for this language.",
             azureCoverageReady: "Azure voice ready: ",
             azureCoverageCatalogLoading: "Azure voice catalog is still loading or unavailable."

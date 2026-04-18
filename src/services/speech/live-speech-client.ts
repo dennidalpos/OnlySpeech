@@ -1,6 +1,7 @@
 import { resolveProviderTargetLanguageCode } from "../../shared/language-registry.js";
 import { getOnlySpeechRendererApi } from "../../shared/onlyspeech-api.js";
 import { reportRuntimeDiagnostic } from "../../shared/runtime-diagnostics.js";
+import { getProviderAdapter } from "./provider-adapters.js";
 import type {
   SpeechEventPayload,
   SpeechStartCommand,
@@ -123,6 +124,11 @@ export class LiveSpeechClient {
     const generation = ++this.generation;
     this.activeSessionId = command.sessionId;
     this.activeCommand = command;
+    const provider = getProviderAdapter(command.translationProvider);
+
+    if (!provider.supportsStt) {
+      throw new Error(`${provider.label} does not support provider-managed speech recognition in OnlySpeech.`);
+    }
 
     if (command.translationProvider === "azure") {
       await this.startAzureTranslation(command, handlers, generation);
@@ -134,7 +140,7 @@ export class LiveSpeechClient {
       return;
     }
 
-    throw new Error(`${command.translationProvider} does not support provider-managed speech recognition in OnlySpeech.`);
+    throw new Error(`${provider.label} does not support provider-managed speech recognition in OnlySpeech.`);
   }
 
   async stop(): Promise<void> {

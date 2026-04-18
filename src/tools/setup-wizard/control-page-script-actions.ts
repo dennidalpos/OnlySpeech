@@ -34,6 +34,7 @@ export function getSetupWizardControlActionsScript(): string {
             noOutputReturned: "(nessun output restituito)",
             selectMicrophoneForProviderSpeechTest: "Seleziona un microfono per il test provider vocale.",
             azureListeningSelectedMicrophone: "Azure Speech e' in ascolto sul microfono selezionato.",
+            providerSpeechUnsupported: "Ollama non supporta test vocali live in OnlySpeech.",
             providerSpeechTestCompleted: "Test provider vocale completato.",
             providerSpeechTestFailed: "Test provider vocale fallito",
             microphoneLabel: "Microfono",
@@ -80,7 +81,7 @@ export function getSetupWizardControlActionsScript(): string {
             autostartDisabled: "Automatic startup disabled.",
             autostartUpdateFailed: "Unable to update automatic startup",
             temporaryPassword: "Temporary setup password: {password}.",
-            saveBlockedInitialLanguages: "Save blocked: the selected initial languages are not valid for the active shared catalog ({detail}).",
+            saveBlockedInitialLanguages: "Save blocked: the selected initial languages are not valid for the active provider language registry ({detail}).",
             saveBlockedProviderConfiguration: "Save blocked: complete the selected provider and its runtime credentials ({detail}).",
             saveBlockedAzureTextToSpeech: "Save blocked: complete Azure TTS coverage for the initial A/B languages ({detail}).",
             configurationAppliedClosing: "Configuration applied. Closing setup wizard.",
@@ -94,6 +95,7 @@ export function getSetupWizardControlActionsScript(): string {
             noOutputReturned: "(no output returned)",
             selectMicrophoneForProviderSpeechTest: "Select a microphone for the provider speech test.",
             azureListeningSelectedMicrophone: "Azure Speech is listening on the selected microphone.",
+            providerSpeechUnsupported: "Ollama does not support live speech tests in OnlySpeech.",
             providerSpeechTestCompleted: "Provider speech test completed.",
             providerSpeechTestFailed: "Provider speech test failed",
             microphoneLabel: "Microphone",
@@ -384,6 +386,12 @@ export function getSetupWizardControlActionsScript(): string {
         const sourceLanguage = document.getElementById("provider-speech-source").value;
         const targetLanguage = document.getElementById("provider-speech-target").value;
         const resultElement = document.getElementById("provider-speech-result");
+        if (provider === "ollama") {
+          resultElement.textContent = actionsCopy.providerSpeechUnsupported;
+          setStatus(actionsCopy.providerSpeechUnsupported, "warn");
+          setDiagnosticSummary("provider-speech-summary", actionsCopy.providerSpeechUnsupported, "warn");
+          return;
+        }
         if (!microphoneDeviceId) {
           setStatus(actionsCopy.selectMicrophoneForProviderSpeechTest, "warn");
           setDiagnosticSummary("provider-speech-summary", actionsCopy.selectMicrophoneForProviderSpeechTest, "warn");

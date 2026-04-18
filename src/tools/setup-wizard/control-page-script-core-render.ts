@@ -42,6 +42,13 @@ export function getSetupWizardControlCoreRenderScript(): string {
         };
       }
       function currentProviderSpeechDisabledState() {
+        if (providerValue() === "ollama") {
+          return {
+            code: "provider-speech-unsupported-provider",
+            message: copy.providerSpeechDisabledUnsupported,
+            tone: "warn"
+          };
+        }
         if (isActionBusy("providerSpeech")) {
           return {
             code: "provider-speech-busy",
@@ -405,10 +412,18 @@ export function getSetupWizardControlCoreRenderScript(): string {
         });
         setBusyRegion("provider-speech", {
           busy: providerSpeechBusy,
-          label: providerValue() === "azure" ? copy.providerSpeechAzureLabel : copy.providerSpeechChatGptLabel,
-          detail: providerValue() === "azure"
-            ? copy.providerSpeechAzureDetail
-            : copy.providerSpeechChatGptDetail
+          label:
+            providerValue() === "azure"
+              ? copy.providerSpeechAzureLabel
+              : providerValue() === "ollama"
+                ? copy.providerSpeechOllamaLabel
+                : copy.providerSpeechChatGptLabel,
+          detail:
+            providerValue() === "azure"
+              ? copy.providerSpeechAzureDetail
+              : providerValue() === "ollama"
+                ? copy.providerSpeechOllamaDetail
+                : copy.providerSpeechChatGptDetail
         });
         updateButtonState("probe-microphones", {
           busy: probingMicrophones,
@@ -460,6 +475,8 @@ export function getSetupWizardControlCoreRenderScript(): string {
           const provider = providerValue() || "chatgpt";
           const idleText = provider === "azure"
             ? (providerSpeechTestState.inFlight ? copy.azureLiveBusy : copy.azureLiveStart)
+            : provider === "ollama"
+              ? copy.providerSpeechOllamaLabel
             : providerSpeechTestState.recorder
               ? copy.finalTurnStopAndSend
               : copy.finalTurnStart;
@@ -478,4 +495,3 @@ export function getSetupWizardControlCoreRenderScript(): string {
       }
 `;
 }
-

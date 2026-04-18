@@ -39,6 +39,15 @@ export async function synthesizeTextToSpeech(
     };
   }
 
+  if (command.translationProvider === "ollama") {
+    return {
+      ok: false,
+      engine,
+      eventType: "unavailable",
+      message: "Ollama does not expose runtime text-to-speech playback in OnlySpeech."
+    };
+  }
+
   try {
     if (engine === "azure") {
       const provider = new AzureTextToSpeechProvider({

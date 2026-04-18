@@ -356,6 +356,10 @@ export const AUTO_DETECT_SOURCE_LANGUAGE_CANDIDATES = Object.freeze(
 export function getSupportedSourceLanguageOptionsByProvider(
   provider: TranslationProvider
 ): SourceLanguageOption[] {
+  if (provider === "ollama") {
+    return [];
+  }
+
   return CANONICAL_INTERACTION_LANGUAGES.filter((entry) => {
     const providerConfig = entry.providers[provider];
     return providerConfig.enabled && (providerConfig.speechToText ?? providerConfig.enabled);

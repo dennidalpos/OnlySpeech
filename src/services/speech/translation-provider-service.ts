@@ -1,5 +1,6 @@
 import type {
   RuntimeConfig,
+  ProviderAdapter,
   SpeechTurnRequest,
   SpeechTurnResult,
   TranslationProvider,
@@ -11,6 +12,7 @@ import {
   resolveChatGptTranscriptionLanguageHint,
   resolveSpeechTurnSourceLanguage
 } from "../../shared/speech-flow.js";
+import { getProviderAdapter } from "./provider-adapters.js";
 
 interface TranslationResponseShape {
   choices?: Array<{
@@ -60,16 +62,40 @@ interface RemoteErrorShape {
   type?: string;
 }
 
-const PROVIDER_LABELS: Record<TranslationProvider, string> = {
-  azure: "Azure Speech",
-  chatgpt: "ChatGPT"
-};
-
 const CHATGPT_TRANSLATION_ENDPOINT = "https://api.openai.com/v1/chat/completions";
 const CHATGPT_TRANSCRIPTION_ENDPOINT = "https://api.openai.com/v1/audio/transcriptions";
 const DEFAULT_AZURE_TRANSLATOR_ENDPOINT = "https://api.cognitive.microsofttranslator.com";
 const CHATGPT_PARTIAL_AUDIO_FALLBACK_MESSAGE =
   "ChatGPT partial transcription is unavailable for this incremental capture; OnlySpeech will continue with the final turn only.";
+
+interface OllamaChatResponseShape {
+  message?: {
+    content?: string;
+  };
+  done?: boolean;
+}
+
+interface OllamaTagsResponseShape {
+  models?: Array<{
+    name?: string;
+    model?: string;
+  }>;
+}
+
+interface OllamaVersionResponseShape {
+  version?: string;
+}
+
+interface SpeechTranslationProvider extends ProviderAdapter {
+  translate: (request: TranslationRequest, isPartial: boolean) => Promise<string>;
+  smokeTest: (request: TranslationRequest) => Promise<ProviderSmokeTestResult>;
+  normalizeTextForPlayback: (request: {
+    provider: TranslationProvider;
+    targetLanguage: string;
+    text: string;
+  }) => Promise<PlaybackNormalizationResult>;
+  processSpeechTurn: (request: SpeechTurnRequest) => Promise<SpeechTurnResult>;
+}
 
 function buildTranslationPrompt(request: TranslationRequest, isPartial: boolean): string {
   const providerTargetLanguage =
@@ -246,46 +272,134 @@ function normalizeDetectedLanguageCode(value: unknown): string | undefined {
 }
 
 export class TranslationProviderService {
-  constructor(private readonly config: RuntimeConfig) {}
+  private readonly providers: Record<TranslationProvider, SpeechTranslationProvider>;
+
+  constructor(private readonly config: RuntimeConfig) {
+    this.providers = {
+      azure: {
+        ...getProviderAdapter("azure"),
+        translate: async (request) => request.text,
+        smokeTest: async () => {
+          this.assertAzureSpeechConfigured();
+          await this.issueAzureSpeechToken();
+          return {
+            mode: "validation",
+            output: `Azure Speech credentials validated for region ${this.config.azureSpeechRegion}. Live microphone recognition still needs kiosk-side validation on the target workstation.`
+          };
+        },
+        normalizeTextForPlayback: async (request) => {
+          const targetLanguage =
+            resolveProviderTargetLanguageCode(request.targetLanguage, "azure", {
+              includeProviderExpansions: true
+            }) ?? request.targetLanguage;
+          const text = request.text.trim();
+          if (!text) {
+            return {
+              outputText: "",
+              targetLanguage,
+              mode: "passthrough"
+            };
+          }
+
+          return {
+            outputText: await this.translateWithAzureTranslator(text, targetLanguage),
+            targetLanguage,
+            mode: "translated"
+          };
+        },
+        processSpeechTurn: async () => {
+          throw new Error("Azure live speech is handled directly in the renderer pipeline.");
+        }
+      },
+      chatgpt: {
+        ...getProviderAdapter("chatgpt"),
+        translate: async (request, isPartial) => {
+          if (!request.text.trim()) {
+            return "";
+          }
+
+          this.assertChatGptTranslationConfigured();
+          return this.translateWithChatGpt(request, isPartial);
+        },
+        smokeTest: async (request) => ({
+          mode: "translation",
+          output: await this.providers.chatgpt.translate(request, false)
+        }),
+        normalizeTextForPlayback: async (request) => {
+          const targetLanguage =
+            resolveProviderTargetLanguageCode(request.targetLanguage, "chatgpt", {
+              includeProviderExpansions: true
+            }) ?? request.targetLanguage;
+          const text = request.text.trim();
+          if (!text) {
+            return {
+              outputText: "",
+              targetLanguage,
+              mode: "passthrough"
+            };
+          }
+
+          return {
+            outputText: await this.translatePlaybackTextWithChatGpt(text, targetLanguage),
+            targetLanguage,
+            mode: "translated"
+          };
+        },
+        processSpeechTurn: async (request) => this.processChatGptSpeechTurn(request)
+      },
+      ollama: {
+        ...getProviderAdapter("ollama"),
+        translate: async (request, isPartial) => {
+          if (!request.text.trim()) {
+            return "";
+          }
+
+          this.assertOllamaConfigured();
+          return this.translateWithOllama(request, isPartial);
+        },
+        smokeTest: async (request) => {
+          this.assertOllamaConfigured();
+          await this.getOllamaVersion();
+          await this.assertOllamaModelAvailable();
+          return {
+            mode: "translation",
+            output: await this.providers.ollama.translate(request, false)
+          };
+        },
+        normalizeTextForPlayback: async (request) => {
+          const text = request.text.trim();
+          const targetLanguage = request.targetLanguage;
+          if (!text) {
+            return {
+              outputText: "",
+              targetLanguage,
+              mode: "passthrough"
+            };
+          }
+
+          return {
+            outputText: await this.translatePlaybackTextWithOllama(text, targetLanguage),
+            targetLanguage,
+            mode: "translated"
+          };
+        },
+        processSpeechTurn: async () => {
+          throw new Error("Ollama is translation-only in OnlySpeech and does not provide live speech capture.");
+        }
+      }
+    };
+  }
 
   getProviderLabel(provider: TranslationProvider = this.config.translationProvider): string {
-    return PROVIDER_LABELS[provider];
+    return this.providers[provider].label;
   }
 
   async translate(request: TranslationRequest, isPartial = false): Promise<string> {
-    if (!request.text.trim()) {
-      return "";
-    }
-
-    switch (request.provider) {
-      case "azure":
-        return request.text;
-      case "chatgpt":
-        this.assertChatGptTranslationConfigured();
-        return this.translateWithChatGpt(request, isPartial);
-      default:
-        throw new Error(`Unsupported translation provider: ${request.provider}`);
-    }
+    return this.providers[request.provider].translate(request, isPartial);
   }
 
   async smokeTestTranslationProvider(request: TranslationRequest): Promise<ProviderSmokeTestResult> {
-    switch (request.provider) {
-      case "azure": {
-        this.assertAzureSpeechConfigured();
-        await this.issueAzureSpeechToken();
-        return {
-          mode: "validation",
-          output: `Azure Speech credentials validated for region ${this.config.azureSpeechRegion}. Live microphone recognition still needs kiosk-side validation on the target workstation.`
-        };
-      }
-      case "chatgpt":
-        return {
-          mode: "translation",
-          output: await this.translate(request)
-        };
-      default:
-        throw new Error(`Unsupported translation provider: ${request.provider}`);
-    }
+    return this.providers[request.provider].smokeTest(request);
   }
 
   async normalizeTextForPlayback(request: {
@@ -293,93 +407,60 @@ export class TranslationProviderService {
     targetLanguage: string;
     text: string;
   }): Promise<PlaybackNormalizationResult> {
-    const text = request.text.trim();
-    const targetLanguage =
-      resolveProviderTargetLanguageCode(request.targetLanguage, request.provider, {
-        includeProviderExpansions: true
-      }) ?? request.targetLanguage;
-
-    if (!text) {
-      return {
-        outputText: "",
-        targetLanguage,
-        mode: "passthrough"
-      };
-    }
-
-    switch (request.provider) {
-      case "azure":
-        return {
-          outputText: await this.translateWithAzureTranslator(text, targetLanguage),
-          targetLanguage,
-          mode: "translated"
-        };
-      case "chatgpt":
-        return {
-          outputText: await this.translatePlaybackTextWithChatGpt(text, targetLanguage),
-          targetLanguage,
-          mode: "translated"
-        };
-      default:
-        throw new Error(`Unsupported translation provider: ${request.provider}`);
-    }
+    return this.providers[request.provider].normalizeTextForPlayback(request);
   }
 
   async processSpeechTurn(request: SpeechTurnRequest): Promise<SpeechTurnResult> {
-    switch (request.provider) {
-      case "azure":
-        throw new Error("Azure live speech is handled directly in the renderer pipeline.");
-      case "chatgpt": {
-        this.assertChatGptSpeechConfigured();
-        if (!request.audioBase64.trim()) {
-          throw new Error("ChatGPT speech turn requires a non-empty audio payload.");
-        }
+    return this.providers[request.provider].processSpeechTurn(request);
+  }
 
-        let transcription: { transcript: string; detectedLanguage?: string };
-        try {
-          transcription = await this.transcribeWithChatGpt(request);
-        } catch (error) {
-          if (request.isPartial && isRecoverableChatGptPartialTranscriptionFailure(error)) {
-            return {
-              transcript: "",
-              translation: "",
-              partialDiagnostic: {
-                code: "partial-audio-unsupported",
-                message: CHATGPT_PARTIAL_AUDIO_FALLBACK_MESSAGE,
-                disableFurtherPartialUpdates: true
-              }
-            };
-          }
+  private async processChatGptSpeechTurn(request: SpeechTurnRequest): Promise<SpeechTurnResult> {
+    this.assertChatGptSpeechConfigured();
+    if (!request.audioBase64.trim()) {
+      throw new Error("ChatGPT speech turn requires a non-empty audio payload.");
+    }
 
-          throw error;
-        }
-
-        if (!transcription.transcript) {
-          return {
-            transcript: "",
-            translation: "",
-            detectedLanguage: transcription.detectedLanguage
-          };
-        }
-
-        const translatedTurn = await this.translateSpeechTurnWithChatGpt(
-          {
-            provider: "chatgpt",
-            sourceLanguage: resolveSpeechTurnSourceLanguage(request.sourceLanguage, transcription.detectedLanguage),
-            targetLanguage: request.targetLanguage,
-            text: transcription.transcript
-          },
-          request.isPartial ?? false
-        );
+    let transcription: { transcript: string; detectedLanguage?: string };
+    try {
+      transcription = await this.transcribeWithChatGpt(request);
+    } catch (error) {
+      if (request.isPartial && isRecoverableChatGptPartialTranscriptionFailure(error)) {
         return {
-          transcript: transcription.transcript,
-          translation: translatedTurn.translation,
-          detectedLanguage: translatedTurn.detectedLanguage ?? transcription.detectedLanguage
+          transcript: "",
+          translation: "",
+          partialDiagnostic: {
+            code: "partial-audio-unsupported",
+            message: CHATGPT_PARTIAL_AUDIO_FALLBACK_MESSAGE,
+            disableFurtherPartialUpdates: true
+          }
         };
       }
-      default:
-        throw new Error(`Unsupported speech provider: ${request.provider}`);
+
+      throw error;
     }
+
+    if (!transcription.transcript) {
+      return {
+        transcript: "",
+        translation: "",
+        detectedLanguage: transcription.detectedLanguage
+      };
+    }
+
+    const translatedTurn = await this.translateSpeechTurnWithChatGpt(
+      {
+        provider: "chatgpt",
+        sourceLanguage: resolveSpeechTurnSourceLanguage(request.sourceLanguage, transcription.detectedLanguage),
+        targetLanguage: request.targetLanguage,
+        text: transcription.transcript
+      },
+      request.isPartial ?? false
+    );
+    return {
+      transcript: transcription.transcript,
+      translation: translatedTurn.translation,
+      detectedLanguage: translatedTurn.detectedLanguage ?? transcription.detectedLanguage
+    };
   }
 
   private async translateWithChatGpt(request: TranslationRequest, isPartial: boolean): Promise<string> {
@@ -451,6 +532,74 @@ export class TranslationProviderService {
     }
 
     return normalizedText;
+  }
+
+  private async translateWithOllama(request: TranslationRequest, isPartial: boolean): Promise<string> {
+    const response = await this.fetchWithTimeout(
+      this.buildOllamaUrl("/chat"),
+      {
+        method: "POST",
+        headers: this.buildOllamaHeaders(),
+        body: JSON.stringify({
+          model: this.config.ollamaModel,
+          stream: this.config.ollamaStreamingEnabled,
+          messages: [
+            {
+              role: "system",
+              content: "You translate live speech for a kiosk app. Return only the translated text with no commentary."
+            },
+            {
+              role: "user",
+              content: buildTranslationPrompt({ ...request, provider: "ollama" }, isPartial)
+            }
+          ]
+        })
+      },
+      this.config.ollamaRequestTimeoutMs
+    );
+
+    if (!response.ok) {
+      throw new Error(`Ollama request failed: ${await parseError(response)}`);
+    }
+
+    return await this.readOllamaChatContent(response);
+  }
+
+  private async translatePlaybackTextWithOllama(text: string, targetLanguage: string): Promise<string> {
+    const response = await this.fetchWithTimeout(
+      this.buildOllamaUrl("/chat"),
+      {
+        method: "POST",
+        headers: this.buildOllamaHeaders(),
+        body: JSON.stringify({
+          model: this.config.ollamaModel,
+          stream: this.config.ollamaStreamingEnabled,
+          messages: [
+            {
+              role: "system",
+              content:
+                "You normalize short speech playback text for a kiosk app. Return only the final target-language text."
+            },
+            {
+              role: "user",
+              content: buildPlaybackNormalizationPrompt(targetLanguage, text)
+            }
+          ]
+        })
+      },
+      this.config.ollamaRequestTimeoutMs
+    );
+
+    if (!response.ok) {
+      throw new Error(`Ollama request failed: ${await parseError(response)}`);
+    }
+
+    const content = await this.readOllamaChatContent(response);
+    if (!content) {
+      throw new Error("Ollama playback normalization returned no translated text.");
+    }
+
+    return content;
   }
 
   private async translateSpeechTurnWithChatGpt(
@@ -589,10 +738,10 @@ export class TranslationProviderService {
     };
   }
 
-  private async fetchWithTimeout(input: string, init: RequestInit): Promise<Response> {
+  private async fetchWithTimeout(input: string, init: RequestInit, timeoutMs = this.config.providerRequestTimeoutMs): Promise<Response> {
     const controller = new AbortController();
-    const timeoutMs = Math.max(1, this.config.providerRequestTimeoutMs);
-    const timeoutHandle = setTimeout(() => controller.abort(), timeoutMs);
+    const effectiveTimeoutMs = Math.max(1, timeoutMs);
+    const timeoutHandle = setTimeout(() => controller.abort(), effectiveTimeoutMs);
 
     try {
       return await fetch(input, {
@@ -601,7 +750,7 @@ export class TranslationProviderService {
       });
     } catch (error) {
       if (error instanceof Error && error.name === "AbortError") {
-        throw new Error(`Provider request timed out after ${timeoutMs}ms.`);
+        throw new Error(`Provider request timed out after ${effectiveTimeoutMs}ms.`);
       }
 
       throw new Error(buildProviderTransportFailureMessage(error));
@@ -649,5 +798,99 @@ export class TranslationProviderService {
     if (!this.config.chatGptTranscribeModel.trim()) {
       throw new Error("ChatGPT speech recognition is not configured. Missing CHATGPT_TRANSCRIBE_MODEL.");
     }
+  }
+
+  private assertOllamaConfigured(): void {
+    const missingKeys = [
+      !this.config.ollamaBaseUrl.trim() ? "OLLAMA_BASE_URL" : null,
+      !this.config.ollamaModel.trim() ? "OLLAMA_MODEL" : null
+    ].filter((value): value is string => value !== null);
+
+    if (missingKeys.length > 0) {
+      throw new Error(`Ollama translation is not configured. Missing ${missingKeys.join(", ")}.`);
+    }
+  }
+
+  private buildOllamaUrl(path: "/chat" | "/tags" | "/version"): string {
+    const baseUrl = this.config.ollamaBaseUrl.trim().replace(/\/+$/, "");
+    const normalizedBaseUrl = /\/api$/i.test(baseUrl) ? baseUrl : `${baseUrl}/api`;
+    return `${normalizedBaseUrl}${path}`;
+  }
+
+  private buildOllamaHeaders(): HeadersInit {
+    return {
+      "Content-Type": "application/json",
+      ...(this.config.ollamaApiKey.trim()
+        ? { Authorization: `Bearer ${this.config.ollamaApiKey.trim()}` }
+        : {})
+    };
+  }
+
+  private async getOllamaVersion(): Promise<string> {
+    const response = await this.fetchWithTimeout(
+      this.buildOllamaUrl("/version"),
+      {
+        method: "GET",
+        headers: this.buildOllamaHeaders()
+      },
+      this.config.ollamaRequestTimeoutMs
+    );
+
+    if (!response.ok) {
+      throw new Error(`Ollama version check failed: ${await parseError(response)}`);
+    }
+
+    const payload = (await response.json()) as OllamaVersionResponseShape;
+    const version = payload.version?.trim() ?? "";
+    if (!version) {
+      throw new Error("Ollama version check returned no version.");
+    }
+
+    return version;
+  }
+
+  private async assertOllamaModelAvailable(): Promise<void> {
+    const response = await this.fetchWithTimeout(
+      this.buildOllamaUrl("/tags"),
+      {
+        method: "GET",
+        headers: this.buildOllamaHeaders()
+      },
+      this.config.ollamaRequestTimeoutMs
+    );
+
+    if (!response.ok) {
+      throw new Error(`Ollama model inventory failed: ${await parseError(response)}`);
+    }
+
+    const payload = (await response.json()) as OllamaTagsResponseShape;
+    const configuredModel = this.config.ollamaModel.trim();
+    const availableModels = payload.models?.flatMap((model) => [model.name?.trim() ?? "", model.model?.trim() ?? ""]) ?? [];
+    if (!availableModels.includes(configuredModel)) {
+      throw new Error(`Ollama model '${configuredModel}' is not available on the configured server.`);
+    }
+  }
+
+  private async readOllamaChatContent(response: Response): Promise<string> {
+    if (!this.config.ollamaStreamingEnabled) {
+      const payload = (await response.json()) as OllamaChatResponseShape;
+      return payload.message?.content?.trim() ?? "";
+    }
+
+    const rawBody = await response.text();
+    const chunks = rawBody
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        try {
+          return JSON.parse(line) as OllamaChatResponseShape;
+        } catch {
+          return null;
+        }
+      })
+      .filter((value): value is OllamaChatResponseShape => value !== null);
+
+    return chunks.map((chunk) => chunk.message?.content ?? "").join("").trim();
   }
 }

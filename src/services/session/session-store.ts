@@ -1,12 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
 import { findSourceLanguageOption, resolveDetectedSourceLanguageOption } from "../../shared/language-options.js";
 import {
-  normalizeCommonProviderInteractionLanguage,
+  normalizeInteractionLanguage,
   resolveProviderTargetLanguageCode
 } from "../../shared/language-registry.js";
 import { DEFAULT_RUNTIME_DISCLOSURE_SETTINGS } from "../../shared/runtime-disclosure.js";
 import {
-  resolveCommonProviderSynchronizedSourceLanguage,
+  resolveSynchronizedSourceLanguage,
 } from "../../shared/language-flow.js";
 import { hasOperatorLocalization } from "../../shared/ui-localization.js";
 import {
@@ -53,13 +53,14 @@ function createLocalizedSideState(
   config: RuntimeConfig,
   hasCommittedLanguageSelection = false
 ): SideState {
-  const effectiveTargetLanguage = normalizeCommonProviderInteractionLanguage(
+  const effectiveTargetLanguage = normalizeInteractionLanguage(
     interactionLanguage,
     config.translationProvider,
-    COMMON_PROVIDER_FALLBACK_LANGUAGE
+    COMMON_PROVIDER_FALLBACK_LANGUAGE,
+    { includeProviderExpansions: true }
   );
   const sourceState = {
-    sourceLanguage: resolveCommonProviderSynchronizedSourceLanguage(
+    sourceLanguage: resolveSynchronizedSourceLanguage(
       effectiveTargetLanguage,
       "en-US",
       config.translationProvider
@@ -120,10 +121,11 @@ function createDefaultSides(config: RuntimeConfig): Record<Side, SideState> {
 }
 
 function normalizeRestartLanguage(side: Side, targetLanguage: string, config: RuntimeConfig): string {
-  return normalizeCommonProviderInteractionLanguage(
+  return normalizeInteractionLanguage(
     targetLanguage,
     config.translationProvider,
     side === "A" ? config.defaultTargetLangA : config.defaultTargetLangB,
+    { includeProviderExpansions: true }
   );
 }
 
@@ -252,10 +254,11 @@ export class SessionStore {
 
   setTargetLanguage(side: Side, targetLanguage: string): void {
     const previousLanguage = this.state.sides[side].selectedTargetLanguage;
-    const normalizedTargetLanguage = normalizeCommonProviderInteractionLanguage(
+    const normalizedTargetLanguage = normalizeInteractionLanguage(
       targetLanguage,
       this.config.translationProvider,
       this.state.sides[side].selectedTargetLanguage ?? this.state.sides[side].selectedInteractionLanguage ?? "en",
+      { includeProviderExpansions: true }
     );
     const effectiveTargetLanguage = normalizedTargetLanguage;
     const visitorLocalization = resolveVisitorLocalizationState(effectiveTargetLanguage);
@@ -277,7 +280,7 @@ export class SessionStore {
     this.state.sides[side].usesEnglishUiFallback =
       side === "A" ? operatorLocalization.usesEnglishUiFallback : visitorLocalization.usesEnglishFallback;
     const synchronizedState = {
-      sourceLanguage: resolveCommonProviderSynchronizedSourceLanguage(
+      sourceLanguage: resolveSynchronizedSourceLanguage(
         effectiveTargetLanguage,
         "en-US",
         this.config.translationProvider

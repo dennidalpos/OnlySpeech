@@ -10,6 +10,14 @@ export function resolveProviderTextToSpeechPolicy(
   _language: string | null,
   options: ResolveProviderTextToSpeechPolicyOptions = {}
 ): ProviderTextToSpeechPolicy {
+  if (provider === "ollama") {
+    return {
+      primaryEngine: null,
+      fallbackEngine: null,
+      blockOnMissing: true
+    };
+  }
+
   if (provider === "chatgpt") {
     return {
       primaryEngine: "openai",

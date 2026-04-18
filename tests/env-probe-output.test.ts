@@ -51,6 +51,9 @@ describe("buildSuggestedEnv", () => {
     expect(envText).toContain(
       "# azure requires AZURE_SPEECH_KEY and AZURE_SPEECH_REGION; normalized playback diagnostics also use AZURE_TRANSLATOR_KEY and AZURE_TRANSLATOR_REGION."
     );
+    expect(envText).toContain(
+      "# ollama requires OLLAMA_BASE_URL and OLLAMA_MODEL; it remains translation-only and cannot unlock live kiosk speech."
+    );
   });
 
   it("adds warnings when probe is incomplete", () => {

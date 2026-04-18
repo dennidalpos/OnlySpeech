@@ -3,6 +3,8 @@ import {
   SUPPORTED_SOURCE_LANGUAGE_OPTIONS,
   type SourceLanguageOption
 } from "./language-options.js";
+import { baseLanguageRegistry } from "./unified-language-registry.js";
+import type { RegionId } from "./region-registry.js";
 import {
   buildCommonProviderInteractionLanguageChoices as buildRegistryCommonProviderInteractionLanguageChoices,
   buildCommonProviderInteractionLanguageOptionGroups as buildRegistryCommonProviderInteractionLanguageOptionGroups,
@@ -22,7 +24,10 @@ import {
 } from "./language-registry.js";
 import type { LanguageOption, SideState, TranslationProvider } from "./types.js";
 
-export type InteractionLanguageChoice = RegistryInteractionLanguageChoice;
+export type InteractionLanguageChoice = RegistryInteractionLanguageChoice & {
+  regionIds: RegionId[];
+  primaryRegionId: RegionId;
+};
 
 export interface ResolvedSideLanguageState {
   sourceLanguage: string | null;
@@ -30,11 +35,24 @@ export interface ResolvedSideLanguageState {
 
 const SOURCE_LANGUAGE_CHOICES = [...SUPPORTED_SOURCE_LANGUAGE_OPTIONS];
 
+function decorateChoice(choice: RegistryInteractionLanguageChoice): InteractionLanguageChoice {
+  const baseLanguage = baseLanguageRegistry[choice.value];
+  if (!baseLanguage) {
+    throw new Error(`Missing unified language registry entry for interaction language '${choice.value}'.`);
+  }
+
+  return {
+    ...choice,
+    regionIds: [...baseLanguage.regionIds],
+    primaryRegionId: baseLanguage.primaryRegionId
+  };
+}
+
 export function buildInteractionLanguageChoices(
   provider?: TranslationProvider,
   options?: InteractionLanguageQueryOptions
 ): InteractionLanguageChoice[] {
-  return buildRegistryInteractionLanguageChoices(provider, options).map((choice) => ({ ...choice }));
+  return buildRegistryInteractionLanguageChoices(provider, options).map((choice) => decorateChoice(choice));
 }
 
 export function buildInteractionLanguageOptions(
@@ -64,7 +82,7 @@ export function buildInteractionLanguageSourceLocaleMap(
 export function buildCommonProviderInteractionLanguageChoices(
   provider?: TranslationProvider
 ): InteractionLanguageChoice[] {
-  return buildRegistryCommonProviderInteractionLanguageChoices(provider).map((choice) => ({ ...choice }));
+  return buildRegistryCommonProviderInteractionLanguageChoices(provider).map((choice) => decorateChoice(choice));
 }
 
 export function buildCommonProviderInteractionLanguageOptions(

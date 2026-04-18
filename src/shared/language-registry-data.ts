@@ -12,6 +12,16 @@ export type LanguageMacroArea =
 
 export type InteractionLanguageTier = "baseline" | "provider-expansion";
 
+type SeedProvider = Exclude<TranslationProvider, "ollama">;
+
+interface SeedProviderDefinition {
+  enabled: boolean;
+  targetCode: string | null;
+  speechToText?: boolean;
+  translationTarget?: boolean;
+  preferredSourceLocale?: string | null;
+}
+
 export interface CanonicalInteractionLanguageDefinition {
   code: string;
   label: string;
@@ -19,16 +29,7 @@ export interface CanonicalInteractionLanguageDefinition {
   macroArea: LanguageMacroArea;
   displayLocale: string;
   preferredSourceLocale: string;
-  providers: Record<
-    TranslationProvider,
-    {
-      enabled: boolean;
-      targetCode: string | null;
-      speechToText?: boolean;
-      translationTarget?: boolean;
-      preferredSourceLocale?: string | null;
-    }
-  >;
+  providers: Record<SeedProvider, SeedProviderDefinition>;
 }
 
 interface CanonicalInteractionLanguageSeed
@@ -40,7 +41,7 @@ export interface ProviderTargetOnlyLanguageDefinition {
   macroAreas: readonly LanguageMacroArea[];
   displayLocale: string | null;
   flagRegionCode: string | null;
-  providers: Record<TranslationProvider, TranslationProviderLanguageCapabilities>;
+  providers: Record<SeedProvider, TranslationProviderLanguageCapabilities>;
 }
 
 export const CANONICAL_INTERACTION_LANGUAGE_BASELINE_COUNT = 56;
@@ -1478,6 +1479,15 @@ function resolveCanonicalProviderCapabilities(
   entry: CanonicalInteractionLanguageDefinition,
   provider: TranslationProvider
 ): TranslationProviderLanguageCapabilities {
+  if (provider === "ollama") {
+    return {
+      speechToText: false,
+      translationTarget: true,
+      preferredSourceLocale: entry.preferredSourceLocale,
+      targetCode: entry.code
+    };
+  }
+
   const providerConfig = entry.providers[provider];
   const speechToText = providerConfig.speechToText ?? providerConfig.enabled;
   const translationTarget = providerConfig.translationTarget ?? providerConfig.enabled;
@@ -1517,12 +1527,14 @@ export const PROVIDER_INTERACTION_LANGUAGE_CATALOGS = Object.freeze({
       const capabilities = resolveCanonicalProviderCapabilities(entry, "chatgpt");
       return capabilities.speechToText && capabilities.translationTarget;
     })
-  )
+  ),
+  ollama: Object.freeze([] as CanonicalInteractionLanguageDefinition[])
 }) satisfies Readonly<Record<TranslationProvider, readonly CanonicalInteractionLanguageDefinition[]>>;
 
 export const PROVIDER_SPEECH_TO_TEXT_LANGUAGE_CODES = Object.freeze({
   azure: Object.freeze(PROVIDER_INTERACTION_LANGUAGE_CATALOGS.azure.map((entry) => entry.code)),
-  chatgpt: Object.freeze(PROVIDER_INTERACTION_LANGUAGE_CATALOGS.chatgpt.map((entry) => entry.code))
+  chatgpt: Object.freeze(PROVIDER_INTERACTION_LANGUAGE_CATALOGS.chatgpt.map((entry) => entry.code)),
+  ollama: Object.freeze([] as string[])
 }) satisfies Readonly<Record<TranslationProvider, readonly string[]>>;
 
 export const PROVIDER_TRANSLATION_TARGET_LANGUAGE_CODES = Object.freeze({
@@ -1538,7 +1550,8 @@ export const PROVIDER_TRANSLATION_TARGET_LANGUAGE_CODES = Object.freeze({
     CANONICAL_INTERACTION_LANGUAGES.filter(
       (entry) => resolveCanonicalProviderCapabilities(entry, "chatgpt").translationTarget
     ).map((entry) => entry.code)
-  )
+  ),
+  ollama: Object.freeze(CANONICAL_INTERACTION_LANGUAGES.map((entry) => entry.code))
 }) satisfies Readonly<Record<TranslationProvider, readonly string[]>>;
 
 export const PROVIDER_LANGUAGE_CAPABILITIES_BY_CODE = Object.freeze({
@@ -1559,6 +1572,14 @@ export const PROVIDER_LANGUAGE_CAPABILITIES_BY_CODE = Object.freeze({
       ]),
       ...CANONICAL_AZURE_TARGET_ONLY_LANGUAGES.map((entry) => [entry.code.toLowerCase(), { ...entry.providers.chatgpt }])
     ])
+  ),
+  ollama: Object.freeze(
+    Object.fromEntries(
+      CANONICAL_INTERACTION_LANGUAGES.map((entry) => [
+        entry.code.toLowerCase(),
+        resolveCanonicalProviderCapabilities(entry, "ollama")
+      ])
+    )
   )
 }) satisfies Readonly<
   Record<TranslationProvider, Readonly<Record<string, TranslationProviderLanguageCapabilities>>>

@@ -112,7 +112,7 @@ describe("setup-wizard preload", () => {
     });
   });
 
-  it("runs provider-owned local playback previews using the active provider credentials from wizard state", async () => {
+  it("runs provider-owned playback previews using the active provider credentials from wizard state", async () => {
     installAudioMocks();
     preloadMocks.invoke.mockImplementation(async (channel) => {
       if (channel === "wizard:get-state") {

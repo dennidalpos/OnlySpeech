@@ -94,6 +94,10 @@ export function buildProviderLanguageMatrixSummary(): Record<
     chatgpt: {
       interaction: buildInteractionMatrix("chatgpt"),
       translationTargets: buildTranslationTargetMatrix("chatgpt")
+    },
+    ollama: {
+      interaction: buildInteractionMatrix("ollama"),
+      translationTargets: buildTranslationTargetMatrix("ollama")
     }
   };
 }
