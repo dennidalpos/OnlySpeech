@@ -69,7 +69,7 @@ describe("language-flow", () => {
     expect(choices.find((choice) => choice.value === "es")).toMatchObject({
       macroArea: "americas",
       macroAreaLabel: "Americhe",
-      macroAreas: ["americas", "europe", "africa"]
+      macroAreas: ["americas"]
     });
     expect(choices.find((choice) => choice.value === "en-us")).toMatchObject({
       macroArea: "americas",
@@ -83,7 +83,8 @@ describe("language-flow", () => {
     });
     expect(choices.find((choice) => choice.value === "en")).toMatchObject({
       macroArea: "americas",
-      macroAreaLabel: "Americhe"
+      macroAreaLabel: "Americhe",
+      macroAreas: ["americas", "oceania"]
     });
     expect(choices.find((choice) => choice.value === "sw")).toMatchObject({
       macroArea: "africa",
@@ -92,7 +93,7 @@ describe("language-flow", () => {
     expect(choices.find((choice) => choice.value === "ar")).toMatchObject({
       macroArea: "asia",
       macroAreaLabel: "Asia",
-      macroAreas: ["asia", "africa"]
+      macroAreas: ["asia"]
     });
     expect(choices).toHaveLength(56);
   });

@@ -11,6 +11,12 @@ export interface RegionMapDefinition {
   position: {
     top: string;
     left: string;
+    width: string;
+    height: string;
+    compactTop: string;
+    compactLeft: string;
+    compactWidth: string;
+    compactHeight: string;
   };
 }
 
@@ -20,6 +26,12 @@ export interface InteractionLanguageRegionGroup {
   position: {
     top: string;
     left: string;
+    width: string;
+    height: string;
+    compactTop: string;
+    compactLeft: string;
+    compactWidth: string;
+    compactHeight: string;
   };
   choices: InteractionLanguageChoice[];
 }

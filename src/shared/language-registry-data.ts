@@ -999,17 +999,7 @@ export const CANONICAL_INTERACTION_LANGUAGES: readonly CanonicalInteractionLangu
 );
 
 export const INTERACTION_LANGUAGE_MACRO_AREA_MEMBERSHIPS = Object.freeze({
-  ar: ["asia", "africa"],
-  az: ["asia", "europe"],
-  en: ["americas", "europe", "oceania"],
-  es: ["americas", "europe", "africa"],
-  fr: ["europe", "americas", "africa"],
-  hy: ["asia", "europe"],
-  ka: ["asia", "europe"],
-  kk: ["asia", "europe"],
-  pt: ["americas", "europe", "africa"],
-  ru: ["europe", "asia"],
-  tr: ["asia", "europe"]
+  en: ["americas", "oceania"]
 }) satisfies Readonly<Record<string, readonly LanguageMacroArea[]>>;
 
 export const INTERACTION_LANGUAGE_FLAG_REGION_CODES = Object.freeze({

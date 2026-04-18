@@ -184,6 +184,8 @@ describe("operator renderer view state", () => {
     expect(html).toContain('aria-label="Flag AL"');
     expect(html).toContain("Europe");
     expect(html).toContain("shqip");
+    expect(html).not.toContain("español");
+    expect(html).not.toContain('aria-label="Flag BR"');
     expect(html.match(/visitor-language-tile/g)?.length).toBe(europeanChoices.length);
   });
 
@@ -254,6 +256,8 @@ describe("operator renderer view state", () => {
     expect(html).not.toContain("visitor-language-tile selected");
     expect(html).toContain("Africa");
     expect(html).toContain("Europa");
+    expect(html).not.toContain("español");
+    expect(html).not.toContain('aria-label="Flag BR"');
     expect(html.match(/visitor-language-tile/g)?.length).toBe(europeChoices.length);
     expect(html).toContain("italiano");
     expect(html).toContain("français");
@@ -327,7 +331,8 @@ describe("operator renderer view state", () => {
 
     expect(html).toContain("ქართული");
     expect(html).toContain("Georgian");
-    expect(html).toContain("Asia • Europa");
+    expect(html).toContain("Asia");
+    expect(html).not.toContain("Europa");
   });
 
   it("renders the active fallback state only when the effective language differs from the configured one", () => {

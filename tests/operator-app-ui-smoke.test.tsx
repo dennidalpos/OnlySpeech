@@ -391,7 +391,7 @@ describe("operator app mounted UI smoke coverage", () => {
     await dispatchClick(findButtonByText("Change language"));
     expect(bodyText()).toContain(operatorLabels.selectInteractionLanguageTitle);
 
-    await dispatchClick(findMacroAreaButton(macroAreaLabel("142", "en")));
+    await dispatchClick(findMacroAreaButton("Middle East"));
     await dispatchClick(findButtonByText(arabic!.nativeLabel));
 
     expect(latestAction(harness.actions)).toEqual({
@@ -574,7 +574,7 @@ describe("operator app mounted UI smoke coverage", () => {
     appState.sides.B.hasCommittedLanguageSelection = true;
     await harness.emitState(appState);
     await dispatchClick(findButtonByText(marathiLabels.changeLanguage));
-    await dispatchClick(findMacroAreaButton(macroAreaLabel("142", appState.sides.B.wizardDefaultUiLanguage ?? "en")));
+    await dispatchClick(findMacroAreaButton("South Asia"));
     await dispatchClick(findButtonByText(nepali!.nativeLabel));
 
     expect(latestAction(harness.actions)).toEqual({
@@ -637,7 +637,7 @@ describe("operator app mounted UI smoke coverage", () => {
     appState.sides.B.hasCommittedLanguageSelection = true;
     await harness.emitState(appState);
     await dispatchClick(findButtonByText(appState.sides.B.effectiveUiLanguage === "it" ? getVisitorUiText("it").changeLanguage : "Change language"));
-    await dispatchClick(findMacroAreaButton(macroAreaLabel("142", "en")));
+    await dispatchClick(findMacroAreaButton("Central Asia"));
     await dispatchClick(findButtonByText(georgian!.nativeLabel));
 
     appState.sessionId = "session-ka";

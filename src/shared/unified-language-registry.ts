@@ -46,6 +46,12 @@ export interface RegionLanguageGroup {
   position: {
     top: string;
     left: string;
+    width: string;
+    height: string;
+    compactTop: string;
+    compactLeft: string;
+    compactWidth: string;
+    compactHeight: string;
   };
   languages: ProviderScopedLanguageRecord[];
 }
@@ -66,14 +72,20 @@ const REGION_COUNTRY_CODES: Readonly<Record<RegionId, readonly string[]>> = Obje
   oceania: ["AU", "FJ", "KI", "MH", "FM", "NC", "NR", "NZ", "PF", "PG", "PW", "SB", "TO", "TV", "VU", "WS"]
 });
 
-const LEGACY_REGION_VISUAL_REFERENCES: Readonly<
+const MACRO_AREA_PRIMARY_REGION_IDS: Readonly<
   Record<"europe" | "americas" | "oceania" | "africa" | "asia", readonly RegionId[]>
 > = Object.freeze({
   europe: ["europe"],
-  americas: ["north-america", "central-america-caribbean", "south-america"],
+  americas: ["north-america"],
   oceania: ["oceania"],
   africa: ["africa"],
-  asia: ["middle-east", "central-asia", "south-asia", "east-asia", "southeast-asia"]
+  asia: ["middle-east"]
+});
+
+const INTERACTION_LANGUAGE_PRIMARY_REGION_OVERRIDES: Readonly<Partial<Record<string, RegionId>>> = Object.freeze({
+  az: "central-asia",
+  ka: "central-asia",
+  tr: "middle-east"
 });
 
 const INTERACTION_LANGUAGE_IDS = Object.freeze(
@@ -111,33 +123,30 @@ function getFlagRegionCode(languageId: string): string | null {
   );
 }
 
-function getLegacyVisualReferences(languageId: string): RegionId[] {
+function getPrimaryMacroAreaRegion(languageId: string): RegionId[] {
   const interactionEntry = CANONICAL_INTERACTION_LANGUAGES.find((entry) => entry.code === languageId);
   if (!interactionEntry) {
-    return [];
+    const targetOnlyEntry = CANONICAL_AZURE_TARGET_ONLY_LANGUAGES.find((entry) => entry.code === languageId);
+    const targetOnlyMacroArea = targetOnlyEntry?.macroAreas[0];
+    return targetOnlyMacroArea ? [...MACRO_AREA_PRIMARY_REGION_IDS[targetOnlyMacroArea]] : [];
   }
 
-  return [...new Set<RegionId>([
-    ...LEGACY_REGION_VISUAL_REFERENCES[interactionEntry.macroArea],
-    ...(interactionEntry.code === "ar" ? ["africa"] : []),
-    ...(interactionEntry.code === "az" ? ["europe"] : []),
-    ...(interactionEntry.code === "en" ? ["europe", "oceania"] : []),
-    ...(interactionEntry.code === "es" ? ["europe", "africa"] : []),
-    ...(interactionEntry.code === "fr" ? ["north-america", "africa"] : []),
-    ...(interactionEntry.code === "pt" ? ["europe", "africa"] : []),
-    ...(interactionEntry.code === "ru" ? ["europe", "central-asia"] : []),
-    ...(interactionEntry.code === "tr" ? ["europe", "middle-east"] : [])
-  ] as RegionId[])];
+  const explicitRegion = INTERACTION_LANGUAGE_PRIMARY_REGION_OVERRIDES[interactionEntry.code];
+  if (explicitRegion) {
+    return [explicitRegion];
+  }
+
+  return [...MACRO_AREA_PRIMARY_REGION_IDS[interactionEntry.macroArea]];
 }
 
 function resolveRegionIds(languageId: string): { primaryRegionId: RegionId; visualReferences: RegionId[] } {
   const flagRegionCode = getFlagRegionCode(languageId);
-  const directRegion = getCountryCodeRegion(flagRegionCode);
-  const visualReferences = new Set<RegionId>(getLegacyVisualReferences(languageId));
-
-  if (directRegion) {
-    visualReferences.add(directRegion);
-  }
+  const interactionEntry = CANONICAL_INTERACTION_LANGUAGES.find((entry) => entry.code === languageId);
+  const forcedRegion = interactionEntry ? INTERACTION_LANGUAGE_PRIMARY_REGION_OVERRIDES[interactionEntry.code] ?? null : null;
+  const directRegion = forcedRegion ?? getCountryCodeRegion(flagRegionCode);
+  const visualReferences = new Set<RegionId>(
+    directRegion ? [directRegion] : getPrimaryMacroAreaRegion(languageId)
+  );
 
   const primaryRegionId = directRegion ?? [...visualReferences][0] ?? "europe";
   visualReferences.add(primaryRegionId);

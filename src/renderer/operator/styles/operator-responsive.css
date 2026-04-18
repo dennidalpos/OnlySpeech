@@ -56,9 +56,20 @@
   }
 
   .world-map-hotspot {
-    width: 96px;
-    height: 60px;
-    padding: 9px 11px;
+    top: var(--hotspot-compact-top);
+    left: var(--hotspot-compact-left);
+    width: var(--hotspot-compact-width);
+    height: var(--hotspot-compact-height);
+    padding: 10px 8px;
+  }
+
+  .visitor-language-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 188px), 188px));
+  }
+
+  .visitor-language-tile {
+    width: 188px;
+    min-height: 102px;
   }
 }
 
@@ -85,6 +96,13 @@
 
   .world-map-stage {
     aspect-ratio: 1.82 / 1;
+  }
+
+  .world-map-hotspot {
+    top: var(--hotspot-compact-top);
+    left: var(--hotspot-compact-left);
+    width: var(--hotspot-compact-width);
+    height: var(--hotspot-compact-height);
   }
 
   .wide-button {

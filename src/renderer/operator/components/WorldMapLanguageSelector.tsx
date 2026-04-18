@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import {
   buildInteractionLanguageRegionGroups,
   type InteractionLanguageRegionGroup
@@ -76,6 +76,19 @@ export function WorldMapLanguageSelector(props: WorldMapLanguageSelectorProps) {
     );
   }
 
+  function buildHotspotStyle(group: InteractionLanguageRegionGroup): CSSProperties {
+    return {
+      "--hotspot-top": group.position.top,
+      "--hotspot-left": group.position.left,
+      "--hotspot-width": group.position.width,
+      "--hotspot-height": group.position.height,
+      "--hotspot-compact-top": group.position.compactTop,
+      "--hotspot-compact-left": group.position.compactLeft,
+      "--hotspot-compact-width": group.position.compactWidth,
+      "--hotspot-compact-height": group.position.compactHeight
+    } as CSSProperties;
+  }
+
   return (
     <div className="world-language-selector">
       <div className="world-map-panel">
@@ -90,10 +103,8 @@ export function WorldMapLanguageSelector(props: WorldMapLanguageSelectorProps) {
                   className={`world-map-hotspot${isActive ? " active" : ""}`}
                   type="button"
                   aria-label={`${group.label} (${group.choices.length})`}
-                  style={{
-                    top: group.position.top,
-                    left: group.position.left
-                  }}
+                  aria-pressed={isActive}
+                  style={buildHotspotStyle(group)}
                   onClick={() => activateMacroArea(group)}
                 >
                   <span>{group.choices.length}</span>
