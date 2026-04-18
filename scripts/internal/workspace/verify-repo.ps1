@@ -2,7 +2,6 @@ param(
   [switch]$SkipInstall,
   [switch]$SkipPack,
   [switch]$SkipPackagedLifecycle,
-  [switch]$ValidateAutostartLive,
   [switch]$EnablePackagedAutomation,
   [switch]$SkipSmokeStart,
   [switch]$KeepOutputs,
@@ -169,9 +168,6 @@ try {
       )
       if ($SkipSmokeStart) {
         $packagedLifecycleArguments += "-SkipLaunches"
-      }
-      if ($ValidateAutostartLive) {
-        $packagedLifecycleArguments += "-ValidateAutostartLive"
       }
 
       Invoke-OnlySpeechStep -Label "packaged-lifecycle" -FilePath "powershell" -Arguments $packagedLifecycleArguments -WorkingDirectory $repoRoot -DryRun:$DryRun

@@ -22,7 +22,7 @@ afterEach(() => {
 });
 
 describeWindows("test-packaged-install-lifecycle.ps1", () => {
-  it("prints the current package lifecycle and autostart validation steps in dry-run mode", () => {
+  it("prints the current package lifecycle steps in dry-run mode", () => {
     const packageRoot = createTempDirectory("onlyspeech-packages");
     const unpackedRoot = join(packageRoot, "win-unpacked");
     mkdirSync(unpackedRoot, { recursive: true });
@@ -53,48 +53,11 @@ describeWindows("test-packaged-install-lifecycle.ps1", () => {
     }
 
     expect(result.stdout).toContain("[layout]");
-    expect(result.stdout).toContain("[autostart-task-install]");
     expect(result.stdout).toContain("[unpacked-launch]");
     expect(result.stdout).toContain("[current-reset]");
     expect(result.stdout).toContain("[current-install]");
     expect(result.stdout).toContain("[current-launch]");
     expect(result.stdout).toContain("[current-uninstall]");
-  });
-
-  it("prints the live autostart validation plan when explicitly requested", () => {
-    const packageRoot = createTempDirectory("onlyspeech-packages-live-autostart");
-    const unpackedRoot = join(packageRoot, "win-unpacked");
-    mkdirSync(unpackedRoot, { recursive: true });
-    writeFileSync(join(unpackedRoot, "OnlySpeech.exe"), "", "utf8");
-    writeFileSync(join(packageRoot, "OnlySpeech-0.1.0-portable.exe"), "", "utf8");
-    writeFileSync(join(packageRoot, "OnlySpeech-0.1.0-installer.exe"), "", "utf8");
-
-    const result = spawnSync(
-      "powershell.exe",
-      [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        lifecycleScriptPath,
-        "-PackageRoot",
-        packageRoot,
-        "-ValidateAutostartLive",
-        "-DryRun"
-      ],
-      {
-        cwd: repoRoot,
-        encoding: "utf8"
-      }
-    );
-
-    if (result.status !== 0) {
-      throw new Error([result.stdout.trim(), result.stderr.trim()].filter(Boolean).join("\n"));
-    }
-
-    expect(result.stdout).toContain("[autostart-live-config]");
-    expect(result.stdout).toContain("[autostart-live-task-install]");
-    expect(result.stdout).toContain("[autostart-live-task-remove]");
   });
 
   it("prints upgrade and rollback steps when comparison installers are supplied", () => {

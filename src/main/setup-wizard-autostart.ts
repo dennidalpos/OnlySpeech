@@ -24,9 +24,10 @@ export function resolveWizardAutostartState(
   options: ResolveWizardAutostartStateOptions
 ): WizardAutostartState {
   if (!options.isPackaged) {
-    // Source-mode / dev session: autostart is unsupported.
+    // Source-mode / dev session: the packaged Run-key contract stays canonical,
+    // but no packaged executable exists yet to register it.
     return {
-      mechanism: "startup-shortcut",
+      mechanism: "current-user-run-key",
       scope: "current-user",
       supported: false,
       canModify: false,

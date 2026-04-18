@@ -215,7 +215,7 @@ describeWindows("write-customer-release-bundle.ps1", () => {
     ).toBe(true);
   });
 
-  it("includes only the retained internal evidence files that actually exist", () => {
+  it("includes only the retained internal evidence files that actually exist", { timeout: customerBundleWriteTimeoutMs }, () => {
     const packagesRoot = createTempDirectory("onlyspeech-customer-bundle-partial-packages");
     const logsRoot = createTempDirectory("onlyspeech-customer-bundle-partial-logs");
     const outputRoot = createTempDirectory("onlyspeech-customer-bundle-partial-output");

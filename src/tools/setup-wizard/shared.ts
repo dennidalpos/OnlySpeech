@@ -39,8 +39,8 @@ export interface WizardMicrophone extends ProbeMicrophoneInfo {
 }
 
 export interface WizardAutostartState {
-  mechanism: "startup-shortcut" | "current-user-run-key";
-  scope: "current-user" | "per-machine";
+  mechanism: "current-user-run-key";
+  scope: "current-user";
   supported: boolean;
   canModify: boolean;
   currentEnabled: boolean;
@@ -378,7 +378,7 @@ export function createInitialWizardState(
       B: 0
     },
     autostart: {
-      mechanism: "startup-shortcut",
+      mechanism: "current-user-run-key",
       scope: "current-user",
       supported: false,
       canModify: false,

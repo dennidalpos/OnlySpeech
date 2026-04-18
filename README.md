@@ -36,5 +36,4 @@ The repository verifies source startup, automated tests, Windows CI, packaged ou
 - [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md) for runtime, verification, packaging, and release boundaries.
 - [scripts/README.md](scripts/README.md) for the PowerShell and npm command surface.
 - [docs/product/provider-setup.md](docs/product/provider-setup.md) for provider setup boundaries and official references.
-- [docs/product/Marketplace_Sales_Package.md](docs/product/Marketplace_Sales_Package.md) for seller-facing marketplace copy and delivery positioning.
-- [PROJECT_STATUS.json](PROJECT_STATUS.json) for residual documentation follow-up only.
+- [PROJECT_STATUS.json](PROJECT_STATUS.json) for residual follow-up only.

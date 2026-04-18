@@ -1,3 +1,36 @@
 {
-  "tasks": []
+  "tasks": [
+    {
+      "id": "residual-upgrade-rollback-validation",
+      "title": "Verificare upgrade e rollback installer su baseline versionata",
+      "status": "open",
+      "priority": 1,
+      "execution_order": 1,
+      "scope": "core",
+      "risk": "HIGH",
+      "area": "packaging",
+      "summary": "Su workstation Windows dedicata, eseguire `scripts/internal/commissioning/test-packaged-install-lifecycle.ps1` con `-PreviousInstallerPath` e `-RollbackInstallerPath` usando installer retained reali per confermare upgrade e rollback della delivery Windows ufficiale. Il repository mantiene il percorso e la dry-run coverage, ma la prova reale resta esterna.",
+      "done_when": [
+        "Upgrade da una versione supportata verificato realmente",
+        "Rollback alla baseline prevista verificato realmente",
+        "Esito e limiti residui registrati nella documentazione release/commissioning pertinente"
+      ]
+    },
+    {
+      "id": "residual-packaged-autostart-live-validation",
+      "title": "Validare live l'autostart packaged via HKCU Run key",
+      "status": "open",
+      "priority": 2,
+      "execution_order": 2,
+      "scope": "core",
+      "risk": "HIGH",
+      "area": "runtime",
+      "summary": "Su workstation Windows packaged reale, abilitare/disabilitare l'autostart dal setup wizard e verificare il comportamento effettivo al logon dell'utente corrente sul solo meccanismo `current-user-run-key`. Il repository copre il contratto HKCU Run key e l'UI, ma non puo provare il logon reale da solo.",
+      "done_when": [
+        "Enable autostart verificato realmente al logon",
+        "Disable autostart verificato realmente al logon",
+        "Nessun path residuo shortcut/task richiesto dal flusso operativo"
+      ]
+    }
+  ]
 }

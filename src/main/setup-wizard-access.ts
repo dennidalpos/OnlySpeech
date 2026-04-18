@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
-import { createHash, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
+import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { MIN_SETUP_WIZARD_PASSWORD_LENGTH } from "../shared/constants.js";
 import type {
   SetupWizardAccessFailureCode,
@@ -9,7 +9,6 @@ import type {
   SetupWizardAccessState
 } from "../shared/types.js";
 
-const LEGACY_SETUP_WIZARD_ACCESS_SCHEMA_VERSION = 1;
 const SETUP_WIZARD_ACCESS_SCHEMA_VERSION = 2;
 
 const DEFAULT_PASSWORD_DERIVATION = Object.freeze({
@@ -20,14 +19,6 @@ const DEFAULT_PASSWORD_DERIVATION = Object.freeze({
   keyLength: 64
 });
 
-interface PersistedSetupWizardAccessRecordV1 {
-  schemaVersion: 1;
-  passwordSalt: string;
-  passwordHash: string;
-  mustChangePassword: boolean;
-  temporaryPassword: string | null;
-}
-
 interface PersistedSetupWizardAccessRecordV2 {
   schemaVersion: 2;
   passwordSalt: string;
@@ -37,13 +28,7 @@ interface PersistedSetupWizardAccessRecordV2 {
   temporaryPassword: string | null;
 }
 
-type PersistedSetupWizardAccessRecord =
-  | PersistedSetupWizardAccessRecordV1
-  | PersistedSetupWizardAccessRecordV2;
-
-function hashPasswordLegacy(password: string, salt: string): string {
-  return createHash("sha256").update(`${salt}:${password}`, "utf8").digest("hex");
-}
+type PersistedSetupWizardAccessRecord = PersistedSetupWizardAccessRecordV2;
 
 function derivePasswordHash(
   password: string,
@@ -68,10 +53,6 @@ function compareHexHashes(left: string, right: string): boolean {
 }
 
 function verifyPassword(password: string, record: PersistedSetupWizardAccessRecord): boolean {
-  if (record.schemaVersion === LEGACY_SETUP_WIZARD_ACCESS_SCHEMA_VERSION) {
-    return compareHexHashes(hashPasswordLegacy(password, record.passwordSalt), record.passwordHash);
-  }
-
   return compareHexHashes(
     derivePasswordHash(password, record.passwordSalt, record.passwordDerivation),
     record.passwordHash
@@ -159,7 +140,6 @@ export class SetupWizardAccessManager {
     }
 
     if (!record.mustChangePassword) {
-      this.migrateLegacyRecord(password, record);
       return { ok: true };
     }
 
@@ -183,26 +163,13 @@ export class SetupWizardAccessManager {
   private readRecord(): PersistedSetupWizardAccessRecord {
     const parsed = JSON.parse(readFileSync(this.accessFilePath, "utf8")) as PersistedSetupWizardAccessRecord;
 
-    if (
-      parsed.schemaVersion !== LEGACY_SETUP_WIZARD_ACCESS_SCHEMA_VERSION &&
-      parsed.schemaVersion !== SETUP_WIZARD_ACCESS_SCHEMA_VERSION
-    ) {
-      throw new Error("Unsupported setup wizard access record schema.");
+    if (parsed.schemaVersion !== SETUP_WIZARD_ACCESS_SCHEMA_VERSION) {
+      throw new Error(
+        `Unsupported setup wizard access record schema. Delete and reprovision '${this.accessFilePath}' before reopening the setup wizard.`
+      );
     }
 
     return parsed;
-  }
-
-  private migrateLegacyRecord(password: string, record: PersistedSetupWizardAccessRecord): void {
-    if (record.schemaVersion !== LEGACY_SETUP_WIZARD_ACCESS_SCHEMA_VERSION) {
-      return;
-    }
-
-    this.writeRecord(createPasswordRecord(password, {
-      mustChangePassword: record.mustChangePassword,
-      temporaryPassword: record.temporaryPassword,
-      randomBytesProvider: this.randomBytesProvider
-    }));
   }
 
   private writeRecord(record: PersistedSetupWizardAccessRecord): void {

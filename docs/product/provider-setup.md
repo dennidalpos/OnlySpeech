@@ -2,7 +2,7 @@
 
 OnlySpeech supports two live speech providers, `azure` and `chatgpt`, plus one translation-only provider, `ollama`. This page documents only the repository-specific setup boundary and links to official provider documentation for account, billing, model, quota, and API details.
 
-For deterministic validation without provider credentials, use `RUNTIME_MODE=demo`.
+For deterministic validation without provider credentials, use `APP_MODE=demo`.
 
 ## Shared Rules
 
@@ -123,4 +123,4 @@ Official Ollama links:
 
 ## Verification State
 
-Repository tests cover request shaping, provider policy, wizard gating, and runtime routing with local/test-double verification. Final live speech proof still requires real provider credentials, microphones, speakers, and a target-equivalent Windows workstation for the `azure` and `chatgpt` paths. The `ollama` path separately still requires reachable-server validation against the configured host and model; if that follow-up is intentionally tracked, keep it in `PROJECT_STATUS.json`.
+Repository tests cover request shaping, provider policy, wizard gating, and runtime routing with local/test-double verification. Final live speech proof still requires real provider credentials, microphones, speakers, and a target-equivalent Windows workstation for the `azure` and `chatgpt` paths. The `ollama` path separately still requires reachable-server validation against the configured host and model, but that is an environment-specific handover check rather than an always-open repository backlog item.

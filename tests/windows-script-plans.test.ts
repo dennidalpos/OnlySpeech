@@ -9,9 +9,6 @@ const repoRoot = process.cwd();
 const helperPath = join(repoRoot, "scripts", "internal", "lib", "plans.ps1");
 const runtimeLogsScriptPath = join(repoRoot, "scripts", "internal", "runtime", "manage-runtime-logs.ps1");
 const windowsStartScriptPath = join(repoRoot, "scripts", "internal", "runtime", "run-workstation.ps1");
-const startupLauncherScriptPath = join(repoRoot, "scripts", "internal", "runtime", "startup", "startup-launcher.ps1");
-const installStartupShortcutScriptPath = join(repoRoot, "scripts", "internal", "runtime", "startup", "install-startup-shortcut.ps1");
-const removeStartupShortcutScriptPath = join(repoRoot, "scripts", "internal", "runtime", "startup", "remove-startup-shortcut.ps1");
 const commissioningArtifactScriptPath = join(repoRoot, "scripts", "internal", "commissioning", "write-commissioning-artifact.ps1");
 const workstationRuntimeDoctorScriptPath = join(repoRoot, "scripts", "internal", "runtime", "workstation-runtime-doctor.ps1");
 const tempDirectories: string[] = [];
@@ -109,27 +106,6 @@ describeWindows("windows script helpers", () => {
     expect(output).toContain(join(repoRoot, "scripts", "internal", "runtime", "start-local.ps1"));
   });
 
-  it("plans the fast startup-launcher path in dry-run mode", () => {
-    const output = runPowerShell([
-      "-NoProfile",
-      "-ExecutionPolicy",
-      "Bypass",
-      "-File",
-      startupLauncherScriptPath,
-      "-DryRun"
-    ]);
-
-    expect(output).toContain("[startup-launcher] Dry-run skips remote update detection");
-    expect(output).toContain("[startup-launch] powershell.exe -NoProfile -ExecutionPolicy Bypass -File");
-    expect(output).toContain(join(repoRoot, "scripts", "internal", "runtime", "run-workstation.ps1"));
-    expect(output).toContain("-PreferPackaged -SkipInstall -SkipDoctor -DryRun");
-  });
-
-  it("keeps the startup fetch probe out of the decision output stream", () => {
-    const script = readFileSync(startupLauncherScriptPath, "utf8");
-    expect(script).toContain('$null = Invoke-OnlySpeechGitCapture -Arguments @("fetch", "--quiet", "--prune")');
-  });
-
   it("launches the packaged executable without an empty ArgumentList when no wizard arguments are requested", () => {
     const packagedExecutablePath = join(repoRoot, "artifacts", "packages", "win-unpacked", "OnlySpeech.exe");
     const output = runPowerShell([
@@ -178,127 +154,6 @@ describeWindows("windows script helpers", () => {
     expect(invocation.WorkingDirectory).toBe(repoRoot);
     expect(invocation.HasArgumentList).toBe(false);
     expect(invocation.ArgumentCount).toBe(-1);
-  });
-
-  it("builds a stable startup shortcut plan", () => {
-    const plan = runPowerShellJson(
-      [
-        "& {",
-        `  . ${toPowerShellString(helperPath)}`,
-        "  $plan = Get-OnlySpeechStartupShortcutPlan `",
-        "    -ShortcutName 'OnlySpeech.lnk' `",
-        "    -AppData 'C:\\Users\\Installer\\AppData\\Roaming' `",
-        "    -LauncherPath 'D:\\Repo\\scripts\\internal\\runtime\\run-workstation.ps1' `",
-        "    -RepoRoot 'D:\\Repo' `",
-        "    -IconPath 'D:\\Repo\\build\\icon.ico'",
-        "  $plan | ConvertTo-Json -Depth 6 -Compress",
-        "}"
-      ].join("\n")
-    ) as Record<string, string>;
-
-    expect(plan.ShortcutPath).toBe(
-      "C:\\Users\\Installer\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\OnlySpeech.lnk"
-    );
-    expect(plan.TargetPath).toBe("powershell.exe");
-    expect(plan.Arguments).toBe(
-      '-ExecutionPolicy Bypass -File "D:\\Repo\\scripts\\internal\\runtime\\run-workstation.ps1" -PreferPackaged'
-    );
-    expect(plan.WorkingDirectory).toBe("D:\\Repo");
-    expect(plan.IconLocation).toBe("D:\\Repo\\build\\icon.ico");
-  });
-
-  it("builds a stable autostart task plan", () => {
-    const plan = runPowerShellJson(
-      [
-        "& {",
-        `  . ${toPowerShellString(helperPath)}`,
-        "  $plan = Get-OnlySpeechAutostartTaskPlan `",
-        "    -TaskName 'OnlySpeech Kiosk' `",
-        "    -PreferPackaged `",
-        "    -LauncherScript 'D:\\Repo\\scripts\\internal\\runtime\\run-workstation.ps1' `",
-        "    -RepoRoot 'D:\\Repo' `",
-        "    -Username 'installer'",
-        "  $plan | ConvertTo-Json -Depth 6 -Compress",
-        "}"
-      ].join("\n")
-    ) as Record<string, string>;
-
-    expect(plan.TaskName).toBe("OnlySpeech Kiosk");
-    expect(plan.Execute).toBe("powershell.exe");
-    expect(plan.Arguments).toBe(
-      '-ExecutionPolicy Bypass -File "D:\\Repo\\scripts\\internal\\runtime\\run-workstation.ps1" -SkipInstall -SkipDoctor -PreferPackaged'
-    );
-    expect(plan.WorkingDirectory).toBe("D:\\Repo");
-    expect(plan.PrincipalUserId).toBe("installer");
-    expect(plan.Description).toBe("Starts the OnlySpeech kiosk app at user logon.");
-  });
-
-  it("builds a stable startup shortcut removal plan", () => {
-    const plan = runPowerShellJson(
-      [
-        "& {",
-        `  . ${toPowerShellString(helperPath)}`,
-        "  $plan = Get-OnlySpeechStartupShortcutRemovalPlan `",
-        "    -ShortcutName 'OnlySpeech.lnk' `",
-        "    -AppData 'C:\\Users\\Installer\\AppData\\Roaming'",
-        "  $plan | ConvertTo-Json -Depth 6 -Compress",
-        "}"
-      ].join("\n")
-    ) as Record<string, string>;
-
-    expect(plan.ShortcutPath).toBe(
-      "C:\\Users\\Installer\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\OnlySpeech.lnk"
-    );
-  });
-
-  it("lets the startup shortcut scripts target a disposable AppData root", () => {
-    const appDataRoot = createTempDirectory("onlyspeech-shortcut-appdata");
-    const installOutput = runPowerShell([
-      "-NoProfile",
-      "-ExecutionPolicy",
-      "Bypass",
-      "-File",
-      installStartupShortcutScriptPath,
-      "-ShortcutName",
-      "DisposableOnlySpeech.lnk",
-      "-AppDataPath",
-      appDataRoot,
-      "-DryRun"
-    ]);
-    const removeOutput = runPowerShell([
-      "-NoProfile",
-      "-ExecutionPolicy",
-      "Bypass",
-      "-File",
-      removeStartupShortcutScriptPath,
-      "-ShortcutName",
-      "DisposableOnlySpeech.lnk",
-      "-AppDataPath",
-      appDataRoot,
-      "-DryRun"
-    ]);
-
-    expect(installOutput).toContain(
-      join(appDataRoot, "Microsoft", "Windows", "Start Menu", "Programs", "Startup", "DisposableOnlySpeech.lnk")
-    );
-    expect(installOutput).toContain(startupLauncherScriptPath);
-    expect(removeOutput).toContain(
-      join(appDataRoot, "Microsoft", "Windows", "Start Menu", "Programs", "Startup", "DisposableOnlySpeech.lnk")
-    );
-  });
-
-  it("builds a stable autostart task removal plan", () => {
-    const plan = runPowerShellJson(
-      [
-        "& {",
-        `  . ${toPowerShellString(helperPath)}`,
-        "  $plan = Get-OnlySpeechAutostartTaskRemovalPlan -TaskName 'OnlySpeech Kiosk'",
-        "  $plan | ConvertTo-Json -Depth 6 -Compress",
-        "}"
-      ].join("\n")
-    ) as Record<string, string>;
-
-    expect(plan.TaskName).toBe("OnlySpeech Kiosk");
   });
 
   it("builds a deterministic cleanup plan for runtime logs", () => {

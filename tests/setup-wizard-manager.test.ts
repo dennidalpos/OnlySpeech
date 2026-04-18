@@ -156,7 +156,7 @@ describe("SetupWizardManager control window", () => {
     const manager = new SetupWizardManager({
       runtimeRoot: "D:\\OnlySpeech",
       getAutostartState: () => ({
-        mechanism: "startup-shortcut",
+        mechanism: "current-user-run-key",
         scope: "current-user",
         supported: true,
         canModify: true,
@@ -169,7 +169,7 @@ describe("SetupWizardManager control window", () => {
 
     const snapshot = manager.getSnapshot();
     expect(snapshot.state?.autostart).toEqual({
-      mechanism: "startup-shortcut",
+      mechanism: "current-user-run-key",
       scope: "current-user",
       supported: true,
       canModify: true,

@@ -87,7 +87,7 @@ export function applyStoredDisplayAssignments(state: WizardState): WizardState {
 
 export function createInitialWizardRuntimeState(runtimeRoot: string): WizardState {
   return createInitialWizardRuntimeStateWithAutostart(runtimeRoot, {
-    mechanism: "startup-shortcut",
+    mechanism: "current-user-run-key",
     scope: "current-user",
     supported: false,
     canModify: false,

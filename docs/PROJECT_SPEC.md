@@ -55,7 +55,7 @@ Not supported by the repository contract:
 ## Repository Topology
 
 - `src/main`: Electron bootstrap, runtime root selection, activation, secure secrets, IPC, kiosk orchestration, setup orchestration, and window management.
-- `src/renderer`: React operator, visitor, and activation surfaces.
+- `src/renderer`: React operator runtime surface and activation UI.
 - `src/shared`: typed contracts, runtime config parsing, language registry, localization bundles, provider policy, and shared speech/session helpers.
 - `src/services`: audio, session, privacy, logging, and speech provider services.
 - `src/tools`: setup-wizard HTML/preload fragments and helper output definitions.
@@ -80,7 +80,7 @@ Not supported by the repository contract:
 
 Main process responsibilities include bootstrap, runtime root selection, activation, display management, kiosk orchestration, provider calls, setup access, packaged secret handling, and IPC.
 
-Renderer responsibilities include the operator and visitor conversation surfaces, activation UI, setup-wizard access prompts, language selection, push-to-talk controls, runtime issue banners, and localized user-facing copy.
+Renderer responsibilities include the operator runtime surface, the visitor-facing session content owned by that runtime, activation UI, setup-wizard access prompts, language selection, push-to-talk controls, runtime issue banners, and localized user-facing copy.
 
 Shared and service modules define config, language policy, provider language matrix, runtime diagnostics, logging, privacy/session behavior, media-device probing, Azure/OpenAI/Ollama provider adapters, and text-to-speech provider behavior.
 
@@ -114,7 +114,7 @@ The supported runtime keys, key order, secure-key metadata, provider validation,
 
 Important externalized choices include:
 
-- `RUNTIME_MODE`: `kiosk` or `demo`;
+- `APP_MODE`: `kiosk` or `demo`;
 - `TRANSLATION_PROVIDER`: `azure`, `chatgpt`, or `ollama`;
 - microphone profile and side assignments;
 - operator and visitor default languages;
@@ -167,7 +167,7 @@ The test surface includes:
 
 `npm run verify:repo` covers cleanup, bootstrap, doctor, tests, source smoke, build, Electron e2e, packaging audit, packaging, packaged lifecycle validation, optional packaged automation, release evidence generation, release compliance generation, and final cleanup unless outputs are preserved.
 
-Supported verification modifiers include `-SkipInstall`, `-SkipPack`, `-SkipPackagedLifecycle`, `-ValidateAutostartLive`, `-EnablePackagedAutomation`, `-SkipSmokeStart`, `-KeepOutputs`, and `-DryRun`.
+Supported verification modifiers include `-SkipInstall`, `-SkipPack`, `-SkipPackagedLifecycle`, `-EnablePackagedAutomation`, `-SkipSmokeStart`, `-KeepOutputs`, and `-DryRun`.
 
 ## Packaging Contract
 
@@ -205,7 +205,6 @@ Repo-local generated outputs are ignored by `.gitignore`. Optional screenshot an
 ## Supporting Documentation
 
 - `docs/product/provider-setup.md`: provider setup and official provider link map.
-- `docs/product/Marketplace_Sales_Package.md`: seller-facing marketplace copy.
 - `docs/customer-bundle/*`: buyer-facing release bundle documents.
 - `docs/internal/Privacy_and_Commercial_Distribution.md`: repository policy for privacy and commercial distribution boundaries.
 - `docs/internal/testing/language-speech-matrix.md`: manual live provider speech proof matrix.

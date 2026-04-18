@@ -1,19 +1,16 @@
 import { resolveInteractionLanguageSourceLocale } from "./language-registry.js";
 import type {
   ProviderTextToSpeechPolicy,
-  ResolveProviderTextToSpeechPolicyOptions,
   TranslationProvider
 } from "./types.js";
 
 export function resolveProviderTextToSpeechPolicy(
   provider: TranslationProvider,
-  _language: string | null,
-  options: ResolveProviderTextToSpeechPolicyOptions = {}
+  _language: string | null
 ): ProviderTextToSpeechPolicy {
   if (provider === "ollama") {
     return {
       primaryEngine: null,
-      fallbackEngine: null,
       blockOnMissing: true
     };
   }
@@ -21,19 +18,15 @@ export function resolveProviderTextToSpeechPolicy(
   if (provider === "chatgpt") {
     return {
       primaryEngine: "openai",
-      fallbackEngine: null,
       blockOnMissing: true
     };
   }
-
-  void options;
 
   // provider === "azure": runtime playback stays Azure-only. Save gating in the wizard
   // already blocks unsupported A/B selections, but the runtime must still refuse local
   // system fallback if configuration drifts or a stale setup reaches playback.
   return {
     primaryEngine: "azure",
-    fallbackEngine: null,
     blockOnMissing: true
   };
 }

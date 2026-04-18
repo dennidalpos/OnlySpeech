@@ -47,10 +47,10 @@ describe("setup wizard autostart state", () => {
       expect(state.selectedEnabled).toBe(false);
     });
 
-    it("uses startup-shortcut mechanism and current-user scope for source-mode sessions", () => {
+    it("keeps the packaged Run-key mechanism as the only supported autostart contract", () => {
       const state = resolveWizardAutostartState({ isPackaged: false });
 
-      expect(state.mechanism).toBe("startup-shortcut");
+      expect(state.mechanism).toBe("current-user-run-key");
       expect(state.scope).toBe("current-user");
     });
   });

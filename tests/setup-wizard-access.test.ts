@@ -1,4 +1,3 @@
-import { createHash } from "node:crypto";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
@@ -124,19 +123,17 @@ describe("SetupWizardAccessManager", () => {
     ).toEqual({ ok: true });
   });
 
-  it("migrates legacy salted SHA-256 records to the stronger persisted derivation after a valid authorization", () => {
+  it("rejects unsupported legacy persisted access records with a reprovision instruction", () => {
     const directory = createTempDirectory();
     const accessFilePath = join(directory, "setup-wizard-access.json");
-    const password = "OperatorPass42";
-    const passwordSalt = "legacy-salt";
 
     writeFileSync(
       accessFilePath,
       JSON.stringify(
         {
           schemaVersion: 1,
-          passwordSalt,
-          passwordHash: createHash("sha256").update(`${passwordSalt}:${password}`, "utf8").digest("hex"),
+          passwordSalt: "legacy-salt",
+          passwordHash: "legacy-hash",
           mustChangePassword: false,
           temporaryPassword: null
         },
@@ -148,27 +145,12 @@ describe("SetupWizardAccessManager", () => {
 
     const manager = new SetupWizardAccessManager(accessFilePath, (size) => Buffer.alloc(size, 0x24));
 
-    expect(
+    expect(() =>
       manager.authorize({
-        password
+        password: "OperatorPass42"
       })
-    ).toEqual({ ok: true });
-
-    const persisted = JSON.parse(readFileSync(accessFilePath, "utf8")) as {
-      schemaVersion: number;
-      passwordDerivation?: { algorithm?: string };
-      temporaryPassword: string | null;
-      mustChangePassword: boolean;
-    };
-
-    expect(persisted.schemaVersion).toBe(2);
-    expect(persisted.passwordDerivation?.algorithm).toBe("scrypt");
-    expect(persisted.temporaryPassword).toBeNull();
-    expect(persisted.mustChangePassword).toBe(false);
-    expect(
-      manager.authorize({
-        password
-      })
-    ).toEqual({ ok: true });
+    ).toThrow(
+      `Unsupported setup wizard access record schema. Delete and reprovision '${accessFilePath}' before reopening the setup wizard.`
+    );
   });
 });

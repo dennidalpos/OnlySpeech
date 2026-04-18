@@ -30,7 +30,7 @@ The stable npm surface is broader than `scripts/public/`: `test`, `test:e2e`, `v
 ### `scripts/internal/lib/`
 
 - `repo.ps1`: shared repository helpers for path resolution, supported Node.js baseline checks, process release checks, and deterministic step execution.
-- `plans.ps1`: shared planning helpers for runtime logs and Windows startup/autostart setup.
+- `plans.ps1`: shared planning helpers for runtime logs and canonical Windows local-data paths.
 
 ### `scripts/internal/runtime/`
 
@@ -44,14 +44,9 @@ The stable npm surface is broader than `scripts/public/`: `test`, `test:e2e`, `v
 
 ### `scripts/internal/runtime/startup/`
 
-- `startup-launcher.ps1`: startup launcher with optional git sync detection.
-- `install-startup-shortcut.ps1`: installs the Windows Startup shortcut.
-- `remove-startup-shortcut.ps1`: removes the Windows Startup shortcut.
-- `install-autostart-task.ps1`: installs the scheduled task autostart entry.
-- `uninstall-autostart-task.ps1`: removes the scheduled task autostart entry.
 - `configure-power-settings.ps1`: wrapper around the canonical power-settings script in `build/`.
 
-Packaged autostart is managed by the setup wizard through the current user's Windows Run entry. The installer removes the old per-machine Run entry during install/uninstall so the wizard toggle can enable or disable startup without admin rights. The Startup shortcut and scheduled-task scripts remain repository-side automation and support utilities for source-mode or explicit maintenance workflows, not the packaged app's normal autostart path.
+Packaged autostart is managed only by the setup wizard through the current user's Windows Run entry. Historical Startup shortcut and scheduled-task utilities are no longer part of the maintained repository surface.
 
 ### `scripts/internal/packaging/`
 

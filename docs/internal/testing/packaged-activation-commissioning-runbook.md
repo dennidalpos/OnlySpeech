@@ -5,7 +5,9 @@ Use this page for the remaining real-workstation close-out that cannot be proven
 This runbook covers:
 
 - final packaged activation validation with real purchased activation material;
-- final target-station commissioning evidence, including explicit `touch-input` closure when applicable to the target hardware.
+- final target-station commissioning evidence, including explicit `touch-input` closure when applicable to the target hardware;
+- packaged autostart validation at real user logon through the supported HKCU Run-key path;
+- retained-installer upgrade and rollback validation on a dedicated Windows workstation.
 
 ## Preconditions
 
@@ -47,6 +49,53 @@ Record the retained notes directly in `artifacts/logs/activation-validation.json
 
 The packaged runtime also enforces one local 15-day trial per workstation through the registry tombstone used by `src/main/trial-tombstone.ts`. That behavior is real, but the current `npm run activation:template` artifact does not expose it as a separate retained scenario. Treat it as a support observation unless the artifact generator is expanded later. If support must intentionally re-arm only the trial gate, use `scripts/internal/runtime/clear-trial-tombstone.ps1`. If support must wipe the entire packaged workstation profile, including `%LOCALAPPDATA%\OnlySpeech\.env`, activation state, secure secrets, logs, session data, and the trial tombstone, prefer `npm run clean:workstation`. The internal script path `scripts/internal/runtime/clear-local-workstation-data.ps1` remains the underlying fallback entrypoint.
 
+## Packaged Autostart Validation
+
+Validate this only on a real packaged workstation session after installation. Source mode and repository-only checks do not prove the behavior.
+
+The supported contract is a single current-user Windows Run entry managed by the setup wizard:
+
+- registry path: `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`
+- value name: `OnlySpeech`
+- target: the packaged `OnlySpeech.exe`
+
+Suggested pass:
+
+1. Install the packaged app and complete enough setup that the packaged runtime can open normally.
+2. In the setup wizard review section, enable automatic startup.
+3. Confirm the `OnlySpeech` value appears under the HKCU Run key and points to the packaged executable.
+4. Sign out or reboot, then sign in again with the same user.
+5. Confirm the packaged app starts automatically without any Startup shortcut or scheduled task helper.
+6. Disable automatic startup from the setup wizard.
+7. Confirm the `OnlySpeech` HKCU Run value is removed.
+8. Sign out or reboot, then sign in again with the same user.
+9. Confirm the app no longer starts automatically.
+
+Retain at minimum:
+
+- operator notes for enable and disable passes;
+- the packaged executable path used for the Run entry;
+- whether any unexpected Startup shortcut or scheduled task was found.
+
+## Upgrade And Rollback Validation
+
+Validate this only when retained comparison installers are available. The repository covers the script path and dry-run behavior, but not the real installer transitions by itself.
+
+Use a dedicated Windows workstation or disposable VM and keep all install roots inside the script-owned lifecycle area.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\internal\commissioning\test-packaged-install-lifecycle.ps1 `
+  -PreviousInstallerPath <path-to-supported-older-installer.exe> `
+  -RollbackInstallerPath <path-to-rollback-baseline-installer.exe>
+```
+
+Expected manual closure:
+
+- the previous retained installer installs and launches successfully;
+- upgrade to the current retained installer succeeds without breaking startup;
+- rollback to the retained rollback baseline succeeds without breaking startup;
+- notes and any retained paths are recorded with the release or commissioning evidence used for the delivery.
+
 ## Commissioning Close-Out
 
 The following target-station checks can be automated on the active workstation before the remaining manual close-out:
@@ -86,7 +135,7 @@ npm run commission:handover
 
 ## Tracking Notes
 
-If this manual pass is being tracked in `PROJECT_STATUS.json`, close or update the relevant open task only after `artifacts/logs/activation-validation.json` and `artifacts/logs/commissioning-evidence.json` reflect the retained evidence that actually exists.
+If this manual pass is being tracked in `PROJECT_STATUS.json`, close or update the relevant open task only after the retained evidence for that area actually exists. For activation and commissioning this usually means `artifacts/logs/activation-validation.json` and `artifacts/logs/commissioning-evidence.json`; for autostart or retained-installer lifecycle validation it may be an operator note bundle retained alongside the release evidence.
 
 Do not claim signed-release, GitHub-hosted CI, or commercial-review completion unless those external bundles are retained too.
 

@@ -3,7 +3,6 @@ param(
   [string]$InstallRoot = "",
   [string]$PreviousInstallerPath = "",
   [string]$RollbackInstallerPath = "",
-  [switch]$ValidateAutostartLive,
   [string]$LiveValidationAppDataPath = "",
   [switch]$SkipLaunches,
   [switch]$DryRun
@@ -48,31 +47,6 @@ function Invoke-ProcessStep {
   if ($process.ExitCode -ne 0) {
     throw "$Label failed with exit code $($process.ExitCode)"
   }
-}
-
-function Invoke-PowerShellScriptStep {
-  param(
-    [string]$Label,
-    [string]$ScriptPath,
-    [string[]]$Arguments = @()
-  )
-
-  $processArguments = @(
-    "-NoProfile",
-    "-ExecutionPolicy",
-    "Bypass",
-    "-File",
-    $ScriptPath
-  ) + @($Arguments)
-
-  Invoke-ProcessStep -Label $Label -FilePath "powershell.exe" -Arguments $processArguments
-}
-
-function Test-ScheduledTaskExists {
-  param([string]$TaskName)
-
-  $null = & schtasks.exe /Query /TN $TaskName 2>$null
-  return $LASTEXITCODE -eq 0
 }
 
 function Get-OnlySpeechProcesses {
@@ -355,69 +329,6 @@ function Invoke-InstallerLifecycle {
   }
 }
 
-function Invoke-AutostartValidation {
-  if (-not $ValidateAutostartLive) {
-    # Packaged autostart is wizard-managed through the current user's HKCU Run key.
-    # The scheduled-task scripts are still validated here as a dry-run smoke test;
-    # the startup-shortcut scripts are not used by packaged builds.
-    $scripts = @(
-      @{
-        Label = "autostart-task-install"
-        Path = Join-Path $repoRoot "scripts\internal\runtime\startup\install-autostart-task.ps1"
-        Arguments = @("-DryRun", "-PreferPackaged")
-      },
-      @{
-        Label = "autostart-task-remove"
-        Path = Join-Path $repoRoot "scripts\internal\runtime\startup\uninstall-autostart-task.ps1"
-        Arguments = @("-DryRun")
-      }
-    )
-
-    foreach ($script in $scripts) {
-      Invoke-PowerShellScriptStep -Label $script.Label -ScriptPath $script.Path -Arguments $script.Arguments
-    }
-
-    return
-  }
-
-  # Packaged autostart is wizard-managed through the current user's HKCU Run key.
-  # Only the scheduled-task mechanism is still validated live here; startup-shortcut
-  # scripts are outside the packaged app's normal autostart path.
-  $validationSuffix = [guid]::NewGuid().ToString("N").Substring(0, 8)
-  $taskName = "OnlySpeech-Lifecycle-$validationSuffix"
-  $installTaskScript = Join-Path $repoRoot "scripts\internal\runtime\startup\install-autostart-task.ps1"
-  $removeTaskScript = Join-Path $repoRoot "scripts\internal\runtime\startup\uninstall-autostart-task.ps1"
-
-  Write-Step -Label "autostart-live-config" -Message "task=$taskName"
-
-  $nestedDryRunArguments = if ($DryRun) { @("-DryRun") } else { @() }
-
-  try {
-    Invoke-PowerShellScriptStep -Label "autostart-live-task-install" -ScriptPath $installTaskScript -Arguments (@(
-      "-TaskName",
-      $taskName,
-      "-PreferPackaged"
-    ) + $nestedDryRunArguments)
-
-    if (-not $DryRun -and -not (Test-ScheduledTaskExists -TaskName $taskName)) {
-      throw "Scheduled Task was not created: $taskName"
-    }
-
-    Invoke-PowerShellScriptStep -Label "autostart-live-task-remove" -ScriptPath $removeTaskScript -Arguments (@(
-      "-TaskName",
-      $taskName
-    ) + $nestedDryRunArguments)
-
-    if (-not $DryRun -and (Test-ScheduledTaskExists -TaskName $taskName)) {
-      throw "Scheduled Task was not removed: $taskName"
-    }
-  } finally {
-    if (-not $DryRun) {
-      & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $removeTaskScript -TaskName $taskName | Out-Null
-    }
-  }
-}
-
 $unpackedExe = Join-Path $resolvedPackageRoot "win-unpacked\OnlySpeech.exe"
 $portableExe = Get-ChildItem -LiteralPath $resolvedPackageRoot -Filter "*portable*.exe" -File -ErrorAction SilentlyContinue |
   Sort-Object Name |
@@ -437,8 +348,6 @@ if ($null -eq $currentInstaller) {
 }
 
 Write-Step -Label "layout" -Message "installer=$($currentInstaller.FullName) portable=$($portableExe.FullName) unpacked=$unpackedExe"
-
-Invoke-AutostartValidation
 Invoke-LaunchValidation -Label "unpacked-launch" -ExecutablePath $unpackedExe -WorkingDirectory (Split-Path -Parent $unpackedExe)
 Invoke-InstallerLifecycle -LabelPrefix "current" -InstallerPath $currentInstaller.FullName -InstallDirectory (Join-Path $resolvedInstallRoot "current")
 
@@ -455,7 +364,6 @@ if (-not [string]::IsNullOrWhiteSpace($PreviousInstallerPath)) {
   Invoke-InstallerLifecycle -LabelPrefix "upgrade" -InstallerPath $currentInstaller.FullName -InstallDirectory $upgradeInstallDirectory -SkipDirectoryReset -SkipUninstall
   Invoke-InstallerLifecycle -LabelPrefix "rollback" -InstallerPath $resolvedRollbackInstallerPath -InstallDirectory $upgradeInstallDirectory -SkipDirectoryReset
 }
-
 
 
 

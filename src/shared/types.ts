@@ -71,13 +71,7 @@ export type ProviderTextToSpeechEngine = TextToSpeechEngine;
 
 export interface ProviderTextToSpeechPolicy {
   primaryEngine: ProviderTextToSpeechEngine | null;
-  fallbackEngine: ProviderTextToSpeechEngine | null;
   blockOnMissing: boolean;
-}
-
-export interface ResolveProviderTextToSpeechPolicyOptions {
-  systemFallbackAvailable?: boolean;
-  azureBackendAvailable?: boolean;
 }
 
 export interface SetupWizardAccessState {

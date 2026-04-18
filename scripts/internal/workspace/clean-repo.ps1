@@ -53,6 +53,22 @@ function Remove-OnlySpeechServiceRegistrations {
   }
 }
 
+function Remove-OnlySpeechAutostartRunValue {
+  $runKeyPath = "HKCU\Software\Microsoft\Windows\CurrentVersion\Run"
+  $runValueName = "OnlySpeech"
+
+  Write-Host "[clean] autostart-run-key $runValueName"
+  if ($DryRun) {
+    return
+  }
+
+  try {
+    & reg.exe delete $runKeyPath /v $runValueName /f | Out-Null
+  } catch {
+    # Already absent is an acceptable clean state.
+  }
+}
+
 $repoTargets = @(
   "dist",
   "artifacts",
@@ -83,23 +99,7 @@ if (-not $KeepEnvFile) {
 }
 
 if (-not $KeepAutostart) {
-  $uninstallAutostartScript = Join-Path $repoRoot "scripts\internal\runtime\startup\uninstall-autostart-task.ps1"
-  $removeStartupShortcutScript = Join-Path $repoRoot "scripts\internal\runtime\startup\remove-startup-shortcut.ps1"
-
-  if (Test-Path -LiteralPath $uninstallAutostartScript) {
-    Write-Host "[clean] autostart-task OnlySpeech Kiosk"
-    if (-not $DryRun) {
-      & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $uninstallAutostartScript
-    }
-  }
-
-  if (Test-Path -LiteralPath $removeStartupShortcutScript) {
-    Write-Host "[clean] startup-shortcut OnlySpeech.lnk"
-    if (-not $DryRun) {
-      & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $removeStartupShortcutScript
-    }
-  }
-
+  Remove-OnlySpeechAutostartRunValue
   Remove-OnlySpeechServiceRegistrations
 }
 
