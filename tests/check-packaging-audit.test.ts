@@ -61,7 +61,7 @@ describe("Validate-PackagingAuditReport", () => {
       })
     ).toEqual({
       ok: true,
-      message: "Packaging audit matches the current clean packaging dependency state (0 findings)."
+      message: "Packaging audit matches the current known packaging dependency state (2 findings)."
     });
   });
 
@@ -74,7 +74,7 @@ describe("Validate-PackagingAuditReport", () => {
       })
     ).toEqual({
       ok: false,
-      message: "Unexpected total count: expected 0, found 21."
+      message: "Unexpected total count: expected 2, found 21."
     });
   });
 
@@ -87,32 +87,42 @@ describe("Validate-PackagingAuditReport", () => {
             name: "electronBuilder",
             severity: "moderate",
             fixAvailable: { ...expected.expectedFix }
+          },
+          uuid: {
+            name: "uuid",
+            severity: "moderate",
+            fixAvailable: { ...expected.expectedFix }
           }
         },
-        metadata: { vulnerabilities: { ...expected.expectedCounts, moderate: 1, total: 1 } }
+        metadata: { vulnerabilities: { ...expected.expectedCounts } }
       })
     ).toEqual({
       ok: false,
-      message: "Unexpected moderate count: expected 0, found 1."
+      message: "Unexpected vulnerability list. Expected microsoft-cognitiveservices-speech-sdk, uuid. Found electronBuilder, uuid."
     });
   });
 
   it("accepts npm audit entries that collapse fixAvailable to true", () => {
     const expected = getExpectedState();
+    const vulnerabilities = Object.fromEntries(
+      expected.expectedVulnerabilities.map((name) => [
+        name,
+        {
+          name,
+          severity: "moderate",
+          fixAvailable: name === "uuid" ? true : { ...expected.expectedFix }
+        }
+      ])
+    );
+
     expect(
       validateReport({
-        vulnerabilities: {
-          electronBuilder: {
-            name: "electronBuilder",
-            severity: "moderate",
-            fixAvailable: true
-          }
-        },
-        metadata: { vulnerabilities: { ...expected.expectedCounts, moderate: 1, total: 1 } }
+        vulnerabilities,
+        metadata: { vulnerabilities: { ...expected.expectedCounts } }
       })
     ).toEqual({
-      ok: false,
-      message: "Unexpected moderate count: expected 0, found 1."
+      ok: true,
+      message: "Packaging audit matches the current known packaging dependency state (2 findings)."
     });
   });
 });

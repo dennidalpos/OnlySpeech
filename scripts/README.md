@@ -25,6 +25,18 @@ The stable npm surface is broader than `scripts/public/`: `test`, `test:e2e`, `v
 
 `clean:workstation` is the preferred stable entrypoint for packaged workstation resets. `scripts/internal/runtime/clear-local-workstation-data.ps1` remains the implementation detail behind that public wrapper, and internal setup-wizard/runtime refactors do not change this support boundary.
 
+## Script Classification
+
+| classification | paths | rule |
+| --- | --- | --- |
+| primary | `scripts/public/*.ps1`, stable npm aliases in `package.json` | Supported operator, developer, CI, and release entrypoints. Prefer these commands in docs and automation. |
+| internal | `scripts/internal/lib/*.ps1`, `scripts/internal/runtime/*.ps1`, `scripts/internal/workspace/*.ps1`, `scripts/internal/packaging/*.ps1`, `scripts/internal/commissioning/*.ps1`, `scripts/internal/docs/*.ps1` | Implementation details behind primary npm commands, tests, release evidence, commissioning, and support workflows. Keep references explicit and covered by tests when callable directly. |
+| agents | none | No agent-owned script path is supported. Agent scratch files must stay out of the tracked repository. |
+| legacy | none | Historical startup shortcut, scheduled-task, per-machine autostart, and duplicate power-settings wrappers are not part of the maintained script surface. |
+| removable | none currently tracked | Remove a script only after references in `package.json`, docs, tests, CI, and installer config are checked in the same change. |
+
+Ignored local outputs and workstation-only material such as `.local/`, `dist/`, `artifacts/`, `node_modules/`, and package caches are not part of the tracked script surface. They may be regenerated or cleaned by the documented commands, but this index tracks only repository-owned scripts.
+
 ## Internal Scripts
 
 ### `scripts/internal/lib/`
@@ -42,16 +54,12 @@ The stable npm surface is broader than `scripts/public/`: `test`, `test:e2e`, `v
 - `repair-microphones.ps1`: reopens the setup wizard on the microphone repair path.
 - `workstation-runtime-doctor.ps1`: Electron-based workstation diagnostics for displays and microphones.
 
-### `scripts/internal/runtime/startup/`
-
-- `configure-power-settings.ps1`: wrapper around the canonical power-settings script in `build/`.
-
 Packaged autostart is managed only by the setup wizard through the current user's Windows Run entry. Historical Startup shortcut and scheduled-task utilities are no longer part of the maintained repository surface.
 
 ### `scripts/internal/packaging/`
 
 - `package-core.ps1`: canonical electron-builder entrypoint with distinct `Public` and `Internal` target profiles, keeping only public deliverables plus the versioned unpacked archive for the public profile.
-- `package-audit.ps1`: validates that the current packaging dependency tree remains in the expected clean `npm audit` state with zero recorded findings.
+- `package-audit.ps1`: validates that the current packaging dependency tree matches the expected `npm audit` state. Any accepted residual finding must also be tracked in `PROJECT_STATUS.json`.
 - `assert-release-tag.ps1`: validates release tags against `package.json`.
 - `check-windows-signing.ps1`: validates Windows signing inputs.
 - `write-release-evidence.ps1`: writes retained release evidence metadata.

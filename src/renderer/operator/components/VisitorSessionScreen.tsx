@@ -1,4 +1,9 @@
-import type { ComponentProps, PointerEvent as ReactPointerEvent, ReactNode } from "react";
+import type {
+  ComponentProps,
+  KeyboardEvent as ReactKeyboardEvent,
+  PointerEvent as ReactPointerEvent,
+  ReactNode
+} from "react";
 import type { AppState, ConversationTurn, Side, SideState } from "../../../shared/types.js";
 import type { InteractionLanguageChoice } from "../../../shared/language-flow.js";
 import { resolveBrowserUiLanguage } from "../../../shared/ui-localization.js";
@@ -72,6 +77,24 @@ export function VisitorSessionScreen(props: VisitorSessionScreenProps) {
     visitorStatusLabels
   } = props;
 
+  const handlePttKeyDown = (event: ReactKeyboardEvent<HTMLButtonElement>) => {
+    if ((event.code !== "Space" && event.code !== "Enter" && event.code !== "NumpadEnter") || event.repeat) {
+      return;
+    }
+
+    event.preventDefault();
+    startPtt();
+  };
+
+  const handlePttKeyUp = (event: ReactKeyboardEvent<HTMLButtonElement>) => {
+    if (event.code !== "Space" && event.code !== "Enter" && event.code !== "NumpadEnter") {
+      return;
+    }
+
+    event.preventDefault();
+    endPtt();
+  };
+
   return (
     <div className="visitor-screen">
       <header className="visitor-header">
@@ -144,9 +167,13 @@ export function VisitorSessionScreen(props: VisitorSessionScreenProps) {
           <button
             className={pttButtonClassName}
             type="button"
+            disabled={!canTalk}
+            aria-disabled={!canTalk}
             onPointerDown={onPointerDown}
             onPointerUp={onPointerUp}
             onPointerCancel={onPointerUp}
+            onKeyDown={handlePttKeyDown}
+            onKeyUp={handlePttKeyUp}
             onMouseDown={() => startPtt()}
             onMouseUp={() => endPtt()}
             onTouchStart={() => startPtt()}

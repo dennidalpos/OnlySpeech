@@ -181,6 +181,7 @@ describe("operator renderer view state", () => {
     expect(html).toContain("world-map-artwork");
     expect(html).toContain("world-map-hotspot active");
     expect(html).toContain("visitor-language-tile selected");
+    expect(html).toContain('class="visitor-language-tile selected" type="button" aria-pressed="true"');
     expect(html).toContain('aria-label="Flag AL"');
     expect(html).toContain("Europe");
     expect(html).toContain("shqip");
@@ -254,6 +255,7 @@ describe("operator renderer view state", () => {
     expect(html).toContain("world-map-artwork");
     expect(html).toContain("world-map-hotspot active");
     expect(html).not.toContain("visitor-language-tile selected");
+    expect(html).not.toContain('class="visitor-language-tile selected" type="button" aria-pressed="true"');
     expect(html).toContain("Africa");
     expect(html).toContain("Europa");
     expect(html).not.toContain("español");

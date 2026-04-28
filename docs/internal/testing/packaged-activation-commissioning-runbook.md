@@ -20,7 +20,7 @@ This runbook covers:
 
 ## Activation Validation
 
-Run these checks on the real packaged build, not on `npm start` source mode.
+Run these checks on the real packaged build, not on `npm run start` source mode.
 Refresh the retained activation checklist first if the file is missing or stale:
 
 ```powershell
@@ -47,7 +47,7 @@ Record the retained notes directly in `artifacts/logs/activation-validation.json
 - each scenario `status` from `pending` to `passed`, `failed`, or `not_applicable`;
 - `checked_at`, `evidence`, and per-scenario `notes` for any observed outcome.
 
-The packaged runtime also enforces one local 15-day trial per workstation through the registry tombstone used by `src/main/trial-tombstone.ts`. That behavior is real, but the current `npm run activation:template` artifact does not expose it as a separate retained scenario. Treat it as a support observation unless the artifact generator is expanded later. If support must intentionally re-arm only the trial gate, use `scripts/internal/runtime/clear-trial-tombstone.ps1`. If support must wipe the entire packaged workstation profile, including `%LOCALAPPDATA%\OnlySpeech\.env`, activation state, secure secrets, logs, session data, and the trial tombstone, prefer `npm run clean:workstation`. The internal script path `scripts/internal/runtime/clear-local-workstation-data.ps1` remains the underlying fallback entrypoint.
+The packaged runtime also enforces one local 15-day trial per workstation through the registry tombstone used by `src/main/trial-tombstone.ts`. That behavior is real, but the current `npm run activation:template` artifact does not expose it as a separate retained scenario. Treat it as a support observation unless the artifact generator is expanded later. If support must intentionally re-arm only the trial gate, use `scripts/internal/runtime/clear-trial-tombstone.ps1`. If support must wipe the entire packaged workstation profile, including `%LOCALAPPDATA%\OnlySpeech\.env`, activation state, secure secrets, logs, session data, and the trial tombstone, use `npm run clean:workstation`. The internal script path `scripts/internal/runtime/clear-local-workstation-data.ps1` is only the implementation detail behind that supported command.
 
 ## Packaged Autostart Validation
 

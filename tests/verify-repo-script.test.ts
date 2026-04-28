@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
@@ -14,7 +14,17 @@ const releaseWorkflowPath = join(repoRoot, ".github", "workflows", "release.yml"
 const publicBootstrapScriptPath = join(repoRoot, "scripts", "public", "bootstrap.ps1");
 const publicCleanWorkstationScriptPath = join(repoRoot, "scripts", "public", "clean-workstation.ps1");
 const publicLicenseKeygenScriptPath = join(repoRoot, "scripts", "public", "license-keygen.ps1");
+const powerSettingsScriptPath = join(repoRoot, "build", "configure-power-settings.ps1");
+const removedPowerSettingsWrapperPath = join(
+  repoRoot,
+  "scripts",
+  "internal",
+  "runtime",
+  "startup",
+  "configure-power-settings.ps1"
+);
 const projectSpecPath = join(repoRoot, "docs", "PROJECT_SPEC.md");
+const projectStatusPath = join(repoRoot, "PROJECT_STATUS.json");
 const readmePath = join(repoRoot, "README.md");
 
 describeWindows("verify-repo.ps1", () => {
@@ -177,6 +187,10 @@ describeWindows("verify-repo.ps1", () => {
   it("keeps scripts/README.md as the canonical script index", () => {
     const scriptsReadme = readFileSync(scriptsReadmePath, "utf8");
 
+    expect(scriptsReadme).toContain("## Script Classification");
+    expect(scriptsReadme).toContain("| agents | none |");
+    expect(scriptsReadme).toContain("| legacy | none |");
+    expect(scriptsReadme).toContain("| removable | none currently tracked |");
     expect(scriptsReadme).toContain("scripts/public/bootstrap.ps1");
     expect(scriptsReadme).toContain("scripts/public/dev.ps1");
     expect(scriptsReadme).toContain("scripts/public/start.ps1");
@@ -188,8 +202,18 @@ describeWindows("verify-repo.ps1", () => {
     expect(scriptsReadme).toContain("clear-local-workstation-data.ps1");
     expect(scriptsReadme).toContain("clear-trial-tombstone.ps1");
     expect(scriptsReadme).toContain("write-product-demo-video.ps1");
+    expect(scriptsReadme).not.toContain("scripts/internal/runtime/startup");
+    expect(scriptsReadme).not.toContain("configure-power-settings.ps1`: wrapper");
     expect(scriptsReadme).not.toContain("scripts/public/start-source.ps1");
     expect(scriptsReadme).not.toContain("audit-supported-scripts");
+  });
+
+  it("keeps build/configure-power-settings.ps1 as the only tracked power-settings script", () => {
+    const script = readFileSync(powerSettingsScriptPath, "utf8");
+
+    expect(existsSync(removedPowerSettingsWrapperPath)).toBe(false);
+    expect(script).toContain("build/configure-power-settings.ps1");
+    expect(script).not.toContain("scripts/internal/shared/configure-power-settings.ps1");
   });
 
   it("keeps docs/PROJECT_SPEC.md aligned with the stable npm surface", () => {
@@ -201,34 +225,44 @@ describeWindows("verify-repo.ps1", () => {
     expect(projectSpec).toContain("`npm run package`");
   });
 
-  it("keeps the repo summary as a storefront instead of a technical command matrix", () => {
+  it("keeps the root README aligned with the real command surface", () => {
     const readme = readFileSync(readmePath, "utf8");
 
     expect(readme).toContain("build/icon.png");
     expect(readme).toContain("## Overview");
     expect(readme).toContain("## Verified Features");
-    expect(readme).toContain("## Verified Windows-First Setup");
-    expect(readme).toContain("## Current Status");
+    expect(readme).toContain("## Requirements");
+    expect(readme).toContain("## Setup");
+    expect(readme).toContain("## Commands");
+    expect(readme).toContain("## Project Status");
     expect(readme).toContain("## Technical Documentation");
     expect(readme).toContain("npm run bootstrap");
     expect(readme).toContain("npm run dev");
     expect(readme).toContain("npm run start");
+    expect(readme).toContain("npm run clean:workstation");
+    expect(readme).toContain("npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation");
+    expect(readme).toContain("npm run release:customer-bundle");
     expect(readme).toContain("docs/PROJECT_SPEC.md");
-    expect(readme).not.toContain("## Stable Commands");
-    expect(readme).not.toContain("npm run clean:workstation");
-    expect(readme).not.toContain("npm run release:customer-bundle");
-    expect(readme).not.toContain("npm run release:evidence");
   });
 
-  it("keeps docs/PROJECT_SPEC.md as the primary technical contract and marks the root README as non-normative", () => {
+  it("keeps docs/PROJECT_SPEC.md as the primary technical contract and defines doc ownership", () => {
     const projectSpec = readFileSync(projectSpecPath, "utf8");
 
-    expect(projectSpec).toContain("README.md` is a GitHub-facing storefront summary only");
+    expect(projectSpec).toContain("README.md` is the repository overview and quick-start command map");
     expect(projectSpec).toContain("docs/PROJECT_SPEC.md` is the primary technical contract");
     expect(projectSpec).toContain("scripts/README.md");
     expect(projectSpec).toContain(".github/workflows/*.yml");
     expect(projectSpec).toContain("docs/customer-bundle/*");
     expect(projectSpec).not.toContain("docs/product/Marketplace_Sales_Package.md");
+  });
+
+  it("keeps PROJECT_STATUS.json limited to open residual follow-up", () => {
+    const projectStatus = JSON.parse(readFileSync(projectStatusPath, "utf8")) as {
+      tasks: Array<{ id: string; status: string }>;
+    };
+
+    expect(projectStatus.tasks.length).toBeGreaterThan(0);
+    expect(projectStatus.tasks.every((task) => task.status === "open")).toBe(true);
   });
 
   it("keeps the public bootstrap wrapper pointed at the deterministic npm ci flow", () => {

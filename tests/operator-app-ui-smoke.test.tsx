@@ -223,10 +223,33 @@ function findButtonByAriaLabel(label: string): HTMLButtonElement {
   return button;
 }
 
+function getPttButton(): HTMLButtonElement {
+  const button = document.querySelector(".ptt-button");
+  if (!(button instanceof HTMLButtonElement)) {
+    throw new Error("PTT button not found.");
+  }
+
+  return button;
+}
+
 function speakerButtons(): HTMLButtonElement[] {
   return [...document.querySelectorAll(".speaker-button")].filter(
     (element): element is HTMLButtonElement => element instanceof HTMLButtonElement
   );
+}
+
+async function dispatchKeyboard(element: Element, type: "keydown" | "keyup", code: string): Promise<void> {
+  await act(async () => {
+    element.dispatchEvent(
+      new KeyboardEvent(type, {
+        bubbles: true,
+        cancelable: true,
+        code,
+        key: code === "Space" ? " " : "Enter"
+      })
+    );
+    await Promise.resolve();
+  });
 }
 
 async function dispatchInput(element: HTMLInputElement, value: string): Promise<void> {
@@ -908,6 +931,65 @@ describe("operator app mounted UI smoke coverage", () => {
       text: "ciao",
       language: "it-IT"
     });
+  });
+
+  it("starts and releases operator push-to-talk from the focused button keyboard flow", async () => {
+    const harness = await renderOperatorApp("A", createAppState());
+    const pttButton = getPttButton();
+
+    expect(pttButton.disabled).toBe(false);
+    expect(pttButton.getAttribute("aria-disabled")).toBe("false");
+    pttButton.focus();
+    expect(document.activeElement).toBe(pttButton);
+    harness.actions.length = 0;
+
+    await dispatchKeyboard(pttButton, "keydown", "Space");
+    await dispatchKeyboard(pttButton, "keyup", "Space");
+
+    expect(harness.actions).toEqual([
+      {
+        type: "request-ptt-down",
+        side: "A"
+      },
+      {
+        type: "request-ptt-up",
+        side: "A"
+      }
+    ]);
+  });
+
+  it("exposes unavailable push-to-talk as disabled and ignores keyboard activation", async () => {
+    const appState = createAppState();
+    appState.activeSide = "B";
+    const harness = await renderOperatorApp("A", appState);
+    const pttButton = getPttButton();
+
+    expect(pttButton.classList.contains("disabled")).toBe(true);
+    expect(pttButton.disabled).toBe(true);
+    expect(pttButton.getAttribute("aria-disabled")).toBe("true");
+    harness.actions.length = 0;
+
+    await dispatchKeyboard(pttButton, "keydown", "Enter");
+    await dispatchKeyboard(pttButton, "keyup", "Enter");
+
+    expect(harness.actions).toEqual([]);
+  });
+
+  it("exposes unavailable visitor push-to-talk with the same disabled semantics", async () => {
+    const appState = createAppState();
+    appState.appMode = "demo";
+    const harness = await renderOperatorApp("B", appState);
+    const pttButton = getPttButton();
+
+    expect(pttButton.classList.contains("disabled")).toBe(true);
+    expect(pttButton.disabled).toBe(true);
+    expect(pttButton.getAttribute("aria-disabled")).toBe("true");
+    harness.actions.length = 0;
+
+    await dispatchKeyboard(pttButton, "keydown", "Space");
+    await dispatchKeyboard(pttButton, "keyup", "Space");
+
+    expect(harness.actions).toEqual([]);
   });
 
   it("toggles the speaker control to stop when the same panel is already playing", async () => {

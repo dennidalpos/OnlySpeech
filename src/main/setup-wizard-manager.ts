@@ -46,7 +46,12 @@ import {
   createRuntimeConfigFromWizardEnv,
   getRuntimeLogsDirectory
 } from "./setup-wizard-runtime.js";
-import { isSecureRuntimeSecretStorageEnabled, persistRuntimeSecrets } from "./runtime-secrets.js";
+import {
+  getSecureRuntimeSecretKeys,
+  isSecureRuntimeSecretStorageEnabled,
+  persistRuntimeSecrets,
+  type RuntimeSecretStorageAdapter
+} from "./runtime-secrets.js";
 import { clampBoundsToVisibleArea } from "./window-factory.js";
 import { getAzureTextToSpeechCatalogSnapshotFromEnvironment } from "./azure-text-to-speech-catalog.js";
 import {
@@ -97,10 +102,28 @@ interface SetupWizardManagerOptions {
   terminateApplication?: () => Promise<void> | void;
   /** Applies the packaged autostart selection. Primarily injectable for tests. */
   applyAutostartSelection?: (selectedEnabled: boolean) => WizardState["autostart"];
+  /** Encrypts packaged runtime secrets. Primarily injectable for tests. */
+  runtimeSecretStorageAdapter?: RuntimeSecretStorageAdapter;
 }
 
 function usesSecureRuntimeSecretStorage(): boolean {
   return isSecureRuntimeSecretStorageEnabled({ isPackaged: app.isPackaged });
+}
+
+function mergeSecureRuntimeSecretsForWizardState(
+  redactedEnvValues: Partial<Record<EnvKey, string>>,
+  sourceEnvValues: Record<EnvKey, string>
+): Partial<Record<EnvKey, string>> {
+  if (!usesSecureRuntimeSecretStorage()) {
+    return redactedEnvValues;
+  }
+
+  const envValues = { ...redactedEnvValues };
+  for (const key of getSecureRuntimeSecretKeys()) {
+    envValues[key] = sourceEnvValues[key] ?? "";
+  }
+
+  return envValues;
 }
 
 function computeWizardLicenseInfo(state: PersistedActivationState, now = new Date()): WizardLicenseInfo {
@@ -956,7 +979,8 @@ export class SetupWizardManager {
       const secretPersistence = persistRuntimeSecrets(state.envValues, {
         runtimeRoot: this.options.runtimeRoot,
         secretsFilePath: getRuntimeSecretsFilePath(app.getPath("userData")),
-        secureStorageEnabled: usesSecureRuntimeSecretStorage()
+        secureStorageEnabled: usesSecureRuntimeSecretStorage(),
+        safeStorageAdapter: this.options.runtimeSecretStorageAdapter
       });
 
       writeFileSync(envPath, preview, "utf8");
@@ -971,7 +995,7 @@ export class SetupWizardManager {
           lastSavedEnvPath: envPath,
           lastSavedPreview: preview
         },
-        parsedPreview
+        mergeSecureRuntimeSecretsForWizardState(parsedPreview, state.envValues)
       );
       this.broadcastState();
       return {

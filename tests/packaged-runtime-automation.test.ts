@@ -138,7 +138,7 @@ function seedPackagedActivationState(localAppDataRoot: string): void {
         email: "trial@onlyspeech.local",
         plan: "trial",
         issuedAt: "2026-04-07T10:30:00.000Z",
-        expiresAt: "2026-04-22T10:30:00.000Z"
+        expiresAt: "2027-04-22T10:30:00.000Z"
       },
       activatedAt: "2026-04-07T10:35:00.000Z",
       lastValidatedAt: "2026-04-07T10:35:00.000Z",

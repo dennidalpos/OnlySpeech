@@ -5,7 +5,7 @@
       "title": "Verificare upgrade e rollback installer su baseline versionata",
       "status": "open",
       "priority": 1,
-      "execution_order": 1,
+      "execution_order": 3,
       "scope": "core",
       "risk": "HIGH",
       "area": "packaging",
@@ -17,11 +17,43 @@
       ]
     },
     {
+      "id": "residual-packaged-activation-commissioning-validation",
+      "title": "Validare activation e commissioning su workstation packaged reale",
+      "status": "open",
+      "priority": 1,
+      "execution_order": 1,
+      "scope": "core",
+      "risk": "HIGH",
+      "area": "commissioning",
+      "summary": "Su target Windows packaged reale, completare la validazione activation con materiale cliente reale e chiudere il commissioning target-station usando `npm run activation:template`, `npm run commission:template`, `npm run commission:automation` e `npm run commission:handover`. Il repository genera i template e copre la superficie automatizzata, ma non puo validare activation acquistata, hardware target, touch input e conferme operatore senza workstation reale.",
+      "done_when": [
+        "`artifacts/logs/activation-validation.json` contiene esiti reali non pending per gli scenari applicabili",
+        "`artifacts/logs/commissioning-evidence.json` non riporta fallback o remaining target-station checks",
+        "Hardware target, touch input quando applicabile, display e microphone mapping sono confermati sul target reale"
+      ]
+    },
+    {
+      "id": "residual-live-provider-speech-proof",
+      "title": "Validare live provider speech end-to-end su hardware reale",
+      "status": "open",
+      "priority": 1,
+      "execution_order": 2,
+      "scope": "core",
+      "risk": "HIGH",
+      "area": "runtime",
+      "summary": "Su workstation Windows target-equivalent con credenziali provider reali, eseguire la matrice `Microphone input -> STT -> translation -> TTS playback` per i provider live `azure` e/o `chatgpt` applicabili e registrare la prova in `artifacts/logs/live-provider-speech-proof.json`. I test repository coprono policy, routing e request shaping, ma non provano microfono, provider live e playback reale.",
+      "done_when": [
+        "`npm run speech:matrix-template` e stato aggiornato con esiti reali per gli scenari applicabili",
+        "STT, traduzione e TTS provider-owned sono confermati per il provider live selezionato",
+        "Eventuali scenari non applicabili sono marcati con motivazione esplicita"
+      ]
+    },
+    {
       "id": "residual-packaged-autostart-live-validation",
       "title": "Validare live l'autostart packaged via HKCU Run key",
       "status": "open",
       "priority": 2,
-      "execution_order": 2,
+      "execution_order": 5,
       "scope": "core",
       "risk": "HIGH",
       "area": "runtime",
@@ -30,6 +62,70 @@
         "Enable autostart verificato realmente al logon",
         "Disable autostart verificato realmente al logon",
         "Nessun path residuo shortcut/task richiesto dal flusso operativo"
+      ]
+    },
+    {
+      "id": "residual-azure-speech-sdk-nested-uuid-audit",
+      "title": "Chiudere advisory npm residuo su uuid annidato nello Speech SDK",
+      "status": "blocked",
+      "priority": 2,
+      "execution_order": 4,
+      "scope": "core",
+      "risk": "MEDIUM",
+      "area": "dependencies",
+      "summary": "`npm audit` resta con 2 finding moderate collegati a `microsoft-cognitiveservices-speech-sdk@1.49.0` -> `uuid@9.0.1`. Verifica del 2026-04-28: `npm view microsoft-cognitiveservices-speech-sdk version dependencies --json` riporta ancora la versione `1.49.0` con dipendenza `uuid:^9.0.0`; non esiste quindi una versione supportata che rimuova il nested `uuid <14`. I finding diretti risolvibili senza forzature sono stati aggiornati nel lockfile (`@xmldom/xmldom`, `postcss`, `uuid` diretto). La correzione npm proposta per il residuo e un downgrade semver-major dello Speech SDK a `1.13.1`, non compatibile con il percorso live Azure corrente senza validazione dedicata; override manuali del nested `uuid` restano bloccati finche non validati su Azure live speech.",
+      "done_when": [
+        "Una versione supportata dello Speech SDK rimuove il nested `uuid <14` oppure viene validata una sostituzione esplicita compatibile con Azure live speech",
+        "`npm audit --json` non riporta piu finding per `microsoft-cognitiveservices-speech-sdk` o nested `uuid`",
+        "`npm run audit:packaging` torna a uno stato atteso senza vulnerabilita residue"
+      ]
+    },
+    {
+      "id": "ui-runtime-status-live-region",
+      "title": "Esporre i cambi stato runtime come aggiornamenti accessibili",
+      "status": "open",
+      "priority": 3,
+      "execution_order": 6,
+      "scope": "ui",
+      "risk": "MEDIUM",
+      "area": "accessibility",
+      "summary": "`src/renderer/operator/components/StatusBadge.tsx` aggiorna visivamente stati come ready, listening, translating ed error, ma renderizza solo un `div` senza `role` o `aria-live`. Allineare il badge agli altri messaggi runtime gia annunciati, come `RuntimeIssueBanner` e `SpeakerControl`, senza cambiare colori o posizionamento.",
+      "done_when": [
+        "Il badge stato runtime espone un ruolo e una politica live region appropriati",
+        "Gli aggiornamenti ready/listening/translating/error restano visivamente invariati",
+        "I test renderer o mounted UI verificano la semantica accessibile del badge"
+      ]
+    },
+    {
+      "id": "ui-setup-access-dialog-error-announcement",
+      "title": "Annunciare errori e descrizioni nei dialog di accesso setup",
+      "status": "open",
+      "priority": 3,
+      "execution_order": 7,
+      "scope": "ui",
+      "risk": "MEDIUM",
+      "area": "accessibility",
+      "summary": "`SetupWizardAccessDialog.tsx` e `ConfirmDialog.tsx` usano `role=\"dialog\"` e `aria-modal`, ma collegano titolo e descrizione solo tramite `aria-label`; l'errore `.setup-access-error` non usa `role=\"alert\"` o live region. Rendere annunciabili titolo, descrizione ed errore senza modificare copy, layout o palette.",
+      "done_when": [
+        "I dialog usano riferimenti accessibili stabili per titolo e descrizione",
+        "Gli errori del setup access gate sono annunciati quando compaiono",
+        "I test setup access coprono aria-labelledby/aria-describedby e annuncio errore"
+      ]
+    },
+    {
+      "id": "residual-project-status-open-status-contract",
+      "title": "Allineare contratto PROJECT_STATUS.json e verifica repository",
+      "status": "open",
+      "priority": 2,
+      "execution_order": 8,
+      "scope": "core",
+      "risk": "MEDIUM",
+      "area": "tests",
+      "summary": "`npm test` completo fallisce in `tests/verify-repo-script.test.ts` perche la verifica richiede che tutti i task in `PROJECT_STATUS.json` abbiano `status` uguale a `open`, mentre il tracker contiene almeno un residuo con `status` uguale a `blocked`. Decidere se il contratto repository deve ammettere stati diversi da `open` o se i residui bloccati devono essere rappresentati con un campo separato senza rompere la verifica.",
+      "done_when": [
+        "Il contratto atteso per gli stati del tracker e documentato o codificato in modo esplicito",
+        "`PROJECT_STATUS.json` e `tests/verify-repo-script.test.ts` sono coerenti sullo stato ammesso dei residui",
+        "`npm test` completo non fallisce piu per il controllo sugli status del tracker"
       ]
     }
   ]

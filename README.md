@@ -6,34 +6,80 @@
 
 ## Overview
 
-OnlySpeech is a Windows-first Electron desktop application for one workstation with two coordinated display surfaces. The repository currently supports the runtime UI, the integrated setup wizard, automated verification, Windows packaging, and the technical evidence used to validate the supported delivery path.
+OnlySpeech is an Electron desktop application for one Windows workstation with two coordinated display surfaces: one operator-facing surface and one visitor-facing surface. The repository contains the runtime UI, activation flow, integrated setup wizard, provider integrations, automated verification, Windows packaging, and release/commissioning evidence helpers for the supported delivery path.
+
+The product boundary is intentionally narrow: one Windows PC, guided in-person conversations, customer-owned provider credentials for live speech, and no browser/SaaS or multi-workstation orchestration mode.
 
 ## Verified Features
 
-- One operator-facing and one visitor-facing conversation surface on the same Windows PC.
+- Operator and visitor runtime surfaces on the same Windows workstation.
 - Guided language confirmation before live speech starts.
-- Push-to-talk speech flow with either two dedicated microphones or one shared microphone profile.
-- Integrated setup for displays, microphones, providers, diagnostics, activation, and packaged startup preferences.
-- Live speech provider paths for `azure` and `chatgpt`, plus translation-only `ollama` diagnostics and demo validation.
-- Deterministic `demo` mode for validation without live provider credentials.
-- Windows packaging outputs for installer, portable, and unpacked delivery.
+- Push-to-talk speech flow with either `dual-dedicated` microphones or one `single-shared` microphone.
+- Integrated setup for displays, microphones, providers, languages, diagnostics, activation, and packaged autostart preference.
+- Live speech paths for `azure` and `chatgpt`.
+- Translation-only `ollama` diagnostics and demo validation, without live STT or TTS support.
+- Deterministic `demo` mode for validation without provider credentials.
+- Windows NSIS installer, portable executable, and versioned unpacked archive outputs.
+- Repository verification for source startup, automated tests, packaging audit, packaged lifecycle checks, release evidence, notices, and SBOM generation.
 
-## Verified Windows-First Setup
+## Requirements
 
-1. Use Windows x64 with Node.js 22+ and npm 10+.
+- Windows x64 for supported development, CI parity, packaging, and runtime validation.
+- PowerShell on Windows for repository scripts.
+- Node.js 22+ and npm 10+.
+- Two active displays for live workstation deployment.
+- Either two assignable microphones or one shared assignable microphone.
+- Internet access and customer-owned Azure Speech or OpenAI credentials for live `kiosk` speech.
+- Optional reachable Ollama host only for translation-only diagnostics or demo-side validation.
+
+## Setup
+
+1. Install Node.js 22+ on Windows.
 2. Run `npm run bootstrap`.
-3. Run `npm run dev` for the watch workspace, or `npm run start` for a direct source launch.
-4. Complete workstation configuration through the integrated setup wizard or the runtime `.env` contract described in the technical documentation.
+3. Use `npm run dev` for the watch workspace, or `npm run start` for a direct source launch.
+4. Complete configuration through the integrated setup wizard, or use the `.env` contract implemented in source and described in [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md).
+5. For packaged workstation reset support, use `npm run clean:workstation`.
 
-Live kiosk use still depends on the target workstation having two active displays and either two assignable microphones or one shared microphone profile.
+## Commands
 
-## Current Status
+| command | purpose |
+| --- | --- |
+| `npm run bootstrap` | Validate the Node/npm baseline and restore dependencies with the deterministic install path when needed. |
+| `npm run dev` | Start renderer, main-process compiler, and Electron in watch mode. |
+| `npm run start` | Build stale/missing source outputs and launch Electron locally. |
+| `npm run build` | Compile renderer and main outputs. |
+| `npm run compile` | Run `build:renderer` and `build:main` directly. |
+| `npm test` | Run Vitest excluding the compiled Electron e2e test. |
+| `npm run test:e2e` | Compile, then run `tests/electron-e2e.test.ts`. |
+| `npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation` | Canonical local/CI verification path with packaged automation enabled and outputs retained. |
+| `npm run package` | Produce public Windows installer, portable executable, and versioned unpacked archive under `artifacts/packages/`. |
+| `npm run clean` | Remove repo-local generated outputs while preserving dependencies, `.env`, workstation data, and autostart state. |
+| `npm run clean:workstation` | Remove packaged workstation-local OnlySpeech data for support/reinstall flows. |
+| `npm run docs:screenshots` | Regenerate optional product screenshots after compile. |
+| `npm run activation:template` | Write the packaged activation validation artifact template. |
+| `npm run commission:template` | Write the target-station validation template and commissioning template artifact. |
+| `npm run commission:automation` | Run target-station automation against the packaged profile when available. |
+| `npm run commission:handover` | Write final commissioning evidence from retained target-station validation. |
+| `npm run speech:matrix-template` | Write the live provider speech proof template. |
+| `npm run release:evidence` | Write release evidence metadata for existing packaged outputs. |
+| `npm run release:compliance` | Write third-party notices and SBOM artifacts. |
+| `npm run release:customer-bundle` | Assemble the customer-facing release bundle from existing package outputs and docs. |
 
-The repository verifies source startup, automated tests, Windows CI, packaged outputs, and packaged install lifecycle from the repository itself. Release completion still depends on external or workstation-specific inputs such as Windows signing credentials, retained comparison installers for upgrade and rollback, target-workstation activation and commissioning evidence, live provider proof on real hardware, optional reachable-server Ollama validation, and deployment-specific legal/privacy review.
+The complete PowerShell script classification and side-effect map lives in [scripts/README.md](scripts/README.md).
+
+## Project Status
+
+The repository can be built, tested, packaged, and verified from the tracked source on Windows. CI and tagged release workflows both run the canonical repository verification command with packaged automation enabled.
+
+Open residual work is limited to items that require real hardware, retained comparison installers, live provider credentials, dependency remediation that depends on a compatible upstream path, or currently unfinished UI accessibility follow-up. Those items are tracked in [PROJECT_STATUS.json](PROJECT_STATUS.json).
 
 ## Technical Documentation
 
-- [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md) for runtime, verification, packaging, and release boundaries.
-- [scripts/README.md](scripts/README.md) for the PowerShell and npm command surface.
-- [docs/product/provider-setup.md](docs/product/provider-setup.md) for provider setup boundaries and official references.
-- [PROJECT_STATUS.json](PROJECT_STATUS.json) for residual follow-up only.
+- [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md): primary technical contract for runtime, configuration, verification, packaging, release, and output boundaries.
+- [scripts/README.md](scripts/README.md): canonical npm/PowerShell script index, classification, and side-effect map.
+- [docs/product/provider-setup.md](docs/product/provider-setup.md): provider setup boundaries and official documentation links.
+- [docs/internal/testing/language-speech-matrix.md](docs/internal/testing/language-speech-matrix.md): manual live provider speech proof matrix.
+- [docs/internal/testing/packaged-activation-commissioning-runbook.md](docs/internal/testing/packaged-activation-commissioning-runbook.md): real-workstation activation, commissioning, autostart, upgrade, and rollback close-out.
+- [docs/customer-bundle/Customer_Quick_Start.md](docs/customer-bundle/Customer_Quick_Start.md): buyer-facing packaged first-use guide.
+- [docs/internal/Privacy_and_Commercial_Distribution.md](docs/internal/Privacy_and_Commercial_Distribution.md): repository privacy and commercial-distribution boundary.
+- [docs/product/Marketplace_Sales_Package.md](docs/product/Marketplace_Sales_Package.md): seller-facing marketplace copy baseline, not buyer-bundle documentation.

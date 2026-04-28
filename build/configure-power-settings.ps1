@@ -10,7 +10,7 @@
 
 .NOTES
   Intended to be run as a post-install step by the OnlySpeech NSIS installer,
-  or standalone by an operator via scripts/internal/shared/configure-power-settings.ps1.
+  or standalone by an operator via build/configure-power-settings.ps1.
   No parameters required. Applies to the current user's session and machine scope.
 #>
 

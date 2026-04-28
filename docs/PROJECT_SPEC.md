@@ -8,7 +8,7 @@ OnlySpeech is a Windows-first Electron desktop translation workstation for assis
 
 This document is the long-form technical contract for the repository. It does not duplicate every script option or test assertion.
 
-- `README.md` is a GitHub-facing storefront summary only.
+- `README.md` is the repository overview and quick-start command map.
 - `docs/PROJECT_SPEC.md` is the primary technical contract; the rest of `docs/` contains the supporting runbooks, product notes, and buyer-facing collateral referenced from that contract.
 - `scripts/README.md` is the canonical script index and PowerShell side-effect map.
 - `.github/workflows/*.yml` are the canonical CI and tagged-release workflow definitions.

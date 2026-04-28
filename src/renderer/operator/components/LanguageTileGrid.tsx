@@ -17,6 +17,7 @@ export function LanguageTileGrid(props: LanguageTileGridProps) {
             key={choice.value}
             className={`visitor-language-tile${isSelected ? " selected" : ""}`}
             type="button"
+            aria-pressed={isSelected}
             onClick={() => props.onSelect(choice.value)}
           >
             <FlagIcon id={choice.value} regionCode={choice.regionCode} />

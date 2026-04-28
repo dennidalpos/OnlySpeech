@@ -2,7 +2,10 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeEach, describe, expect, it, vi, afterEach } from "vitest";
-import { createInitialWizardState } from "../src/tools/setup-wizard/shared.js";
+import {
+  createInitialWizardState,
+  getWizardConfigurationIssues
+} from "../src/tools/setup-wizard/shared.js";
 
 const electronMocks = vi.hoisted(() => {
   const createdWindows: MockBrowserWindow[] = [];
@@ -73,6 +76,11 @@ const electronMocks = vi.hoisted(() => {
     shell: {
       openPath: vi.fn()
     },
+    safeStorage: {
+      isEncryptionAvailable: vi.fn(() => true),
+      encryptString: vi.fn((value: string) => Buffer.from(`encrypted:${value}`, "utf8")),
+      decryptString: vi.fn((value: Buffer) => value.toString("utf8").replace(/^encrypted:/, ""))
+    },
     createdWindows
   };
 });
@@ -82,7 +90,8 @@ vi.mock("electron", () => ({
   app: electronMocks.app,
   ipcMain: electronMocks.ipcMain,
   screen: electronMocks.screen,
-  shell: electronMocks.shell
+  shell: electronMocks.shell,
+  safeStorage: electronMocks.safeStorage
 }));
 
 import { SetupWizardManager } from "../src/main/setup-wizard-manager.js";
@@ -97,9 +106,13 @@ afterEach(() => {
 
 describe("SetupWizardManager control window", () => {
   beforeEach(() => {
+    electronMocks.app.isPackaged = false;
     electronMocks.createdWindows.length = 0;
     electronMocks.ipcMain.handle.mockReset();
     electronMocks.ipcMain.on.mockReset();
+    electronMocks.safeStorage.isEncryptionAvailable.mockClear();
+    electronMocks.safeStorage.encryptString.mockClear();
+    electronMocks.safeStorage.decryptString.mockClear();
     electronMocks.screen.getAllDisplays.mockReset();
     electronMocks.screen.getDisplayMatching.mockReset();
     electronMocks.screen.getPrimaryDisplay.mockReset();
@@ -245,6 +258,80 @@ describe("SetupWizardManager control window", () => {
     expect(readFileSync(join(runtimeRoot, ".env"), "utf8")).toContain("TRANSLATION_PROVIDER=chatgpt");
     expect(manager.getSnapshot().state?.autostart.currentEnabled).toBe(true);
     expect(manager.getSnapshot().state?.autostart.mechanism).toBe("current-user-run-key");
+  });
+
+  it("keeps packaged secure provider secrets in wizard state after saving a redacted env file", async () => {
+    electronMocks.app.isPackaged = true;
+    const runtimeRoot = mkdtempSync(join(tmpdir(), "onlyspeech-wizard-secure-save-"));
+    tempDirectories.push(runtimeRoot);
+
+    const manager = new SetupWizardManager({
+      runtimeRoot,
+      runtimeSecretStorageAdapter: electronMocks.safeStorage,
+      getAutostartState: () => ({
+        mechanism: "current-user-run-key" as const,
+        scope: "current-user" as const,
+        supported: true,
+        canModify: true,
+        currentEnabled: true,
+        selectedEnabled: true
+      })
+    });
+
+    const state = createInitialWizardState(
+      [
+        { displayId: 1, label: "A", bounds: { x: 0, y: 0, width: 1920, height: 1080 }, scaleFactor: 1 },
+        { displayId: 2, label: "B", bounds: { x: 1920, y: 0, width: 1920, height: 1080 }, scaleFactor: 1 }
+      ],
+      {
+        SETUP_UI_LANGUAGE: "en",
+        TRANSLATION_PROVIDER: "chatgpt",
+        DEFAULT_TARGET_LANG_A: "it",
+        DEFAULT_TARGET_LANG_B: "en",
+        CHATGPT_API_KEY: "chatgpt-secure-key",
+        CHATGPT_MODEL: "gpt-4.1-mini",
+        CHATGPT_TRANSCRIBE_MODEL: "gpt-4o-mini-transcribe"
+      }
+    );
+    (manager as unknown as { state: unknown }).state = {
+      ...state,
+      autostart: {
+        mechanism: "current-user-run-key",
+        scope: "current-user",
+        supported: true,
+        canModify: true,
+        currentEnabled: true,
+        selectedEnabled: true
+      }
+    };
+    (manager as unknown as { registerIpcHandlers: () => void }).registerIpcHandlers();
+
+    const saveHandler = electronMocks.ipcMain.handle.mock.calls.find(
+      ([channel]: string[]) => channel === "wizard:save-env"
+    )?.[1] as (() => Promise<{
+      preview: string;
+      secretStorageMode: "dotenv" | "windows-secure-store";
+      storedSecretKeys: string[];
+    }>) | undefined;
+
+    if (!saveHandler) {
+      throw new Error("wizard:save-env handler not registered.");
+    }
+
+    const result = await saveHandler();
+    const snapshot = manager.getSnapshot().state;
+
+    expect(result.secretStorageMode).toBe("windows-secure-store");
+    expect(result.storedSecretKeys).toContain("CHATGPT_API_KEY");
+    expect(result.preview).toContain("CHATGPT_API_KEY=");
+    expect(result.preview).not.toContain("chatgpt-secure-key");
+    expect(readFileSync(join(runtimeRoot, ".env"), "utf8")).not.toContain("chatgpt-secure-key");
+    expect(snapshot?.envValues.CHATGPT_API_KEY).toBe("chatgpt-secure-key");
+    expect(
+      snapshot
+        ? getWizardConfigurationIssues(snapshot).some((issue) => issue.code === "missing-provider-credentials")
+        : true
+    ).toBe(false);
   });
 
   it("wizard:update-autostart applies the selected packaged startup state immediately", async () => {

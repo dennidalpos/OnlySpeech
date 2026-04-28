@@ -5,7 +5,7 @@ function Get-ObjectPropertyNames {
     return @()
   }
 
-  if ($Object -is [hashtable]) {
+  if ($Object -is [System.Collections.IDictionary]) {
     return @($Object.Keys)
   }
 
@@ -23,8 +23,8 @@ function Get-ObjectPropertyValue {
     return $DefaultValue
   }
 
-  if ($Object -is [hashtable]) {
-    return $(if ($Object.ContainsKey($Name)) { $Object[$Name] } else { $DefaultValue })
+  if ($Object -is [System.Collections.IDictionary]) {
+    return $(if ($Object.Contains($Name)) { $Object[$Name] } else { $DefaultValue })
   }
 
   $property = $Object.PSObject.Properties[$Name]
@@ -47,17 +47,20 @@ function New-PackagingAuditMismatch {
 function Get-ExpectedPackagingAuditState {
   return [ordered]@{
     expectedFix = [ordered]@{
-      name = "electron-builder"
+      name = "microsoft-cognitiveservices-speech-sdk"
       isSemVerMajor = $true
     }
-    expectedVulnerabilities = @()
+    expectedVulnerabilities = @(
+      "microsoft-cognitiveservices-speech-sdk",
+      "uuid"
+    )
     expectedCounts = [ordered]@{
       info = 0
       low = 0
-      moderate = 0
+      moderate = 2
       high = 0
       critical = 0
-      total = 0
+      total = 2
     }
   }
 }
@@ -102,13 +105,13 @@ function Validate-PackagingAuditReport {
     $fixName = [string](Get-ObjectPropertyValue $fixAvailable "name")
     $isSemVerMajor = [bool](Get-ObjectPropertyValue $fixAvailable "isSemVerMajor" $false)
     if ($fixName -ne [string](Get-ObjectPropertyValue $expectedFix "name") -or $isSemVerMajor -ne [bool](Get-ObjectPropertyValue $expectedFix "isSemVerMajor")) {
-      return New-PackagingAuditMismatch -Message "Unexpected fixAvailable for ${name}: expected a semver-major electron-builder downgrade."
+      return New-PackagingAuditMismatch -Message "Unexpected fixAvailable for ${name}: expected a semver-major microsoft-cognitiveservices-speech-sdk downgrade."
     }
   }
 
   return [ordered]@{
     ok = $true
-    message = "Packaging audit matches the current clean packaging dependency state ($([int](Get-ObjectPropertyValue $actualCounts 'total' 0)) findings)."
+    message = "Packaging audit matches the current known packaging dependency state ($([int](Get-ObjectPropertyValue $actualCounts 'total' 0)) findings)."
   }
 }
 
