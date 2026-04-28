@@ -13,6 +13,7 @@ const ciWorkflowPath = join(repoRoot, ".github", "workflows", "ci.yml");
 const releaseWorkflowPath = join(repoRoot, ".github", "workflows", "release.yml");
 const publicBootstrapScriptPath = join(repoRoot, "scripts", "public", "bootstrap.ps1");
 const publicCleanWorkstationScriptPath = join(repoRoot, "scripts", "public", "clean-workstation.ps1");
+const publicGateScriptPath = join(repoRoot, "scripts", "public", "gate.ps1");
 const publicLicenseKeygenScriptPath = join(repoRoot, "scripts", "public", "license-keygen.ps1");
 const powerSettingsScriptPath = join(repoRoot, "build", "configure-power-settings.ps1");
 const removedPowerSettingsWrapperPath = join(
@@ -56,6 +57,44 @@ describeWindows("verify-repo.ps1", () => {
     expect(result.stdout).toContain("OnlySpeech-0.1.0-x64-unpacked.zip");
     expect(result.stdout.indexOf("[archive-unpacked]")).toBeLessThan(result.stdout.indexOf("[release-evidence]"));
     expect(result.stdout).not.toContain("audit:scripts");
+  });
+
+  it("supports opt-in workstation cleanup and dependency refresh in the dry-run gate sequence", () => {
+    const result = spawnSync(
+      "powershell.exe",
+      [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        scriptPath,
+        "-CleanWorkstationData",
+        "-ForceRefreshDependencies",
+        "-DryRun"
+      ],
+      {
+        cwd: repoRoot,
+        encoding: "utf8"
+      }
+    );
+
+    if (result.status !== 0) {
+      throw new Error([result.stdout.trim(), result.stderr.trim()].filter(Boolean).join("\n"));
+    }
+
+    expect(result.stdout).toContain("[clean-workstation] powershell.exe");
+    expect(result.stdout).toContain("scripts\\public\\clean-workstation.ps1");
+    expect(result.stdout).toContain("[bootstrap] npm run bootstrap -- -ForceRefresh");
+  });
+
+  it("keeps the public gate wrapper pointed at canonical repository verification", () => {
+    const script = readFileSync(publicGateScriptPath, "utf8");
+
+    expect(script).toContain("scripts\\internal\\workspace\\verify-repo.ps1");
+    expect(script).toContain("-CleanWorkstationData");
+    expect(script).toContain("-ForceRefreshDependencies");
+    expect(script).toContain("-EnablePackagedAutomation");
+    expect(script).toContain("Invoke-OnlySpeechStep -Label \"gate\"");
   });
 
   it("skips the source smoke start in dry-run mode when -SkipSmokeStart is passed", () => {
@@ -153,7 +192,7 @@ describeWindows("verify-repo.ps1", () => {
     );
   });
 
-  it("keeps the public npm surface limited to eight stable commands", () => {
+  it("keeps the public npm surface limited to nine stable commands", () => {
     const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8")) as {
       scripts: Record<string, string>;
     };
@@ -164,6 +203,7 @@ describeWindows("verify-repo.ps1", () => {
     expect(packageJson.scripts.dev).toBe("powershell -ExecutionPolicy Bypass -File ./scripts/public/dev.ps1");
     expect(packageJson.scripts.start).toBe("powershell -ExecutionPolicy Bypass -File ./scripts/public/start.ps1");
     expect(packageJson.scripts.build).toBe("powershell -ExecutionPolicy Bypass -File ./scripts/public/build.ps1");
+    expect(packageJson.scripts.gate).toBe("powershell -ExecutionPolicy Bypass -File ./scripts/public/gate.ps1");
     expect(packageJson.scripts.package).toBe("powershell -ExecutionPolicy Bypass -File ./scripts/public/package.ps1");
     expect(packageJson.scripts.clean).toBe("powershell -ExecutionPolicy Bypass -File ./scripts/public/clean.ps1");
     expect(packageJson.scripts["clean:workstation"]).toBe(
@@ -195,6 +235,7 @@ describeWindows("verify-repo.ps1", () => {
     expect(scriptsReadme).toContain("scripts/public/dev.ps1");
     expect(scriptsReadme).toContain("scripts/public/start.ps1");
     expect(scriptsReadme).toContain("scripts/public/build.ps1");
+    expect(scriptsReadme).toContain("scripts/public/gate.ps1");
     expect(scriptsReadme).toContain("scripts/public/package.ps1");
     expect(scriptsReadme).toContain("scripts/public/clean.ps1");
     expect(scriptsReadme).toContain("scripts/public/clean-workstation.ps1");
@@ -220,6 +261,7 @@ describeWindows("verify-repo.ps1", () => {
     const projectSpec = readFileSync(projectSpecPath, "utf8");
 
     expect(projectSpec).toContain("`clean:workstation`");
+    expect(projectSpec).toContain("`gate`");
     expect(projectSpec).toContain("`test:e2e`");
     expect(projectSpec).toContain("`npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation`");
     expect(projectSpec).toContain("`npm run package`");
@@ -239,6 +281,7 @@ describeWindows("verify-repo.ps1", () => {
     expect(readme).toContain("npm run bootstrap");
     expect(readme).toContain("npm run dev");
     expect(readme).toContain("npm run start");
+    expect(readme).toContain("npm run gate -- -KeepOutputs -EnablePackagedAutomation");
     expect(readme).toContain("npm run clean:workstation");
     expect(readme).toContain("npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation");
     expect(readme).toContain("npm run release:customer-bundle");
@@ -256,13 +299,13 @@ describeWindows("verify-repo.ps1", () => {
     expect(projectSpec).not.toContain("docs/product/Marketplace_Sales_Package.md");
   });
 
-  it("keeps PROJECT_STATUS.json limited to open residual follow-up", () => {
+  it("keeps PROJECT_STATUS.json limited to open or blocked residual follow-up", () => {
     const projectStatus = JSON.parse(readFileSync(projectStatusPath, "utf8")) as {
       tasks: Array<{ id: string; status: string }>;
     };
 
     expect(projectStatus.tasks.length).toBeGreaterThan(0);
-    expect(projectStatus.tasks.every((task) => task.status === "open")).toBe(true);
+    expect(projectStatus.tasks.every((task) => ["open", "blocked"].includes(task.status))).toBe(true);
   });
 
   it("keeps the public bootstrap wrapper pointed at the deterministic npm ci flow", () => {

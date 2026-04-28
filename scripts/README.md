@@ -2,7 +2,7 @@
 
 `scripts/` contains the canonical PowerShell entrypoints for the repository.
 
-Public PowerShell access is intentionally limited to eight stable wrappers under `scripts/public/`. Everything else under `scripts/internal/` is internal implementation detail and may change as long as `package.json` npm aliases, `docs/PROJECT_SPEC.md`, and CI stay aligned.
+Public PowerShell access is intentionally limited to nine stable wrappers under `scripts/public/`. Everything else under `scripts/internal/` is internal implementation detail and may change as long as `package.json` npm aliases, `docs/PROJECT_SPEC.md`, and CI stay aligned.
 
 This file is the canonical script index. The repo-root `README.md` is a storefront overview only; the technical command contract lives in `docs/PROJECT_SPEC.md`, and this document explains which PowerShell scripts implement that surface and what side effects they have.
 
@@ -16,8 +16,9 @@ The stable npm surface is broader than `scripts/public/`: `test`, `test:e2e`, `v
 | `dev` | `scripts/public/dev.ps1` | Starts the source development watch workspace. | Starts long-running renderer, main, and Electron watch processes. |
 | `start` | `scripts/public/start.ps1` | Starts the source runtime only. | Recompiles when source outputs are missing or stale, then launches Electron locally. |
 | `build` | `scripts/public/build.ps1` | Compiles renderer and main without cleaning the repo. | Rewrites `dist/` outputs only. |
+| `gate` | `scripts/public/gate.ps1` | Runs the full Windows verification gate through the canonical internal repository verifier. | Cleans generated repo outputs before and after the gate, restores dependencies when needed, runs doctor/tests/build/e2e/packaging checks, and can opt in to workstation data cleanup with `-CleanWorkstationData`, dependency refresh with `-RefreshDependencies`, retained outputs with `-KeepOutputs`, and packaged automation with `-EnablePackagedAutomation`. |
 | `package` | `scripts/public/package.ps1` | Builds and packages the public Windows deliverables. | Produces the `nsis` installer, portable executable, and versioned unpacked archive under `artifacts/packages/`. |
-| `clean` | `scripts/public/clean.ps1` | Removes repo-local generated outputs without destroying workstation state. | Deletes repo outputs such as `dist/`, `artifacts/`, caches, and tsbuildinfo while preserving dependencies, `.env`, workstation data, and autostart state. |
+| `clean` | `scripts/public/clean.ps1` | Removes repo-local generated outputs without destroying workstation state. | Deletes repo outputs such as `dist/`, `artifacts/`, caches, local logs, screenshots, test reports, agent analysis outputs, generated `media/`, and tsbuildinfo while preserving dependencies, `.env`, workstation data, and autostart state. |
 | `clean:workstation` | `scripts/public/clean-workstation.ps1` | Removes packaged OnlySpeech workstation-local data for support or reinstall flows. | Deletes `%LOCALAPPDATA%\OnlySpeech`, including the packaged runtime `.env`, activation state, secure secrets, logs, session data, and clears `HKCU\Software\OnlySpeech\Activation\TrialUsedAt`. It does not delete the repo-root `.env`. |
 | `license:keygen` | `scripts/public/license-keygen.ps1` | Launches the repo-local activation key generator. | Executes `.local/activation-generator/launch-generator.ps1` when present. |
 
@@ -36,6 +37,8 @@ The stable npm surface is broader than `scripts/public/`: `test`, `test:e2e`, `v
 | removable | none currently tracked | Remove a script only after references in `package.json`, docs, tests, CI, and installer config are checked in the same change. |
 
 Ignored local outputs and workstation-only material such as `.local/`, `dist/`, `artifacts/`, `node_modules/`, and package caches are not part of the tracked script surface. They may be regenerated or cleaned by the documented commands, but this index tracks only repository-owned scripts.
+
+`tooling/`, `tools/`, and `src/tools/` are intentionally separate: `tooling/` contains repo-owned helper utilities, `tools/` is ignored local or vendored payload, and `src/tools/` is application source for the setup wizard.
 
 ## Internal Scripts
 

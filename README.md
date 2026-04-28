@@ -51,6 +51,7 @@ The product boundary is intentionally narrow: one Windows PC, guided in-person c
 | `npm run compile` | Run `build:renderer` and `build:main` directly. |
 | `npm test` | Run Vitest excluding the compiled Electron e2e test. |
 | `npm run test:e2e` | Compile, then run `tests/electron-e2e.test.ts`. |
+| `npm run gate -- -KeepOutputs -EnablePackagedAutomation` | Run the full Windows verification gate through the canonical repository verifier, retaining installer outputs when requested. |
 | `npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation` | Canonical local/CI verification path with packaged automation enabled and outputs retained. |
 | `npm run package` | Produce public Windows installer, portable executable, and versioned unpacked archive under `artifacts/packages/`. |
 | `npm run clean` | Remove repo-local generated outputs while preserving dependencies, `.env`, workstation data, and autostart state. |

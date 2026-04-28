@@ -5,6 +5,13 @@
 /artifacts/
 /coverage/
 /logs/
+/media/
+/screenshots/
+/test-results/
+/playwright-report/
+/blob-report/
+/agent-artifacts/
+/agent-analysis/
 /.vite/
 *.tsbuildinfo
 
@@ -14,6 +21,7 @@
 /.env.*.local
 !/.env.example
 /.local/activation-generator/
+/.local/logs/
 
 # Sensitive local credentials and Windows signing material
 *.pem

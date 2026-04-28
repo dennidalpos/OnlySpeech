@@ -134,20 +134,20 @@ Provider/model overrides must be validated on the target workstation before depl
 
 ## Script And Command Contract
 
-The stable user-facing npm entrypoints are intentionally small: `bootstrap`, `dev`, `start`, `build`, `package`, `clean`, `clean:workstation`, `test`, `test:e2e`, `verify:repo`, `docs:screenshots`, and `license:keygen`.
+The stable user-facing npm entrypoints are intentionally small: `bootstrap`, `dev`, `start`, `build`, `gate`, `package`, `clean`, `clean:workstation`, `test`, `test:e2e`, `verify:repo`, `docs:screenshots`, and `license:keygen`.
 
 `npm run bootstrap` is the dependency restore entrypoint. It validates the Node.js baseline, requires `package-lock.json`, and runs `npm ci --include=dev --omit=optional` only when the dependency tree is missing, inconsistent, or force-refreshed.
 
 `clean:workstation` is the stable packaged workstation reset entrypoint for support and reinstall flows. `test:e2e` is the compiled Electron end-to-end validation entrypoint when the full repository gate is not needed.
 
-`verify:repo` is the canonical local and CI verification entrypoint. `package` is the canonical public packaging entrypoint.
+`gate` is the public Windows verification wrapper for local release readiness. It delegates to `verify:repo` and exposes opt-in cleanup and retention switches without duplicating the verification sequence. `verify:repo` is the canonical local and CI verification implementation. `package` is the canonical public packaging entrypoint.
 
 The deterministic local path is:
 
 1. `npm run bootstrap`
 2. `npm run dev` or `npm run start`
 3. `npm run test:e2e` for targeted compiled Electron validation
-4. `npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation` for canonical repository verification
+4. `npm run gate -- -KeepOutputs -EnablePackagedAutomation` for public local repository verification
 5. `npm run package` for public Windows packaging
 6. `npm run release:customer-bundle` after packaged artifacts already exist
 
@@ -165,9 +165,9 @@ The test surface includes:
 - PowerShell planning and repo-helper tests;
 - packaged runtime automation tests.
 
-`npm run verify:repo` covers cleanup, bootstrap, doctor, tests, source smoke, build, Electron e2e, packaging audit, packaging, packaged lifecycle validation, optional packaged automation, release evidence generation, release compliance generation, and final cleanup unless outputs are preserved.
+`npm run gate` and `npm run verify:repo` cover cleanup, bootstrap, doctor, tests, source smoke, build, Electron e2e, packaging audit, packaging, packaged lifecycle validation, optional packaged automation, release evidence generation, release compliance generation, and final cleanup unless outputs are preserved. The gate default preserves `.env`, `.local/activation-generator`, dependencies, local vendored `tools/`, workstation data, and autostart state; `-CleanWorkstationData` explicitly removes packaged workstation data through `clean:workstation`, and `-RefreshDependencies` force-refreshes the deterministic bootstrap.
 
-Supported verification modifiers include `-SkipInstall`, `-SkipPack`, `-SkipPackagedLifecycle`, `-EnablePackagedAutomation`, `-SkipSmokeStart`, `-KeepOutputs`, and `-DryRun`.
+Supported verification modifiers include `-SkipInstall`, `-SkipPack`, `-SkipPackagedLifecycle`, `-EnablePackagedAutomation`, `-SkipSmokeStart`, `-KeepOutputs`, `-CleanWorkstationData`, `-ForceRefreshDependencies`, and `-DryRun`. The public `gate` wrapper exposes dependency refresh as `-RefreshDependencies`.
 
 ## Packaging Contract
 

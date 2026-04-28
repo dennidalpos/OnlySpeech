@@ -74,6 +74,14 @@ $repoTargets = @(
   "artifacts",
   "coverage",
   "logs",
+  "media",
+  "screenshots",
+  "test-results",
+  "playwright-report",
+  "blob-report",
+  "agent-artifacts",
+  "agent-analysis",
+  ".local\logs",
   ".vite",
   ".npm-cache"
 )

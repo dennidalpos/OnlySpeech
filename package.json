@@ -21,6 +21,7 @@
     "build": "powershell -ExecutionPolicy Bypass -File ./scripts/public/build.ps1",
     "build:renderer": "vite build",
     "build:main": "tsc -p tsconfig.main.json",
+    "gate": "powershell -ExecutionPolicy Bypass -File ./scripts/public/gate.ps1",
     "package": "powershell -ExecutionPolicy Bypass -File ./scripts/public/package.ps1",
     "package:internal": "powershell -ExecutionPolicy Bypass -File ./scripts/internal/packaging/package-core.ps1 -Profile Internal",
     "audit:packaging": "powershell -ExecutionPolicy Bypass -File ./scripts/internal/packaging/package-audit.ps1",

@@ -5,6 +5,8 @@ param(
   [switch]$EnablePackagedAutomation,
   [switch]$SkipSmokeStart,
   [switch]$KeepOutputs,
+  [switch]$CleanWorkstationData,
+  [switch]$ForceRefreshDependencies,
   [switch]$DryRun
 )
 
@@ -19,6 +21,7 @@ $sourceLauncherScript = Join-Path $repoRoot "scripts\internal\runtime\start-loca
 $packageCoreScript = Join-Path $repoRoot "scripts\internal\packaging\package-core.ps1"
 $packagedLifecycleScript = Join-Path $repoRoot "scripts\internal\commissioning\test-packaged-install-lifecycle.ps1"
 $packagedAutomationScript = Join-Path $repoRoot "scripts\internal\commissioning\test-packaged-runtime-automation.ps1"
+$cleanWorkstationScript = Join-Path $repoRoot "scripts\public\clean-workstation.ps1"
 
 function Get-PackagedAppProcesses {
   if (-not (Test-Path -LiteralPath $packagedExe)) {
@@ -120,11 +123,27 @@ try {
   Stop-PackagedAppProcesses
   Invoke-OnlySpeechStep -Label "clean" -FilePath "npm" -Arguments @("run", "clean:repo") -WorkingDirectory $repoRoot -DryRun:$DryRun
 
+  if ($CleanWorkstationData) {
+    Invoke-OnlySpeechStep -Label "clean-workstation" -FilePath "powershell.exe" -Arguments @(
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      $cleanWorkstationScript
+    ) -WorkingDirectory $repoRoot -DryRun:$DryRun
+  }
+
   if (-not $SkipInstall) {
     if (-not $DryRun) {
       Wait-OnlySpeechRepoProcessRelease -RepoRoot $repoRoot -Operation "run bootstrap"
     }
-    Invoke-OnlySpeechStep -Label "bootstrap" -FilePath "npm" -Arguments @("run", "bootstrap") -WorkingDirectory $repoRoot -DryRun:$DryRun
+
+    $bootstrapArguments = @("run", "bootstrap")
+    if ($ForceRefreshDependencies) {
+      $bootstrapArguments += "--"
+      $bootstrapArguments += "-ForceRefresh"
+    }
+
+    Invoke-OnlySpeechStep -Label "bootstrap" -FilePath "npm" -Arguments $bootstrapArguments -WorkingDirectory $repoRoot -DryRun:$DryRun
   }
 
   Invoke-OnlySpeechStep -Label "doctor" -FilePath "powershell.exe" -Arguments @(
