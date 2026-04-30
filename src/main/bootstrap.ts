@@ -490,8 +490,7 @@ app.whenReady()
             resolve();
           });
         }),
-      canShutdownComputer: () =>
-        app.isPackaged && process.env.ONLYSPEECH_ALLOW_RENDERER_SHUTDOWN === "1"
+      canShutdownComputer: () => app.isPackaged
     });
 
     await setupWizardManager.ensureReady();

@@ -10,6 +10,9 @@ interface ConfirmDialogProps {
 }
 
 export function ConfirmDialog(props: ConfirmDialogProps) {
+  const titleId = "confirm-dialog-title";
+  const descriptionId = "confirm-dialog-description";
+
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -22,9 +25,15 @@ export function ConfirmDialog(props: ConfirmDialogProps) {
 
   return (
     <div className="dialog-backdrop" role="presentation">
-      <div className="dialog-card" role="dialog" aria-modal="true" aria-label={props.title}>
-        <h2>{props.title}</h2>
-        <p>{props.description}</p>
+      <div
+        className="dialog-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={descriptionId}
+      >
+        <h2 id={titleId}>{props.title}</h2>
+        <p id={descriptionId}>{props.description}</p>
         <div className="dialog-actions">
           <button className="secondary-button" type="button" onClick={props.onCancel}>
             {props.cancelLabel}

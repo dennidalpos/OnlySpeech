@@ -102,6 +102,8 @@ The setup wizard persists workstation configuration, validates provider settings
 
 Provider language behavior is governed by the shared language registry and the provider capability matrix. Runtime code must use the existing `sourceLocale`, provider `targetCode`, canonical BCP-47 locale, and capability metadata instead of inventing fallback languages. Unsupported STT, translation, or TTS capability must be blocked or degraded according to the configured policy.
 
+The runtime interaction catalog exposes one selectable entry for regional English, French, and Portuguese families. Legacy regional aliases such as `en-us`, `en-gb`, `fr-ca`, and `pt-pt` are accepted only as input aliases and normalize into canonical runtime choices; English uses `en-GB` as its canonical runtime locale. The expected catalog counts are: baseline interaction 53, Azure interaction 79, and ChatGPT interaction 66.
+
 Language and audio quality controls are configured globally through the setup wizard or `.env`:
 
 - `PROVIDER_LANGUAGE_CONTRACT_MODE`: `strict` keeps provider mappings fixed to the selected operator/visitor languages; `compatible` allows only provider-compatible normalization.

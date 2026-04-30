@@ -113,7 +113,7 @@ export function resolveCanonicalWindowsLocalAppDataPath(options: {
   const localAppDataPath = options.localAppDataPath === undefined
     ? process.env.LOCALAPPDATA ?? null
     : options.localAppDataPath;
-  if (localAppDataPath) {
+  if (localAppDataPath && !isAppSpecificUserDataPath(localAppDataPath)) {
     return localAppDataPath;
   }
 
@@ -135,6 +135,15 @@ export function resolveCanonicalWindowsLocalAppDataPath(options: {
   }
 
   return null;
+}
+
+function isAppSpecificUserDataPath(value: string): boolean {
+  const segments = value
+    .replace(/[\\/]+$/g, "")
+    .split(/[\\/]+/)
+    .map((segment) => segment.toLowerCase());
+
+  return segments.at(-1) === "userdata" && segments.includes("onlyspeech");
 }
 
 export function resolveAppProfilePaths(options: AppProfilePathOptions = {}): AppProfilePaths {

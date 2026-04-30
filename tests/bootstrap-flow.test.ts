@@ -489,6 +489,20 @@ describe("bootstrap integrated setup wizard flow", () => {
     });
   });
 
+  it("exposes the shutdown capability in packaged operator mode", async () => {
+    bootstrapMocks.hasRuntimeEnvFile.mockReturnValue(true);
+
+    await importBootstrap();
+    bootstrapMocks.resolveWhenReady();
+    await flushAsyncWork();
+
+    const bindings = bootstrapMocks.registerIpcHandlers.mock.calls[0]?.[0] as
+      | { canShutdownComputer: () => boolean }
+      | undefined;
+
+    expect(bindings?.canShutdownComputer()).toBe(true);
+  });
+
   it("does not start the kiosk when the first-run wizard closes without saving", async () => {
     bootstrapMocks.hasRuntimeEnvFile.mockReturnValue(false);
 

@@ -96,54 +96,6 @@
         "`npm audit --json` non riporta piu finding per `microsoft-cognitiveservices-speech-sdk` o nested `uuid`",
         "`npm run audit:packaging` torna a uno stato atteso senza vulnerabilita residue"
       ]
-    },
-    {
-      "id": "ui-runtime-status-live-region",
-      "title": "Esporre i cambi stato runtime come aggiornamenti accessibili",
-      "status": "open",
-      "priority": 3,
-      "execution_order": 6,
-      "scope": "ui",
-      "risk": "MEDIUM",
-      "area": "accessibility",
-      "summary": "`src/renderer/operator/components/StatusBadge.tsx` aggiorna visivamente stati come ready, listening, translating ed error, ma renderizza solo un `div` senza `role` o `aria-live`. Allineare il badge agli altri messaggi runtime gia annunciati, come `RuntimeIssueBanner` e `SpeakerControl`, senza cambiare colori o posizionamento.",
-      "done_when": [
-        "Il badge stato runtime espone un ruolo e una politica live region appropriati",
-        "Gli aggiornamenti ready/listening/translating/error restano visivamente invariati",
-        "I test renderer o mounted UI verificano la semantica accessibile del badge"
-      ]
-    },
-    {
-      "id": "ui-setup-access-dialog-error-announcement",
-      "title": "Annunciare errori e descrizioni nei dialog di accesso setup",
-      "status": "open",
-      "priority": 3,
-      "execution_order": 7,
-      "scope": "ui",
-      "risk": "MEDIUM",
-      "area": "accessibility",
-      "summary": "`SetupWizardAccessDialog.tsx` e `ConfirmDialog.tsx` usano `role=\"dialog\"` e `aria-modal`, ma collegano titolo e descrizione solo tramite `aria-label`; l'errore `.setup-access-error` non usa `role=\"alert\"` o live region. Rendere annunciabili titolo, descrizione ed errore senza modificare copy, layout o palette.",
-      "done_when": [
-        "I dialog usano riferimenti accessibili stabili per titolo e descrizione",
-        "Gli errori del setup access gate sono annunciati quando compaiono",
-        "I test setup access coprono aria-labelledby/aria-describedby e annuncio errore"
-      ]
-    },
-    {
-      "id": "residual-project-status-open-status-contract",
-      "title": "Allineare contratto PROJECT_STATUS.json e verifica repository",
-      "status": "open",
-      "priority": 2,
-      "execution_order": 8,
-      "scope": "core",
-      "risk": "MEDIUM",
-      "area": "tests",
-      "summary": "`npm test` completo fallisce in `tests/verify-repo-script.test.ts` perche la verifica richiede che tutti i task in `PROJECT_STATUS.json` abbiano `status` uguale a `open`, mentre il tracker contiene almeno un residuo con `status` uguale a `blocked`. Decidere se il contratto repository deve ammettere stati diversi da `open` o se i residui bloccati devono essere rappresentati con un campo separato senza rompere la verifica.",
-      "done_when": [
-        "Il contratto atteso per gli stati del tracker e documentato o codificato in modo esplicito",
-        "`PROJECT_STATUS.json` e `tests/verify-repo-script.test.ts` sono coerenti sullo stato ammesso dei residui",
-        "`npm test` completo non fallisce piu per il controllo sugli status del tracker"
-      ]
     }
   ]
 }

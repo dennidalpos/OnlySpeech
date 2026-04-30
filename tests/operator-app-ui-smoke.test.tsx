@@ -810,7 +810,7 @@ describe("operator app mounted UI smoke coverage", () => {
     expect(harness.openSetupWizardCalls).toBe(1);
   });
 
-  it("hides the shutdown control when the runtime does not expose shutdown capability", async () => {
+  it("hides the shutdown control when the runtime reports shutdown is unavailable", async () => {
     await renderOperatorApp("A", createAppState());
 
     expect(document.querySelector('button[aria-label="Shutdown computer"]')).toBeNull();

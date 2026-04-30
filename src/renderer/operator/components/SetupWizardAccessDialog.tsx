@@ -19,6 +19,8 @@ export function SetupWizardAccessDialog(props: SetupWizardAccessDialogProps) {
   const [password, setPassword] = useState("");
   const [nextPassword, setNextPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const titleId = "setup-wizard-access-dialog-title";
+  const descriptionId = "setup-wizard-access-dialog-description";
 
   const handleSubmit = () => {
     props.onSubmit({
@@ -30,9 +32,15 @@ export function SetupWizardAccessDialog(props: SetupWizardAccessDialogProps) {
 
   return (
     <div className="dialog-backdrop" role="presentation">
-      <div className="dialog-card" role="dialog" aria-modal="true" aria-label={props.title}>
-        <h2>{props.title}</h2>
-        <p>{props.description}</p>
+      <div
+        className="dialog-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={descriptionId}
+      >
+        <h2 id={titleId}>{props.title}</h2>
+        <p id={descriptionId}>{props.description}</p>
         <form
           className="setup-access-form"
           onSubmit={(event) => {
@@ -74,7 +82,11 @@ export function SetupWizardAccessDialog(props: SetupWizardAccessDialogProps) {
               </label>
             </>
           ) : null}
-          {props.errorMessage ? <div className="setup-access-error">{props.errorMessage}</div> : null}
+          {props.errorMessage ? (
+            <div className="setup-access-error" role="alert" aria-live="assertive">
+              {props.errorMessage}
+            </div>
+          ) : null}
           <div className="dialog-actions">
             <button className="secondary-button" type="button" disabled={props.busy} onClick={props.onCancel}>
               {props.cancelLabel}

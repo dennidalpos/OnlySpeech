@@ -33,7 +33,7 @@ export function LanguageHeaderChip(props: LanguageHeaderChipProps) {
           {props.uiFallback ? <small className="header-chip-ui-fallback">{labels.headerChipUiFallback}</small> : null}
           {props.showMeta === false ? null : (
             <small className="header-chip-meta">
-              {props.choice.macroAreaLabels.join(" • ")}
+              {[props.choice.macroAreaLabels.join(" / "), props.choice.sourceLocale].filter(Boolean).join(" - ")}
             </small>
           )}
         </>

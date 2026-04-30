@@ -187,7 +187,8 @@ describe("operator renderer view state", () => {
     expect(html).toContain("shqip");
     expect(html).not.toContain("español");
     expect(html).not.toContain('aria-label="Flag BR"');
-    expect(html.match(/visitor-language-tile/g)?.length).toBe(europeanChoices.length);
+    expect(html.match(/class="visitor-language-tile(?: selected)?" type=/g)?.length).toBe(europeanChoices.length);
+    expect(html).toContain("sq-AL");
   });
 
   it("renders a stable fallback flag icon when no region is available", () => {
@@ -260,9 +261,10 @@ describe("operator renderer view state", () => {
     expect(html).toContain("Europa");
     expect(html).not.toContain("español");
     expect(html).not.toContain('aria-label="Flag BR"');
-    expect(html.match(/visitor-language-tile/g)?.length).toBe(europeChoices.length);
+    expect(html.match(/class="visitor-language-tile(?: selected)?" type=/g)?.length).toBe(europeChoices.length);
     expect(html).toContain("italiano");
     expect(html).toContain("français");
+    expect(html).toContain("it-IT");
   });
 
   it("keeps the world map artwork decorative while macro-area selection stays on overlay hotspots", () => {

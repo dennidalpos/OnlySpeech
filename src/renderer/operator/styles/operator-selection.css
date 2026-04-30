@@ -236,9 +236,23 @@
     box-shadow 120ms ease;
 }
 
+.visitor-language-tile-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
 .visitor-language-tile strong {
   font-size: 0.96rem;
   line-height: 1.15;
+}
+
+.visitor-language-tile small,
+.visitor-language-tile em {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-style: normal;
+  line-height: 1.2;
 }
 
 .visitor-language-tile.selected,

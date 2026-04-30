@@ -11,5 +11,9 @@ export function StatusBadge({
   labels?: Record<OperatorStatus, string>;
 }) {
   const badgeLabels = labels ?? getUiText(language ?? "en").statusLabels;
-  return <div className={`status-badge status-${status}`}>{badgeLabels[status]}</div>;
+  return (
+    <div className={`status-badge status-${status}`} role="status" aria-live="polite" aria-atomic="true">
+      {badgeLabels[status]}
+    </div>
+  );
 }

@@ -100,6 +100,20 @@ describe("resolveAppProfilePaths", () => {
     });
   });
 
+  it("ignores an app-specific userData override and derives the canonical Windows LocalAppData root", () => {
+    expect(
+      resolveAppProfilePaths({
+        platform: "win32",
+        localAppDataPath: "D:\\OnlySpeech\\userData",
+        userProfilePath: "C:\\Users\\Installer",
+        appDataPath: "C:\\Users\\Installer\\AppData\\Roaming"
+      })
+    ).toEqual({
+      userDataPath: "C:\\Users\\Installer\\AppData\\Local\\OnlySpeech",
+      sessionDataPath: "C:\\Users\\Installer\\AppData\\Local\\OnlySpeech\\session-data"
+    });
+  });
+
   it("requires a resolvable LocalAppData root on Windows", () => {
     expect(() =>
       resolveAppProfilePaths({

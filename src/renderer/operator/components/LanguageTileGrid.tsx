@@ -21,7 +21,11 @@ export function LanguageTileGrid(props: LanguageTileGridProps) {
             onClick={() => props.onSelect(choice.value)}
           >
             <FlagIcon id={choice.value} regionCode={choice.regionCode} />
-            <strong>{choice.nativeLabel}</strong>
+            <span className="visitor-language-tile-copy">
+              <strong>{choice.nativeLabel}</strong>
+              {choice.label && choice.label !== choice.nativeLabel ? <small>{choice.label}</small> : null}
+              {choice.sourceLocale ? <em>{choice.sourceLocale}</em> : null}
+            </span>
           </button>
         );
       })}
