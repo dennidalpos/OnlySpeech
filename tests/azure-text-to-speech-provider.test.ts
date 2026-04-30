@@ -159,6 +159,7 @@ describe("AzureTextToSpeechProvider", () => {
       })
     );
     expect(String(synthCall[1]?.body)).toContain('<voice name="ar-EG-ShakirNeural">');
+    expect(String(synthCall[1]?.body)).toContain('<lang xml:lang="ar-EG">');
     expect(String(synthCall[1]?.body)).toContain("مرحبا من OnlySpeech");
     expect(events).toContainEqual(
       expect.objectContaining({
@@ -168,6 +169,26 @@ describe("AzureTextToSpeechProvider", () => {
         language: "ar-EG"
       })
     );
+  });
+
+  it("can disable the Azure SSML lang wrapper per command", async () => {
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(createVoiceCatalogResponse())
+      .mockResolvedValueOnce(new Response(new Uint8Array([1, 2, 3]), { status: 200 }));
+    const client = new TextToSpeechClient();
+
+    await client.start(
+      createStartCommand("ar-EG", {
+        azureTtsLangElementEnabled: false
+      }),
+      {
+        onEvent: () => {}
+      }
+    );
+
+    const synthCall = vi.mocked(fetch).mock.calls[1];
+    expect(String(synthCall[1]?.body)).toContain('<voice name="ar-EG-ShakirNeural">');
+    expect(String(synthCall[1]?.body)).not.toContain('<lang xml:lang="ar-EG">');
   });
 
   it.each([

@@ -112,7 +112,9 @@ export const startTextToSpeechCommandSchema = z.object({
   azureSpeechRegion: z.string().nullable().optional(),
   chatGptApiKey: z.string().nullable().optional(),
   chatGptTextToSpeechModel: z.string().nullable().optional(),
-  chatGptTextToSpeechVoice: z.string().nullable().optional()
+  chatGptTextToSpeechVoice: z.string().nullable().optional(),
+  openAiTtsLanguageInstructionsEnabled: z.boolean().nullable().optional(),
+  azureTtsLangElementEnabled: z.boolean().nullable().optional()
 }).strict() satisfies z.ZodType<StartTextToSpeechCommand>;
 
 export const textToSpeechRequestSchema = z.object({

@@ -18,6 +18,8 @@ export function getSetupWizardControlCoreRuntimeFoundationScript(data: SetupWiza
     translationTargetOptionGroupsByProvider,
     sourceLocaleByTargetLanguageByProvider,
     runtimeDisclosureDefaultsByLanguage,
+    providerLanguageContractModeOptions,
+    chatGptTranslationDetectedLanguageModeOptions,
     logLevelOptions,
     initialWizardSection
   } = data;
@@ -64,6 +66,8 @@ export function getSetupWizardControlCoreRuntimeFoundationScript(data: SetupWiza
       const interactionLanguageMacroAreaGroupsByProvider = ${interactionLanguageMacroAreaGroupsByProvider};
       const translationTargetOptionGroupsByProvider = ${translationTargetOptionGroupsByProvider};
       const sourceLocaleByTargetLanguageByProvider = ${sourceLocaleByTargetLanguageByProvider};
+      const providerLanguageContractModeOptions = ${providerLanguageContractModeOptions};
+      const chatGptTranslationDetectedLanguageModeOptions = ${chatGptTranslationDetectedLanguageModeOptions};
       const logLevelOptions = ${logLevelOptions};
       const initialWizardSection = ${initialWizardSection};
       const microphoneCategoryOrder = ["usb","analog","bluetooth","hdmi","virtual","network","other"];

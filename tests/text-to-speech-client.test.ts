@@ -83,6 +83,8 @@ describe("TextToSpeechClient", () => {
         })
       })
     );
+    const speechBody = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body));
+    expect(speechBody.instructions).toContain("English");
     expect(emitted[0]).toEqual(
       expect.objectContaining({
         type: "started",
@@ -90,6 +92,21 @@ describe("TextToSpeechClient", () => {
         requestId: "tts-1"
       })
     );
+  });
+
+  it("can disable OpenAI TTS language instructions per command", async () => {
+    installAudioMocks();
+    const fetchMock = vi.fn(async () => createAudioResponse());
+    vi.stubGlobal("fetch", fetchMock);
+
+    const client = new TextToSpeechClient();
+
+    await client.start(createCommand({ openAiTtsLanguageInstructionsEnabled: false }), {
+      onEvent: () => {}
+    });
+
+    const speechBody = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body));
+    expect(speechBody.instructions).toBeUndefined();
   });
 
   it("emits unavailable when the ChatGPT/OpenAI provider has no configured API key", async () => {

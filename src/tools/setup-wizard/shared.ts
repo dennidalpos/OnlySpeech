@@ -587,6 +587,8 @@ export function buildWizardEnv(state: WizardState, options: BuildWizardEnvOption
       disclosureDisabled: "# Runtime and wizard AI-assisted disclosure are disabled.",
       disclosureCustom: "# Runtime and wizard AI-assisted disclosure use the custom global text.",
       audioFilters: "# Browser audio processing filters were customized for microphone capture.",
+      languageQuality:
+        "# Language and audio quality controls were customized for STT, translation, TTS, or capture diagnostics.",
       secureStorage: "# Provider secrets are stored in Windows secure local storage for packaged installs."
     },
     it: {
@@ -610,6 +612,8 @@ export function buildWizardEnv(state: WizardState, options: BuildWizardEnvOption
       disclosureDisabled: "# Gli avvisi AI runtime e wizard sono disattivati.",
       disclosureCustom: "# Gli avvisi AI runtime e wizard usano il testo personalizzato globale.",
       audioFilters: "# I filtri browser di elaborazione audio sono stati personalizzati per l'acquisizione microfono.",
+      languageQuality:
+        "# I controlli qualita lingua e audio sono stati personalizzati per STT, traduzione, TTS o diagnostica acquisizione.",
       secureStorage:
         "# I segreti provider vengono archiviati nello storage locale sicuro di Windows per le installazioni pacchettizzate."
     },
@@ -634,6 +638,8 @@ export function buildWizardEnv(state: WizardState, options: BuildWizardEnvOption
       disclosureDisabled: "# Los avisos de IA de runtime y del asistente estan desactivados.",
       disclosureCustom: "# Los avisos de IA de runtime y del asistente usan el texto global personalizado.",
       audioFilters: "# Los filtros del navegador para el audio del microfono fueron personalizados.",
+      languageQuality:
+        "# Los controles de calidad de idioma y audio fueron personalizados para STT, traduccion, TTS o diagnostico de captura.",
       secureStorage:
         "# Los secretos del proveedor se guardan en el almacenamiento seguro local de Windows para instalaciones empaquetadas."
     },
@@ -658,6 +664,8 @@ export function buildWizardEnv(state: WizardState, options: BuildWizardEnvOption
       disclosureDisabled: "# Les avis IA runtime et assistant sont desactives.",
       disclosureCustom: "# Les avis IA runtime et assistant utilisent le texte global personnalise.",
       audioFilters: "# Les filtres audio du navigateur ont ete personnalises pour la capture microphone.",
+      languageQuality:
+        "# Les controles de qualite langue et audio ont ete personnalises pour STT, traduction, TTS ou diagnostic de capture.",
       secureStorage:
         "# Les secrets fournisseur sont stockes dans le stockage local securise de Windows pour les installations packagees."
     },
@@ -682,6 +690,8 @@ export function buildWizardEnv(state: WizardState, options: BuildWizardEnvOption
       disclosureDisabled: "# Die KI-Hinweise fuer Runtime und Assistent sind deaktiviert.",
       disclosureCustom: "# Die KI-Hinweise fuer Runtime und Assistent verwenden den globalen benutzerdefinierten Text.",
       audioFilters: "# Die Browser-Audiofilter fuer die Mikrofonaufnahme wurden angepasst.",
+      languageQuality:
+        "# Sprach- und Audioqualitaetsregler wurden fuer STT, Uebersetzung, TTS oder Aufnahmediagnose angepasst.",
       secureStorage:
         "# Anbieter-Geheimnisse werden bei paketierten Installationen im sicheren lokalen Windows-Speicher abgelegt."
     },
@@ -701,6 +711,7 @@ export function buildWizardEnv(state: WizardState, options: BuildWizardEnvOption
       disclosureDisabled: "# runtime 和向导中的 AI 提示已关闭。",
       disclosureCustom: "# runtime 和向导中的 AI 提示使用全局自定义文本。",
       audioFilters: "# 浏览器音频处理过滤器已针对麦克风采集进行自定义。",
+      languageQuality: "# 语言和音频质量控制已针对 STT、翻译、TTS 或采集诊断进行自定义。",
       secureStorage: "# 打包安装时，服务商密钥会保存在 Windows 本地安全存储中。"
     }
   };
@@ -745,6 +756,17 @@ export function buildWizardEnv(state: WizardState, options: BuildWizardEnvOption
     state.envValues.AUDIO_NOISE_SUPPRESSION === "false"
   ) {
     comments.push(commentCopy.audioFilters);
+  }
+
+  if (
+    state.envValues.PROVIDER_LANGUAGE_CONTRACT_MODE !== "strict" ||
+    state.envValues.CHATGPT_STT_LANGUAGE_PROMPT_ENABLED === "false" ||
+    state.envValues.CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE !== "diagnostic" ||
+    state.envValues.OPENAI_TTS_LANGUAGE_INSTRUCTIONS_ENABLED === "false" ||
+    state.envValues.AZURE_TTS_LANG_ELEMENT_ENABLED === "false" ||
+    state.envValues.AUDIO_CAPTURE_SETTINGS_DIAGNOSTICS_ENABLED === "true"
+  ) {
+    comments.push(commentCopy.languageQuality);
   }
 
   if (options.secureSecretStorage) {

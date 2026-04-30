@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { buildInteractionLanguageChoices } from "../src/shared/language-flow.js";
+import { resolveProviderLanguageContract } from "../src/shared/provider-language-contract.js";
 import { resolveChatGptTranscriptionLanguagePolicy } from "../src/shared/provider-language-policy.js";
 import {
   resolveChatGptTranscriptionPrompt,
   resolveChatGptTranscriptionLanguageHint,
   resolveSideSpeechStartParameters,
-  resolveSpeechTurnSourceLanguage
+  resolveSpeechTurnSourceLanguage,
+  resolveTextToSpeechLanguageInstructions
 } from "../src/shared/speech-flow.js";
 import type { SideState } from "../src/shared/types.js";
 
@@ -49,6 +51,11 @@ describe("speech-flow", () => {
   it("does not add a fallback prompt when the ChatGPT language hint is supported", () => {
     expect(resolveChatGptTranscriptionPrompt("it-IT")).toBeUndefined();
     expect(resolveChatGptTranscriptionPrompt("zh-TW")).toBeUndefined();
+  });
+
+  it("adds a ChatGPT transcription prompt for supported hints when language prompts are enabled", () => {
+    expect(resolveChatGptTranscriptionPrompt("it-IT", { alwaysInclude: true })).toContain("Italian");
+    expect(resolveChatGptTranscriptionPrompt("zh-TW", { alwaysInclude: true })).toContain("Chinese");
   });
 
   it("uses prompt fallback for every ChatGPT interaction language whose base code is not safe for the STT language parameter", () => {
@@ -101,6 +108,36 @@ describe("speech-flow", () => {
     expect(resolveSpeechTurnSourceLanguage("it-IT", "en-US")).toBe("it-IT");
     expect(resolveSpeechTurnSourceLanguage("it-IT", "   ")).toBe("it-IT");
     expect(resolveSpeechTurnSourceLanguage("it-IT", undefined)).toBe("it-IT");
+  });
+
+  it("uses detected language only when ChatGPT translation detection is adaptive", () => {
+    expect(resolveSpeechTurnSourceLanguage("it-IT", "en-US", "diagnostic")).toBe("it-IT");
+    expect(resolveSpeechTurnSourceLanguage("it-IT", "en-US", "off")).toBe("it-IT");
+    expect(resolveSpeechTurnSourceLanguage("it-IT", "en-US", "adaptive")).toBe("en-US");
+  });
+
+  it("resolves one provider language contract for representative language pairs", () => {
+    for (const provider of ["azure", "chatgpt", "ollama"] as const) {
+      for (const language of ["it", "en", "fr", "de", "es", "pt", "zh-Hans", "ja", "sq"]) {
+        const contract = resolveProviderLanguageContract({ provider, language });
+        expect(contract.selectedLanguage).toBeTruthy();
+        expect(contract.sourceLocale).toBeTruthy();
+        expect(contract.targetCode).toBeTruthy();
+        expect(contract.ttsLocale).toBeTruthy();
+        expect(contract.canonicalBcp47).toBeTruthy();
+        expect(contract.displayLabel).toBeTruthy();
+        expect(contract.capability).toEqual(
+          expect.objectContaining({
+            translation: expect.any(Boolean)
+          })
+        );
+      }
+    }
+  });
+
+  it("builds TTS language instructions from the selected provider language contract", () => {
+    expect(resolveTextToSpeechLanguageInstructions("chatgpt", "it")).toContain("Italian");
+    expect(resolveTextToSpeechLanguageInstructions("chatgpt", "ja")).toContain("Japanese");
   });
 
   it("uses the configured source language for runtime speech start parameters", () => {

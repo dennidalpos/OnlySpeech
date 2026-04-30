@@ -50,6 +50,17 @@ const logLevelOptions = [
   { value: "debug", label: "debug" }
 ];
 
+const providerLanguageContractModeOptions = [
+  { value: "strict", label: "strict" },
+  { value: "compatible", label: "compatible" }
+];
+
+const chatGptTranslationDetectedLanguageModeOptions = [
+  { value: "off", label: "off" },
+  { value: "diagnostic", label: "diagnostic" },
+  { value: "adaptive", label: "adaptive" }
+];
+
 function buildInteractionLanguageFlagMarkupByProvider() {
   const providers = ["chatgpt", "azure", "ollama"] as const;
 
@@ -169,6 +180,8 @@ export function getSetupWizardControlPageData(uiLanguage: SetupWizardUiLanguage 
       ollama: buildInteractionLanguageSourceLocaleMap("ollama", { includeProviderExpansions: true })
     }),
     runtimeDisclosureDefaultsByLanguage: JSON.stringify(runtimeDisclosureDefaultsByLanguage),
+    providerLanguageContractModeOptions: JSON.stringify(providerLanguageContractModeOptions),
+    chatGptTranslationDetectedLanguageModeOptions: JSON.stringify(chatGptTranslationDetectedLanguageModeOptions),
     logLevelOptions: JSON.stringify(logLevelOptions)
   };
 }

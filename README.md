@@ -15,7 +15,7 @@ The product boundary is intentionally narrow: one Windows PC, guided in-person c
 - Operator and visitor runtime surfaces on the same Windows workstation.
 - Guided language confirmation before live speech starts.
 - Push-to-talk speech flow with either `dual-dedicated` microphones or one `single-shared` microphone.
-- Integrated setup for displays, microphones, providers, languages, diagnostics, activation, and packaged autostart preference.
+- Integrated setup for displays, microphones, providers, languages, language/audio quality controls, diagnostics, activation, and packaged autostart preference.
 - Live speech paths for `azure` and `chatgpt`.
 - Translation-only `ollama` diagnostics and demo validation, without live STT or TTS support.
 - Deterministic `demo` mode for validation without provider credentials.

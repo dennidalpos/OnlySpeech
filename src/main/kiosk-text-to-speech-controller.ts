@@ -18,6 +18,8 @@ interface KioskTextToSpeechControllerOptions {
   azureSpeechKey: string;
   azureSpeechRegion: string;
   chatGptApiKey: string;
+  openAiTtsLanguageInstructionsEnabled?: boolean;
+  azureTtsLangElementEnabled?: boolean;
   sendCommand: (
     side: Side,
     command:
@@ -35,6 +37,8 @@ interface KioskTextToSpeechControllerOptions {
           chatGptApiKey?: string | null;
           chatGptTextToSpeechModel?: string | null;
           chatGptTextToSpeechVoice?: string | null;
+          openAiTtsLanguageInstructionsEnabled?: boolean | null;
+          azureTtsLangElementEnabled?: boolean | null;
         }
       | {
           type: "stop-tts";
@@ -204,7 +208,9 @@ export class KioskTextToSpeechController {
       chatGptApiKey:
         this.options.getState().translationProvider === "chatgpt"
           ? this.options.chatGptApiKey
-          : null
+          : null,
+      openAiTtsLanguageInstructionsEnabled: this.options.openAiTtsLanguageInstructionsEnabled ?? true,
+      azureTtsLangElementEnabled: this.options.azureTtsLangElementEnabled ?? true
     });
     this.options.broadcastState();
   }

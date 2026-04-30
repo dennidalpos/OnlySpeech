@@ -49,6 +49,23 @@
       ]
     },
     {
+      "id": "residual-language-audio-quality-live-matrix",
+      "title": "Validare live matrice lingua e qualita audio STT/TTS",
+      "status": "open",
+      "priority": 1,
+      "execution_order": 9,
+      "scope": "core",
+      "risk": "HIGH",
+      "area": "runtime",
+      "summary": "Dopo l'introduzione del contratto lingua provider e delle opzioni wizard per prompt STT ChatGPT, detection traduzione, istruzioni TTS OpenAI, `<lang>` Azure TTS e diagnostica `getSettings()` audio, resta da validare su hardware reale e provider live l'effetto operativo per tutte le lingue campione. I test repository confermano mapping, payload, wizard e build, ma non possono misurare interpretazione in presenza di rumore/voci sovrapposte, efficacia reale di echo cancellation/noise suppression o pronuncia TTS del provider.",
+      "done_when": [
+        "Matrice live eseguita almeno per it/en, fr/de, es/pt, zh-Hans/ja e una lingua gestita solo con prompt fallback ChatGPT",
+        "Per ogni provider applicabile sono registrati source locale STT, target traduzione, locale/voce TTS, capability e opzioni wizard attive",
+        "Echo cancellation e noise suppression sono provati con diagnostica `getSettings()` abilitata e risultati annotati senza salvare audio",
+        "Eventuali degradi, blocchi capability o lingue non applicabili sono marcati con motivazione esplicita"
+      ]
+    },
+    {
       "id": "residual-packaged-autostart-live-validation",
       "title": "Validare live l'autostart packaged via HKCU Run key",
       "status": "open",

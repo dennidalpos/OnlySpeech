@@ -58,6 +58,25 @@ function buildMicrophoneConstraints(command: {
   };
 }
 
+function sanitizeAudioTrackSettings(track: MediaStreamTrack | undefined): Record<string, unknown> | null {
+  if (!track || typeof track.getSettings !== "function") {
+    return null;
+  }
+
+  const settings = track.getSettings();
+  const extendedSettings = settings as MediaTrackSettings & { latency?: number };
+  return {
+    deviceId: typeof settings.deviceId === "string" ? "[redacted]" : undefined,
+    echoCancellation: settings.echoCancellation,
+    noiseSuppression: settings.noiseSuppression,
+    autoGainControl: settings.autoGainControl,
+    channelCount: settings.channelCount,
+    sampleRate: settings.sampleRate,
+    sampleSize: settings.sampleSize,
+    latency: extendedSettings.latency
+  };
+}
+
 function createMediaRecorder(stream: MediaStream): MediaRecorder {
   if (typeof MediaRecorder.isTypeSupported !== "function") {
     return new MediaRecorder(stream);
@@ -380,6 +399,7 @@ export class LiveSpeechClient {
     generation: number
   ): Promise<void> {
     const stream = await this.requestChatGptRecorderStream(command);
+    this.reportAudioCaptureSettings(command, stream, "chatgpt-recorder");
 
     if (generation !== this.generation) {
       this.stopAudioStream(stream);
@@ -723,7 +743,29 @@ export class LiveSpeechClient {
       audio: buildMicrophoneConstraints(command),
       video: false
     });
+    this.reportAudioCaptureSettings(command, warmupStream, "azure-warmup");
     this.stopAudioStream(warmupStream);
+  }
+
+  private reportAudioCaptureSettings(
+    command: SpeechStartCommand,
+    stream: MediaStream,
+    stage: "chatgpt-recorder" | "azure-warmup"
+  ): void {
+    if (!command.audioCaptureSettingsDiagnosticsEnabled) {
+      return;
+    }
+
+    console.info("[OnlySpeech] Audio capture settings diagnostics.", {
+      stage,
+      side: command.side,
+      translationProvider: command.translationProvider,
+      requested: {
+        echoCancellation: command.audioEchoCancellation,
+        noiseSuppression: command.audioNoiseSuppression
+      },
+      effective: sanitizeAudioTrackSettings(stream.getAudioTracks()[0])
+    });
   }
 
   private createEmitIfCurrent(

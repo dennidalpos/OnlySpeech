@@ -471,6 +471,46 @@ describe("TranslationProviderService", () => {
 
     const transcriptionFormData = fetchMock.mock.calls[0]?.[1]?.body as FormData;
     expect(transcriptionFormData.get("language")).toBe("it");
+    expect(transcriptionFormData.get("prompt")).toContain("Italian");
+  });
+
+  it("can disable the ChatGPT transcription prompt for supported language hints", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          text: "ciao mondo"
+        })
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          choices: [
+            {
+              message: {
+                content: '{"translation":"hello world","detected_language":"it"}'
+              }
+            }
+          ]
+        })
+      });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const service = new TranslationProviderService({
+      ...createConfig(),
+      chatGptSttLanguagePromptEnabled: false
+    });
+    await service.processSpeechTurn({
+      provider: "chatgpt",
+      sourceLanguage: "it-IT",
+      targetLanguage: "en-US",
+      audioBase64: Buffer.from("fake-audio").toString("base64"),
+      audioMimeType: "audio/webm"
+    });
+
+    const transcriptionFormData = fetchMock.mock.calls[0]?.[1]?.body as FormData;
+    expect(transcriptionFormData.get("language")).toBe("it");
     expect(transcriptionFormData.get("prompt")).toBeNull();
   });
 
@@ -536,9 +576,54 @@ describe("TranslationProviderService", () => {
     const tagalogFormData = fetchMock.mock.calls[0]?.[1]?.body as FormData;
     const norwegianFormData = fetchMock.mock.calls[2]?.[1]?.body as FormData;
     expect(tagalogFormData.get("language")).toBe("tl");
-    expect(tagalogFormData.get("prompt")).toBeNull();
+    expect(tagalogFormData.get("prompt")).toContain("Filipino");
     expect(norwegianFormData.get("language")).toBe("no");
-    expect(norwegianFormData.get("prompt")).toBeNull();
+    expect(norwegianFormData.get("prompt")).toContain("Norwegian");
+  });
+
+  it("omits detected-language JSON instructions when ChatGPT detection mode is off", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          text: "ciao mondo"
+        })
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          choices: [
+            {
+              message: {
+                content: '{"translation":"hello world"}'
+              }
+            }
+          ]
+        })
+      });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const service = new TranslationProviderService({
+      ...createConfig(),
+      chatGptTranslationDetectedLanguageMode: "off"
+    });
+    await expect(
+      service.processSpeechTurn({
+        provider: "chatgpt",
+        sourceLanguage: "it-IT",
+        targetLanguage: "en-US",
+        audioBase64: Buffer.from("fake-audio").toString("base64"),
+        audioMimeType: "audio/webm"
+      })
+    ).resolves.toEqual({
+      transcript: "ciao mondo",
+      translation: "hello world",
+      detectedLanguage: undefined
+    });
+
+    const translationBody = JSON.parse(String(fetchMock.mock.calls[1]?.[1]?.body));
+    expect(JSON.stringify(translationBody.messages)).not.toContain("detected_language");
   });
 
   it("does not call translation when transcription returns empty text", async () => {

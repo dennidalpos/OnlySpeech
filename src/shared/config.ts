@@ -14,7 +14,13 @@ import {
 import { RUNTIME_ENV_DEFAULTS } from "./runtime-env-contract.js";
 import { normalizeRuntimeEnvValues } from "./runtime-env-normalization.js";
 import { normalizeRuntimeDisclosureMode } from "./runtime-disclosure.js";
-import type { RuntimeConfig, TranslationProvider, UiLanguage } from "./types.js";
+import type {
+  ChatGptTranslationDetectedLanguageMode,
+  ProviderLanguageContractMode,
+  RuntimeConfig,
+  TranslationProvider,
+  UiLanguage
+} from "./types.js";
 
 loadEnv({ quiet: true });
 
@@ -72,6 +78,19 @@ const booleanFromEnv = (fallback: boolean) =>
 const translationProvider = z
   .enum(["azure", "chatgpt", "ollama"] satisfies [TranslationProvider, ...TranslationProvider[]])
   .catch(RUNTIME_ENV_DEFAULTS.TRANSLATION_PROVIDER as TranslationProvider);
+
+const providerLanguageContractMode = z
+  .enum(["strict", "compatible"] satisfies [ProviderLanguageContractMode, ...ProviderLanguageContractMode[]])
+  .catch(RUNTIME_ENV_DEFAULTS.PROVIDER_LANGUAGE_CONTRACT_MODE as ProviderLanguageContractMode);
+
+const chatGptTranslationDetectedLanguageMode = z
+  .enum(["off", "diagnostic", "adaptive"] satisfies [
+    ChatGptTranslationDetectedLanguageMode,
+    ...ChatGptTranslationDetectedLanguageMode[]
+  ])
+  .catch(
+    RUNTIME_ENV_DEFAULTS.CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE as ChatGptTranslationDetectedLanguageMode
+  );
 
 const setupUiLanguage = z
   .string()
@@ -135,15 +154,31 @@ const schema = z.object({
   ),
   AUDIO_ECHO_CANCELLATION: booleanFromEnv(RUNTIME_ENV_DEFAULTS.AUDIO_ECHO_CANCELLATION === "true"),
   AUDIO_NOISE_SUPPRESSION: booleanFromEnv(RUNTIME_ENV_DEFAULTS.AUDIO_NOISE_SUPPRESSION === "true"),
+  AUDIO_CAPTURE_SETTINGS_DIAGNOSTICS_ENABLED: booleanFromEnv(
+    RUNTIME_ENV_DEFAULTS.AUDIO_CAPTURE_SETTINGS_DIAGNOSTICS_ENABLED === "true"
+  ),
   AZURE_SPEECH_KEY: z.string().optional().default(RUNTIME_ENV_DEFAULTS.AZURE_SPEECH_KEY),
   AZURE_SPEECH_REGION: z.string().optional().default(RUNTIME_ENV_DEFAULTS.AZURE_SPEECH_REGION),
   AZURE_TRANSLATOR_KEY: z.string().optional().default(RUNTIME_ENV_DEFAULTS.AZURE_TRANSLATOR_KEY),
   AZURE_TRANSLATOR_REGION: z.string().optional().default(RUNTIME_ENV_DEFAULTS.AZURE_TRANSLATOR_REGION),
   AZURE_TRANSLATOR_ENDPOINT: nullableString,
   TRANSLATION_PROVIDER: translationProvider.default(RUNTIME_ENV_DEFAULTS.TRANSLATION_PROVIDER as TranslationProvider),
+  PROVIDER_LANGUAGE_CONTRACT_MODE: providerLanguageContractMode.default(
+    RUNTIME_ENV_DEFAULTS.PROVIDER_LANGUAGE_CONTRACT_MODE as ProviderLanguageContractMode
+  ),
   CHATGPT_API_KEY: z.string().optional().default(RUNTIME_ENV_DEFAULTS.CHATGPT_API_KEY),
   CHATGPT_MODEL: z.string().optional().default(RUNTIME_ENV_DEFAULTS.CHATGPT_MODEL),
   CHATGPT_TRANSCRIBE_MODEL: z.string().optional().default(RUNTIME_ENV_DEFAULTS.CHATGPT_TRANSCRIBE_MODEL),
+  CHATGPT_STT_LANGUAGE_PROMPT_ENABLED: booleanFromEnv(
+    RUNTIME_ENV_DEFAULTS.CHATGPT_STT_LANGUAGE_PROMPT_ENABLED === "true"
+  ),
+  CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE: chatGptTranslationDetectedLanguageMode.default(
+    RUNTIME_ENV_DEFAULTS.CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE as ChatGptTranslationDetectedLanguageMode
+  ),
+  OPENAI_TTS_LANGUAGE_INSTRUCTIONS_ENABLED: booleanFromEnv(
+    RUNTIME_ENV_DEFAULTS.OPENAI_TTS_LANGUAGE_INSTRUCTIONS_ENABLED === "true"
+  ),
+  AZURE_TTS_LANG_ELEMENT_ENABLED: booleanFromEnv(RUNTIME_ENV_DEFAULTS.AZURE_TTS_LANG_ELEMENT_ENABLED === "true"),
   OLLAMA_BASE_URL: z.string().optional().default(RUNTIME_ENV_DEFAULTS.OLLAMA_BASE_URL),
   OLLAMA_MODEL: z.string().optional().default(RUNTIME_ENV_DEFAULTS.OLLAMA_MODEL),
   OLLAMA_REQUEST_TIMEOUT_MS: numberFromEnv(Number(RUNTIME_ENV_DEFAULTS.OLLAMA_REQUEST_TIMEOUT_MS)),
@@ -203,15 +238,21 @@ export function loadRuntimeConfig(env: NodeJS.ProcessEnv = process.env): Runtime
     visitorConversationHistoryEnabled: parsed.VISITOR_CONVERSATION_HISTORY_ENABLED,
     audioEchoCancellation: parsed.AUDIO_ECHO_CANCELLATION,
     audioNoiseSuppression: parsed.AUDIO_NOISE_SUPPRESSION,
+    audioCaptureSettingsDiagnosticsEnabled: parsed.AUDIO_CAPTURE_SETTINGS_DIAGNOSTICS_ENABLED,
     azureSpeechKey: parsed.AZURE_SPEECH_KEY,
     azureSpeechRegion: parsed.AZURE_SPEECH_REGION,
     azureTranslatorKey: parsed.AZURE_TRANSLATOR_KEY,
     azureTranslatorRegion: parsed.AZURE_TRANSLATOR_REGION,
     azureTranslatorEndpoint: parsed.AZURE_TRANSLATOR_ENDPOINT,
     translationProvider: parsed.TRANSLATION_PROVIDER,
+    providerLanguageContractMode: parsed.PROVIDER_LANGUAGE_CONTRACT_MODE,
     chatGptApiKey: parsed.CHATGPT_API_KEY,
     chatGptModel: parsed.CHATGPT_MODEL,
     chatGptTranscribeModel: parsed.CHATGPT_TRANSCRIBE_MODEL,
+    chatGptSttLanguagePromptEnabled: parsed.CHATGPT_STT_LANGUAGE_PROMPT_ENABLED,
+    chatGptTranslationDetectedLanguageMode: parsed.CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE,
+    openAiTtsLanguageInstructionsEnabled: parsed.OPENAI_TTS_LANGUAGE_INSTRUCTIONS_ENABLED,
+    azureTtsLangElementEnabled: parsed.AZURE_TTS_LANG_ELEMENT_ENABLED,
     ollamaBaseUrl: parsed.OLLAMA_BASE_URL,
     ollamaModel: parsed.OLLAMA_MODEL,
     ollamaRequestTimeoutMs: parsed.OLLAMA_REQUEST_TIMEOUT_MS,

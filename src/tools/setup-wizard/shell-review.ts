@@ -24,6 +24,13 @@ export function getSetupWizardReviewShellHtml(uiLanguage: SetupWizardUiLanguage 
       idleHardReset: "Idle hard reset",
       hardResetSeconds: "Hard reset seconds",
       audioAndSession: "Audio and session",
+      languageQuality: "Language quality",
+      languageContractMode: "Provider language contract",
+      chatGptSttPrompt: "ChatGPT STT language prompt",
+      chatGptDetectedLanguageMode: "ChatGPT detected language mode",
+      openAiTtsInstructions: "OpenAI TTS language instructions",
+      azureTtsLangElement: "Azure TTS SSML language",
+      audioDiagnostics: "Audio capture diagnostics",
       visitorHistory: "Visitor-side history",
       echoCancellation: "Echo cancellation",
       noiseSuppression: "Noise suppression",
@@ -54,6 +61,13 @@ export function getSetupWizardReviewShellHtml(uiLanguage: SetupWizardUiLanguage 
       idleHardReset: "Hard reset inattivita'",
       hardResetSeconds: "Secondi hard reset",
       audioAndSession: "Audio e sessione",
+      languageQuality: "Qualita lingua",
+      languageContractMode: "Contratto lingua provider",
+      chatGptSttPrompt: "Prompt lingua STT ChatGPT",
+      chatGptDetectedLanguageMode: "Detection lingua ChatGPT",
+      openAiTtsInstructions: "Istruzioni lingua TTS OpenAI",
+      azureTtsLangElement: "Lingua SSML TTS Azure",
+      audioDiagnostics: "Diagnostica acquisizione audio",
       visitorHistory: "Storico lato utente",
       echoCancellation: "Cancellazione eco",
       noiseSuppression: "Riduzione rumore",
@@ -84,6 +98,13 @@ export function getSetupWizardReviewShellHtml(uiLanguage: SetupWizardUiLanguage 
       idleHardReset: "Reinicio duro por inactividad",
       hardResetSeconds: "Segundos de reinicio duro",
       audioAndSession: "Audio y sesion",
+      languageQuality: "Calidad de idioma",
+      languageContractMode: "Contrato de idioma del proveedor",
+      chatGptSttPrompt: "Prompt de idioma STT ChatGPT",
+      chatGptDetectedLanguageMode: "Deteccion de idioma ChatGPT",
+      openAiTtsInstructions: "Instrucciones de idioma TTS OpenAI",
+      azureTtsLangElement: "Idioma SSML TTS Azure",
+      audioDiagnostics: "Diagnostico de captura audio",
       visitorHistory: "Historial del lado usuario",
       echoCancellation: "Cancelacion de eco",
       noiseSuppression: "Reduccion de ruido",
@@ -114,6 +135,13 @@ export function getSetupWizardReviewShellHtml(uiLanguage: SetupWizardUiLanguage 
       idleHardReset: "Reinitialisation dure d'inactivite",
       hardResetSeconds: "Secondes avant reinitialisation dure",
       audioAndSession: "Audio et session",
+      languageQuality: "Qualite de langue",
+      languageContractMode: "Contrat langue fournisseur",
+      chatGptSttPrompt: "Prompt langue STT ChatGPT",
+      chatGptDetectedLanguageMode: "Detection langue ChatGPT",
+      openAiTtsInstructions: "Instructions langue TTS OpenAI",
+      azureTtsLangElement: "Langue SSML TTS Azure",
+      audioDiagnostics: "Diagnostic capture audio",
       visitorHistory: "Historique cote utilisateur",
       echoCancellation: "Annulation d'echo",
       noiseSuppression: "Reduction du bruit",
@@ -144,6 +172,13 @@ export function getSetupWizardReviewShellHtml(uiLanguage: SetupWizardUiLanguage 
       idleHardReset: "Harter Leerlauf-Reset",
       hardResetSeconds: "Sekunden bis Hard Reset",
       audioAndSession: "Audio und Sitzung",
+      languageQuality: "Sprachqualitaet",
+      languageContractMode: "Anbieter-Sprachvertrag",
+      chatGptSttPrompt: "ChatGPT STT-Sprachprompt",
+      chatGptDetectedLanguageMode: "ChatGPT-Spracherkennung",
+      openAiTtsInstructions: "OpenAI TTS-Sprachanweisungen",
+      azureTtsLangElement: "Azure TTS SSML-Sprache",
+      audioDiagnostics: "Audioaufnahme-Diagnose",
       visitorHistory: "Verlauf auf der Nutzerseite",
       echoCancellation: "Echounterdrueckung",
       noiseSuppression: "Rauschunterdrueckung",
@@ -174,6 +209,13 @@ export function getSetupWizardReviewShellHtml(uiLanguage: SetupWizardUiLanguage 
       idleHardReset: "空闲硬重置",
       hardResetSeconds: "硬重置秒数",
       audioAndSession: "音频和会话",
+      languageQuality: "语言质量",
+      languageContractMode: "服务商语言约束",
+      chatGptSttPrompt: "ChatGPT STT 语言提示",
+      chatGptDetectedLanguageMode: "ChatGPT 检测语言模式",
+      openAiTtsInstructions: "OpenAI TTS 语言指令",
+      azureTtsLangElement: "Azure TTS SSML 语言",
+      audioDiagnostics: "音频采集诊断",
       visitorHistory: "用户侧历史",
       echoCancellation: "回声消除",
       noiseSuppression: "噪声抑制",
@@ -273,6 +315,29 @@ ${getSetupWizardDisclosureHtml({
                     <span>${copy.visitorHistory}</span>
                     <strong id="save-review-visitor-history"></strong>
                   </div>
+                </div>
+              </div>
+              <div class="card kiosk-card full-span">
+                <h3>${copy.languageQuality}</h3>
+                <div class="form-grid">
+                  <label>${copy.languageContractMode}
+                    <select id="env-PROVIDER_LANGUAGE_CONTRACT_MODE" data-env-key="PROVIDER_LANGUAGE_CONTRACT_MODE"></select>
+                  </label>
+                  <label>${copy.chatGptSttPrompt}
+                    <select id="env-CHATGPT_STT_LANGUAGE_PROMPT_ENABLED" data-env-key="CHATGPT_STT_LANGUAGE_PROMPT_ENABLED"></select>
+                  </label>
+                  <label>${copy.chatGptDetectedLanguageMode}
+                    <select id="env-CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE" data-env-key="CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE"></select>
+                  </label>
+                  <label>${copy.openAiTtsInstructions}
+                    <select id="env-OPENAI_TTS_LANGUAGE_INSTRUCTIONS_ENABLED" data-env-key="OPENAI_TTS_LANGUAGE_INSTRUCTIONS_ENABLED"></select>
+                  </label>
+                  <label>${copy.azureTtsLangElement}
+                    <select id="env-AZURE_TTS_LANG_ELEMENT_ENABLED" data-env-key="AZURE_TTS_LANG_ELEMENT_ENABLED"></select>
+                  </label>
+                  <label>${copy.audioDiagnostics}
+                    <select id="env-AUDIO_CAPTURE_SETTINGS_DIAGNOSTICS_ENABLED" data-env-key="AUDIO_CAPTURE_SETTINGS_DIAGNOSTICS_ENABLED"></select>
+                  </label>
                 </div>
               </div>
               <div class="card kiosk-card full-span">

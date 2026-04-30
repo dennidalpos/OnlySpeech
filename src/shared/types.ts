@@ -5,6 +5,8 @@ export type Side = "A" | "B";
 export type UiLanguage = string;
 
 export type TranslationProvider = "azure" | "chatgpt" | "ollama";
+export type ProviderLanguageContractMode = "strict" | "compatible";
+export type ChatGptTranslationDetectedLanguageMode = "off" | "diagnostic" | "adaptive";
 export type RuntimeDisclosureMode = "standard" | "custom" | "disabled";
 export type TextToSpeechEngine = "openai" | "azure";
 export type TextToSpeechContent = "transcript" | "translation" | "technical";
@@ -376,6 +378,7 @@ export interface SpeechStartCommand {
   chatGptSilenceRmsThreshold: number;
   audioEchoCancellation: boolean;
   audioNoiseSuppression: boolean;
+  audioCaptureSettingsDiagnosticsEnabled?: boolean;
 }
 
 export interface SpeechStopCommand {
@@ -401,6 +404,8 @@ export interface StartTextToSpeechCommand {
   chatGptApiKey?: string | null;
   chatGptTextToSpeechModel?: string | null;
   chatGptTextToSpeechVoice?: string | null;
+  openAiTtsLanguageInstructionsEnabled?: boolean | null;
+  azureTtsLangElementEnabled?: boolean | null;
 }
 
 export interface StopTextToSpeechCommand {
@@ -484,15 +489,21 @@ export interface RuntimeConfig {
   visitorConversationHistoryEnabled: boolean;
   audioEchoCancellation: boolean;
   audioNoiseSuppression: boolean;
+  audioCaptureSettingsDiagnosticsEnabled?: boolean;
   azureSpeechKey: string;
   azureSpeechRegion: string;
   azureTranslatorKey?: string;
   azureTranslatorRegion?: string;
   azureTranslatorEndpoint?: string | null;
   translationProvider: TranslationProvider;
+  providerLanguageContractMode?: ProviderLanguageContractMode;
   chatGptApiKey: string;
   chatGptModel: string;
   chatGptTranscribeModel: string;
+  chatGptSttLanguagePromptEnabled?: boolean;
+  chatGptTranslationDetectedLanguageMode?: ChatGptTranslationDetectedLanguageMode;
+  openAiTtsLanguageInstructionsEnabled?: boolean;
+  azureTtsLangElementEnabled?: boolean;
   ollamaBaseUrl: string;
   ollamaModel: string;
   ollamaRequestTimeoutMs: number;

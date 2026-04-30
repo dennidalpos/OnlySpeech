@@ -33,15 +33,21 @@ const RUNTIME_ENV_DEFAULTS = Object.freeze({
   VISITOR_CONVERSATION_HISTORY_ENABLED: "false",
   AUDIO_ECHO_CANCELLATION: "true",
   AUDIO_NOISE_SUPPRESSION: "true",
+  AUDIO_CAPTURE_SETTINGS_DIAGNOSTICS_ENABLED: "false",
   AZURE_SPEECH_KEY: "",
   AZURE_SPEECH_REGION: "",
   AZURE_TRANSLATOR_KEY: "",
   AZURE_TRANSLATOR_REGION: "",
   AZURE_TRANSLATOR_ENDPOINT: "",
   TRANSLATION_PROVIDER: "chatgpt",
+  PROVIDER_LANGUAGE_CONTRACT_MODE: "strict",
   CHATGPT_API_KEY: "",
   CHATGPT_MODEL: "gpt-4.1-mini",
   CHATGPT_TRANSCRIBE_MODEL: "gpt-4o-mini-transcribe",
+  CHATGPT_STT_LANGUAGE_PROMPT_ENABLED: "true",
+  CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE: "diagnostic",
+  OPENAI_TTS_LANGUAGE_INSTRUCTIONS_ENABLED: "true",
+  AZURE_TTS_LANG_ELEMENT_ENABLED: "true",
   OLLAMA_BASE_URL: "http://localhost:11434/api",
   OLLAMA_MODEL: "gemma3",
   OLLAMA_REQUEST_TIMEOUT_MS: "45000",
@@ -135,6 +141,10 @@ function normalizeMicrophonePttMode(value: string | undefined): MicrophonePttMod
     : DEFAULT_MICROPHONE_PTT_MODE;
 }
 
+function normalizeEnumValue<T extends string>(value: string, supported: readonly T[], fallback: T): T {
+  return supported.includes(value as T) ? (value as T) : fallback;
+}
+
 function normalizeRequiredMicrophones(
   value: string,
   appMode: AppMode,
@@ -169,6 +179,16 @@ export function normalizeRuntimeEnvValues(
 
   normalized.APP_MODE = normalizeAppMode(normalized.APP_MODE);
   normalized.MICROPHONE_PTT_MODE = normalizeMicrophonePttMode(normalized.MICROPHONE_PTT_MODE);
+  normalized.PROVIDER_LANGUAGE_CONTRACT_MODE = normalizeEnumValue(
+    normalized.PROVIDER_LANGUAGE_CONTRACT_MODE,
+    ["strict", "compatible"],
+    "strict"
+  );
+  normalized.CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE = normalizeEnumValue(
+    normalized.CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE,
+    ["off", "diagnostic", "adaptive"],
+    "diagnostic"
+  );
 
   for (const [key, rule] of Object.entries(NUMERIC_ENV_RULES) as Array<[RuntimeEnvKey, NumericRule]>) {
     if (key === "REQUIRED_MICROPHONES") {

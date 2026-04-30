@@ -1,4 +1,5 @@
 import { getSpeechReadyLanguages } from "../../shared/unified-language-registry.js";
+import { resolveTextToSpeechLanguageInstructions } from "../../shared/speech-flow.js";
 import type { StartTextToSpeechCommand } from "../../shared/types.js";
 import {
   ProviderPlayback,
@@ -190,6 +191,10 @@ export class OpenAiTextToSpeechProvider implements TextToSpeechProvider {
     voice: VoiceCandidate
   ): Promise<SynthesizedTextToSpeechAudio> {
     const config = await this.resolveConfig(true);
+    const languageInstructions =
+      command.openAiTtsLanguageInstructionsEnabled === false
+        ? undefined
+        : resolveTextToSpeechLanguageInstructions("chatgpt", command.language ?? voice.locale);
     const response = await this.fetchWithErrorMapping(OPENAI_TEXT_TO_SPEECH_ENDPOINT, {
       method: "POST",
       headers: {
@@ -200,7 +205,8 @@ export class OpenAiTextToSpeechProvider implements TextToSpeechProvider {
         model: config.model,
         voice: config.voice,
         input: command.text,
-        response_format: "mp3"
+        response_format: "mp3",
+        ...(languageInstructions ? { instructions: languageInstructions } : {})
       })
     });
     const audioBuffer = await response.arrayBuffer();

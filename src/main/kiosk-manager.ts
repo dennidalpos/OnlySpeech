@@ -125,6 +125,8 @@ export class KioskManager {
       azureSpeechKey: config.azureSpeechKey,
       azureSpeechRegion: config.azureSpeechRegion,
       chatGptApiKey: config.chatGptApiKey,
+      openAiTtsLanguageInstructionsEnabled: config.openAiTtsLanguageInstructionsEnabled,
+      azureTtsLangElementEnabled: config.azureTtsLangElementEnabled,
       sendCommand: (side, command) => this.displayRuntime.sendCommand(side, command)
     });
     this.idleController = new IdleController({

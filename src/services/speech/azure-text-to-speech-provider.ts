@@ -108,10 +108,15 @@ function buildSynthesisUrl(region: string): string {
 
 function createSsml(command: StartTextToSpeechCommand, voice: VoiceCandidate): string {
   const xmlLanguage = voice.locale || command.language || "en-US";
+  const escapedText = escapeXml(command.text);
+  const body =
+    command.azureTtsLangElementEnabled === false
+      ? escapedText
+      : `<lang xml:lang="${escapeXml(xmlLanguage)}">${escapedText}</lang>`;
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
     `<speak version="1.0" xml:lang="${escapeXml(xmlLanguage)}">`,
-    `<voice name="${escapeXml(voice.id)}">${escapeXml(command.text)}</voice>`,
+    `<voice name="${escapeXml(voice.id)}">${body}</voice>`,
     "</speak>"
   ].join("");
 }

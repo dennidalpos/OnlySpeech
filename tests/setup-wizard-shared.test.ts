@@ -159,6 +159,12 @@ describe("setup wizard shared state", () => {
     expect(envText).toContain("VISITOR_CONVERSATION_HISTORY_ENABLED=false");
     expect(envText).toContain("AUDIO_ECHO_CANCELLATION=true");
     expect(envText).toContain("AUDIO_NOISE_SUPPRESSION=true");
+    expect(envText).toContain("AUDIO_CAPTURE_SETTINGS_DIAGNOSTICS_ENABLED=false");
+    expect(envText).toContain("PROVIDER_LANGUAGE_CONTRACT_MODE=strict");
+    expect(envText).toContain("CHATGPT_STT_LANGUAGE_PROMPT_ENABLED=true");
+    expect(envText).toContain("CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE=diagnostic");
+    expect(envText).toContain("OPENAI_TTS_LANGUAGE_INSTRUCTIONS_ENABLED=true");
+    expect(envText).toContain("AZURE_TTS_LANG_ELEMENT_ENABLED=true");
     expect(envText).toContain("# chatgpt requires CHATGPT_API_KEY, CHATGPT_MODEL, and CHATGPT_TRANSCRIBE_MODEL.");
     expect(envText).toContain(
       "# azure requires AZURE_SPEECH_KEY and AZURE_SPEECH_REGION; normalized playback diagnostics also use AZURE_TRANSLATOR_KEY and AZURE_TRANSLATOR_REGION."
@@ -242,6 +248,12 @@ describe("setup wizard shared state", () => {
         RUNTIME_DISCLOSURE_CUSTOM_TEXT: "Custom wizard-managed notice",
         AUDIO_ECHO_CANCELLATION: "false",
         AUDIO_NOISE_SUPPRESSION: "false",
+        AUDIO_CAPTURE_SETTINGS_DIAGNOSTICS_ENABLED: "true",
+        PROVIDER_LANGUAGE_CONTRACT_MODE: "compatible",
+        CHATGPT_STT_LANGUAGE_PROMPT_ENABLED: "false",
+        CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE: "adaptive",
+        OPENAI_TTS_LANGUAGE_INSTRUCTIONS_ENABLED: "false",
+        AZURE_TTS_LANG_ELEMENT_ENABLED: "false",
         DEFAULT_TARGET_LANG_A: "fr",
         DEFAULT_TARGET_LANG_B: "de",
         LOG_LEVEL: "debug"
@@ -272,6 +284,12 @@ describe("setup wizard shared state", () => {
     });
     expect(reloadedConfig.audioEchoCancellation).toBe(false);
     expect(reloadedConfig.audioNoiseSuppression).toBe(false);
+    expect(reloadedConfig.audioCaptureSettingsDiagnosticsEnabled).toBe(true);
+    expect(reloadedConfig.providerLanguageContractMode).toBe("compatible");
+    expect(reloadedConfig.chatGptSttLanguagePromptEnabled).toBe(false);
+    expect(reloadedConfig.chatGptTranslationDetectedLanguageMode).toBe("adaptive");
+    expect(reloadedConfig.openAiTtsLanguageInstructionsEnabled).toBe(false);
+    expect(reloadedConfig.azureTtsLangElementEnabled).toBe(false);
     expect(reloadedConfig.defaultTargetLangA).toBe("fr");
     expect(reloadedConfig.defaultTargetLangB).toBe("de");
     expect(reloadedConfig.defaultSourceLangA).toBe("fr-FR");
@@ -306,6 +324,12 @@ describe("setup wizard shared state", () => {
         VISITOR_CONVERSATION_HISTORY_ENABLED: "true",
         AUDIO_ECHO_CANCELLATION: "false",
         AUDIO_NOISE_SUPPRESSION: "false",
+        AUDIO_CAPTURE_SETTINGS_DIAGNOSTICS_ENABLED: "true",
+        PROVIDER_LANGUAGE_CONTRACT_MODE: "compatible",
+        CHATGPT_STT_LANGUAGE_PROMPT_ENABLED: "false",
+        CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE: "adaptive",
+        OPENAI_TTS_LANGUAGE_INSTRUCTIONS_ENABLED: "false",
+        AZURE_TTS_LANG_ELEMENT_ENABLED: "false",
         AZURE_SPEECH_KEY: "azure-key",
         AZURE_SPEECH_REGION: "westeurope",
         TRANSLATION_PROVIDER: "azure",
@@ -366,6 +390,12 @@ describe("setup wizard shared state", () => {
     expect(parsedEnv.VISITOR_CONVERSATION_HISTORY_ENABLED).toBe("true");
     expect(parsedEnv.AUDIO_ECHO_CANCELLATION).toBe("false");
     expect(parsedEnv.AUDIO_NOISE_SUPPRESSION).toBe("false");
+    expect(parsedEnv.AUDIO_CAPTURE_SETTINGS_DIAGNOSTICS_ENABLED).toBe("true");
+    expect(parsedEnv.PROVIDER_LANGUAGE_CONTRACT_MODE).toBe("compatible");
+    expect(parsedEnv.CHATGPT_STT_LANGUAGE_PROMPT_ENABLED).toBe("false");
+    expect(parsedEnv.CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE).toBe("adaptive");
+    expect(parsedEnv.OPENAI_TTS_LANGUAGE_INSTRUCTIONS_ENABLED).toBe("false");
+    expect(parsedEnv.AZURE_TTS_LANG_ELEMENT_ENABLED).toBe("false");
     expect(parsedEnv.AZURE_SPEECH_KEY).toBe("azure-key");
     expect(parsedEnv.AZURE_SPEECH_REGION).toBe("westeurope");
     expect(parsedEnv.TRANSLATION_PROVIDER).toBe("azure");
@@ -398,6 +428,12 @@ describe("setup wizard shared state", () => {
     expect(reloadedConfig.visitorConversationHistoryEnabled).toBe(true);
     expect(reloadedConfig.audioEchoCancellation).toBe(false);
     expect(reloadedConfig.audioNoiseSuppression).toBe(false);
+    expect(reloadedConfig.audioCaptureSettingsDiagnosticsEnabled).toBe(true);
+    expect(reloadedConfig.providerLanguageContractMode).toBe("compatible");
+    expect(reloadedConfig.chatGptSttLanguagePromptEnabled).toBe(false);
+    expect(reloadedConfig.chatGptTranslationDetectedLanguageMode).toBe("adaptive");
+    expect(reloadedConfig.openAiTtsLanguageInstructionsEnabled).toBe(false);
+    expect(reloadedConfig.azureTtsLangElementEnabled).toBe(false);
     expect(reloadedConfig.azureSpeechKey).toBe("azure-key");
     expect(reloadedConfig.azureSpeechRegion).toBe("westeurope");
     expect(reloadedConfig.translationProvider).toBe("azure");

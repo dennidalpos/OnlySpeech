@@ -25,6 +25,8 @@ export function getSetupWizardControlHtml(uiLanguage: SetupWizardUiLanguage = "e
     translationTargetOptionGroupsByProvider,
     sourceLocaleByTargetLanguageByProvider,
     runtimeDisclosureDefaultsByLanguage,
+    providerLanguageContractModeOptions,
+    chatGptTranslationDetectedLanguageModeOptions,
     logLevelOptions
   } = getSetupWizardControlPageData(uiLanguage);
   return `<!doctype html>
@@ -59,8 +61,10 @@ ${getSetupWizardControlScript({
   translationTargetOptionGroupsByProvider,
   sourceLocaleByTargetLanguageByProvider,
   runtimeDisclosureDefaultsByLanguage,
+  providerLanguageContractModeOptions,
+  chatGptTranslationDetectedLanguageModeOptions,
   logLevelOptions
-})}
+})} 
     </script>
   </body>
 </html>`;

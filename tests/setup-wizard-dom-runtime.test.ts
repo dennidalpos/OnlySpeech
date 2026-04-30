@@ -27,6 +27,18 @@ describe("setup wizard executable DOM interactions", () => {
     expect(window.document.querySelector("#env-TEXT_TO_SPEECH_ENABLED")?.getAttribute("data-env-key")).toBe(
       "TEXT_TO_SPEECH_ENABLED"
     );
+    expect(window.document.querySelector("#env-PROVIDER_LANGUAGE_CONTRACT_MODE")?.getAttribute("data-env-key")).toBe(
+      "PROVIDER_LANGUAGE_CONTRACT_MODE"
+    );
+    expect(window.document.querySelector("#env-CHATGPT_STT_LANGUAGE_PROMPT_ENABLED")?.getAttribute("data-env-key")).toBe(
+      "CHATGPT_STT_LANGUAGE_PROMPT_ENABLED"
+    );
+    expect(window.document.querySelector("#env-AUDIO_CAPTURE_SETTINGS_DIAGNOSTICS_ENABLED")?.getAttribute("data-env-key")).toBe(
+      "AUDIO_CAPTURE_SETTINGS_DIAGNOSTICS_ENABLED"
+    );
+    expect(window.document.querySelector("#provider-speech-notices")?.textContent).toContain(
+      "STT / translation / TTS availability"
+    );
     expect(window.document.querySelector("#run-provider-speech-test")?.textContent).toContain("Start final-turn test");
     expect(window.document.querySelector("#toggle-monitor-setup")?.textContent).toContain("Open guided display setup");
     expect(window.document.querySelector("#toggle-monitor-setup .window-action-indicator")?.textContent).toContain(

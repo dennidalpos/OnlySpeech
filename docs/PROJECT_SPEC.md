@@ -44,7 +44,9 @@ Not supported by the repository contract:
 - `MICROPHONE_PTT_MODE=dual-dedicated` assigns one live microphone per side.
 - `MICROPHONE_PTT_MODE=single-shared` mirrors one selected microphone to both sides and alternates push-to-talk ownership.
 - The speaking side sees transcript text; the opposite side sees translated text.
+- Each selected runtime language resolves through the provider language contract: STT source locale, translation target code, canonical BCP-47 locale, TTS locale, display label, and provider capability metadata.
 - Text-to-speech is provider-owned only: Azure mode uses Azure TTS, ChatGPT mode uses OpenAI TTS, Ollama exposes no TTS path, and no local TTS fallback is part of the product contract.
+- Language detection returned by translation providers is diagnostic by default and must not override the configured source/target languages unless `adaptive` mode is explicitly enabled.
 - Text-to-speech stops on reset, language change, shutdown, or live push-to-talk capture.
 - Changing language after session start creates a new shared session and clears active conversation state for both sides.
 - Conversation history stays disabled unless explicitly enabled.
@@ -98,6 +100,18 @@ The setup wizard persists workstation configuration, validates provider settings
 
 `ollama` provider mode uses an Ollama server for translation-only chat validation and demo-side diagnostics. It does not provide live speech capture or playback, so full live kiosk speech remains blocked when `TRANSLATION_PROVIDER=ollama`.
 
+Provider language behavior is governed by the shared language registry and the provider capability matrix. Runtime code must use the existing `sourceLocale`, provider `targetCode`, canonical BCP-47 locale, and capability metadata instead of inventing fallback languages. Unsupported STT, translation, or TTS capability must be blocked or degraded according to the configured policy.
+
+Language and audio quality controls are configured globally through the setup wizard or `.env`:
+
+- `PROVIDER_LANGUAGE_CONTRACT_MODE`: `strict` keeps provider mappings fixed to the selected operator/visitor languages; `compatible` allows only provider-compatible normalization.
+- `CHATGPT_STT_LANGUAGE_PROMPT_ENABLED`: sends a source-language prompt for ChatGPT transcription while still using the official `language` hint when available.
+- `CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE`: `off`, `diagnostic`, or `adaptive`; the default is diagnostic metadata only.
+- `OPENAI_TTS_LANGUAGE_INSTRUCTIONS_ENABLED`: sends OpenAI TTS instructions for the selected language and accent.
+- `AZURE_TTS_LANG_ELEMENT_ENABLED`: wraps Azure TTS SSML text with a matching `<lang xml:lang>` element.
+- `AUDIO_CAPTURE_SETTINGS_DIAGNOSTICS_ENABLED`: logs non-sensitive `getSettings()` capture diagnostics when enabled.
+- `AUDIO_ECHO_CANCELLATION` and `AUDIO_NOISE_SUPPRESSION`: request browser capture processing for every provider path that uses `getUserMedia`; actual effectiveness remains browser/device/provider dependent.
+
 Provider account setup boundaries and official documentation links live in `docs/product/provider-setup.md`.
 
 ## Runtime Root And Persistence
@@ -118,6 +132,7 @@ Important externalized choices include:
 - `TRANSLATION_PROVIDER`: `azure`, `chatgpt`, or `ollama`;
 - microphone profile and side assignments;
 - operator and visitor default languages;
+- language and audio quality controls for STT, translation detection, TTS language enforcement, and capture diagnostics;
 - provider credentials, server endpoints, and model overrides;
 - conversation history setting;
 - setup access and packaged startup preferences.

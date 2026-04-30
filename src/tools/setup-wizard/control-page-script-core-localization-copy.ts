@@ -94,6 +94,8 @@ export function getSetupWizardControlCoreLocalizationCopyScript(initialWizardUiL
             providerSpeechAzureDetail: "Azure Speech resta in ascolto sul microfono selezionato.",
             providerSpeechChatGptDetail: "ChatGPT sta elaborando l'audio del turn finale.",
             providerSpeechOllamaDetail: "Ollama resta disponibile solo per traduzione testuale e diagnostica modello.",
+            providerCapabilityNote:
+              "Disponibilita STT / traduzione / TTS verificata sulle lingue selezionate nel registry del provider.",
             probeMicrophonesIdle: "Rileva microfoni",
             probeMicrophonesBusy: "Rilevamento...",
             probeMicrophonesDisabledReason: "Attendi la fine del rilevamento microfoni prima di avviare un nuovo probe.",
@@ -219,6 +221,8 @@ export function getSetupWizardControlCoreLocalizationCopyScript(initialWizardUiL
             providerSpeechAzureDetail: "Azure Speech is listening on the selected microphone.",
             providerSpeechChatGptDetail: "ChatGPT is processing the final-turn audio.",
             providerSpeechOllamaDetail: "Ollama remains available for text translation and model diagnostics only.",
+            providerCapabilityNote:
+              "STT / translation / TTS availability is checked against the selected provider language registry.",
             probeMicrophonesIdle: "Probe microphones",
             probeMicrophonesBusy: "Probing...",
             probeMicrophonesDisabledReason: "Wait for the current microphone probe to finish before starting a new probe.",

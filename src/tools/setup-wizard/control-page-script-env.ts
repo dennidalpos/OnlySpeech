@@ -21,7 +21,8 @@ export function getSetupWizardControlEnvScript(): string {
             providerSpeechAzureReady: "Azure supporta un percorso di validazione live sul microfono selezionato.",
             providerSpeechChatGptRecording: "ChatGPT sta registrando localmente un clip final-turn. Premi di nuovo per inviarlo.",
             providerSpeechChatGptReady: "ChatGPT usa il caricamento audio final-turn invece dello streaming live nel setup wizard.",
-            providerSpeechOllamaUnavailable: "Ollama e' disponibile solo per traduzione testuale e diagnostica modello. I test vocali live non sono supportati."
+            providerSpeechOllamaUnavailable: "Ollama e' disponibile solo per traduzione testuale e diagnostica modello. I test vocali live non sono supportati.",
+            providerCapabilityNote: "Disponibilita STT / traduzione / TTS verificata sulle lingue selezionate nel registry del provider."
           },
         en: {
             runtimeDisclosureHidden: "The AI notice is hidden in runtime and setup.",
@@ -44,7 +45,8 @@ export function getSetupWizardControlEnvScript(): string {
             providerSpeechAzureReady: "Azure supports a live microphone validation path on the selected microphone.",
             providerSpeechChatGptRecording: "ChatGPT is recording a final-turn clip locally. Press again to upload it.",
             providerSpeechChatGptReady: "ChatGPT uses final-turn audio upload instead of live streaming in the setup wizard.",
-            providerSpeechOllamaUnavailable: "Ollama is available for text translation and model diagnostics only. Live speech tests are not supported."
+            providerSpeechOllamaUnavailable: "Ollama is available for text translation and model diagnostics only. Live speech tests are not supported.",
+            providerCapabilityNote: "STT / translation / TTS availability is checked against the selected provider language registry."
           }
       };
       envCopyByLanguage.es = {
@@ -404,6 +406,7 @@ export function getSetupWizardControlEnvScript(): string {
         const configurationIssues = currentConfigurationIssues();
         const providerStateIssue = configurationIssues.find((issue) => issue.code === "unsupported-provider");
         const providerCredentialIssue = configurationIssues.find((issue) => issue.code === "missing-provider-credentials");
+        providerNotices.push('<div class="notice info">' + escapeHtml(envCopy.providerCapabilityNote) + '</div>');
         if (providerStateIssue) {
           providerNotices.push('<div class="notice warn">' + escapeHtml(localizeWizardIssue(providerStateIssue).message) + '</div>');
         }
@@ -421,6 +424,12 @@ export function getSetupWizardControlEnvScript(): string {
         const textToSpeechSelect = getCanonicalSelect("env-TEXT_TO_SPEECH_ENABLED");
         const echoCancellationSelect = getCanonicalSelect("env-AUDIO_ECHO_CANCELLATION");
         const noiseSuppressionSelect = getCanonicalSelect("env-AUDIO_NOISE_SUPPRESSION");
+        const providerLanguageContractModeSelect = getCanonicalSelect("env-PROVIDER_LANGUAGE_CONTRACT_MODE");
+        const chatGptSttLanguagePromptSelect = getCanonicalSelect("env-CHATGPT_STT_LANGUAGE_PROMPT_ENABLED");
+        const chatGptDetectedLanguageModeSelect = getCanonicalSelect("env-CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE");
+        const openAiTtsLanguageInstructionsSelect = getCanonicalSelect("env-OPENAI_TTS_LANGUAGE_INSTRUCTIONS_ENABLED");
+        const azureTtsLangElementSelect = getCanonicalSelect("env-AZURE_TTS_LANG_ELEMENT_ENABLED");
+        const audioCaptureSettingsDiagnosticsSelect = getCanonicalSelect("env-AUDIO_CAPTURE_SETTINGS_DIAGNOSTICS_ENABLED");
         const logLevelSelect = getCanonicalSelect("env-LOG_LEVEL");
         const sharedCredentialsCard = document.getElementById("provider-shared-credentials-card");
         const providerSpecificCard = document.getElementById("provider-specific-settings-card");
@@ -552,6 +561,18 @@ export function getSetupWizardControlEnvScript(): string {
         echoCancellationSelect.value = normalizeBooleanEnv(state.envValues.AUDIO_ECHO_CANCELLATION, "true");
         noiseSuppressionSelect.innerHTML = booleanOptionsHtml(state.envValues.AUDIO_NOISE_SUPPRESSION || "true");
         noiseSuppressionSelect.value = normalizeBooleanEnv(state.envValues.AUDIO_NOISE_SUPPRESSION, "true");
+        providerLanguageContractModeSelect.innerHTML = genericOptionsHtml(providerLanguageContractModeOptions, state.envValues.PROVIDER_LANGUAGE_CONTRACT_MODE || "strict");
+        providerLanguageContractModeSelect.value = state.envValues.PROVIDER_LANGUAGE_CONTRACT_MODE || "strict";
+        chatGptSttLanguagePromptSelect.innerHTML = booleanOptionsHtml(state.envValues.CHATGPT_STT_LANGUAGE_PROMPT_ENABLED || "true");
+        chatGptSttLanguagePromptSelect.value = normalizeBooleanEnv(state.envValues.CHATGPT_STT_LANGUAGE_PROMPT_ENABLED, "true");
+        chatGptDetectedLanguageModeSelect.innerHTML = genericOptionsHtml(chatGptTranslationDetectedLanguageModeOptions, state.envValues.CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE || "diagnostic");
+        chatGptDetectedLanguageModeSelect.value = state.envValues.CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE || "diagnostic";
+        openAiTtsLanguageInstructionsSelect.innerHTML = booleanOptionsHtml(state.envValues.OPENAI_TTS_LANGUAGE_INSTRUCTIONS_ENABLED || "true");
+        openAiTtsLanguageInstructionsSelect.value = normalizeBooleanEnv(state.envValues.OPENAI_TTS_LANGUAGE_INSTRUCTIONS_ENABLED, "true");
+        azureTtsLangElementSelect.innerHTML = booleanOptionsHtml(state.envValues.AZURE_TTS_LANG_ELEMENT_ENABLED || "true");
+        azureTtsLangElementSelect.value = normalizeBooleanEnv(state.envValues.AZURE_TTS_LANG_ELEMENT_ENABLED, "true");
+        audioCaptureSettingsDiagnosticsSelect.innerHTML = booleanOptionsHtml(state.envValues.AUDIO_CAPTURE_SETTINGS_DIAGNOSTICS_ENABLED || "false");
+        audioCaptureSettingsDiagnosticsSelect.value = normalizeBooleanEnv(state.envValues.AUDIO_CAPTURE_SETTINGS_DIAGNOSTICS_ENABLED, "false");
         logLevelSelect.innerHTML = genericOptionsHtml(logLevelOptions, state.envValues.LOG_LEVEL || "info");
         logLevelSelect.value = state.envValues.LOG_LEVEL || "info";
         if (visitorHistoryReview) {
@@ -618,7 +639,7 @@ export function getSetupWizardControlEnvScript(): string {
 
         renderProviderValidationNotices();
 
-        ["SELECTOR_UI_LANGUAGE_A","SELECTOR_UI_LANGUAGE_B","LOG_LEVEL","AZURE_SPEECH_KEY","AZURE_SPEECH_REGION","AZURE_TRANSLATOR_KEY","AZURE_TRANSLATOR_REGION","AZURE_TRANSLATOR_ENDPOINT","TEXT_TO_SPEECH_ENABLED","VISITOR_CONVERSATION_HISTORY_ENABLED","AUDIO_ECHO_CANCELLATION","AUDIO_NOISE_SUPPRESSION","CHATGPT_MODEL","CHATGPT_TRANSCRIBE_MODEL","OLLAMA_BASE_URL","OLLAMA_MODEL","OLLAMA_REQUEST_TIMEOUT_MS","OLLAMA_STREAMING_ENABLED","OLLAMA_API_KEY","DEMO_SLIDE_INTERVAL_SECONDS"].forEach((key) => {
+        ["SELECTOR_UI_LANGUAGE_A","SELECTOR_UI_LANGUAGE_B","LOG_LEVEL","AZURE_SPEECH_KEY","AZURE_SPEECH_REGION","AZURE_TRANSLATOR_KEY","AZURE_TRANSLATOR_REGION","AZURE_TRANSLATOR_ENDPOINT","TEXT_TO_SPEECH_ENABLED","VISITOR_CONVERSATION_HISTORY_ENABLED","AUDIO_ECHO_CANCELLATION","AUDIO_NOISE_SUPPRESSION","AUDIO_CAPTURE_SETTINGS_DIAGNOSTICS_ENABLED","PROVIDER_LANGUAGE_CONTRACT_MODE","CHATGPT_STT_LANGUAGE_PROMPT_ENABLED","CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE","OPENAI_TTS_LANGUAGE_INSTRUCTIONS_ENABLED","AZURE_TTS_LANG_ELEMENT_ENABLED","CHATGPT_MODEL","CHATGPT_TRANSCRIBE_MODEL","OLLAMA_BASE_URL","OLLAMA_MODEL","OLLAMA_REQUEST_TIMEOUT_MS","OLLAMA_STREAMING_ENABLED","OLLAMA_API_KEY","DEMO_SLIDE_INTERVAL_SECONDS"].forEach((key) => {
           const element = document.getElementById("env-" + key);
           element.oninput = () => {
             const nextValue =
@@ -775,6 +796,7 @@ export function getSetupWizardControlEnvScript(): string {
         const notices = [];
         const selectedProvider = state.envValues.TRANSLATION_PROVIDER || "chatgpt";
         const disabledState = currentProviderSpeechDisabledState();
+        notices.push('<div class="notice info">' + escapeHtml(envCopy.providerCapabilityNote) + '</div>');
         if (selectedProvider === "ollama") {
           notices.push('<div class="notice info">' + escapeHtml(envCopy.providerSpeechOllamaUnavailable) + '</div>');
         } else if (!state.microphonePermissionGranted) {

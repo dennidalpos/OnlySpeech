@@ -138,7 +138,8 @@ export class KioskSpeechController {
       azureRegion: this.options.config.azureSpeechRegion,
       chatGptSilenceRmsThreshold: this.options.config.chatGptSilenceRmsThreshold,
       audioEchoCancellation: this.options.config.audioEchoCancellation,
-      audioNoiseSuppression: this.options.config.audioNoiseSuppression
+      audioNoiseSuppression: this.options.config.audioNoiseSuppression,
+      audioCaptureSettingsDiagnosticsEnabled: this.options.config.audioCaptureSettingsDiagnosticsEnabled
     });
   }
 

@@ -116,19 +116,29 @@ function buildTranslationPrompt(request: TranslationRequest, isPartial: boolean)
     .join("\n");
 }
 
-function buildSpeechTurnTranslationPrompt(request: TranslationRequest, isPartial: boolean): string {
+function buildSpeechTurnTranslationPrompt(
+  request: TranslationRequest,
+  isPartial: boolean,
+  detectedLanguageMode: RuntimeConfig["chatGptTranslationDetectedLanguageMode"]
+): string {
   const providerTargetLanguage =
     resolveProviderTargetLanguageCode(request.targetLanguage, request.provider, {
       includeProviderExpansions: true
     }) ?? request.targetLanguage;
+  const detectedLanguageInstruction =
+    detectedLanguageMode === "off"
+      ? 'Return strict JSON with key "translation" only.'
+      : 'Return strict JSON with keys "translation" and "detected_language". Use null for "detected_language" when unclear. The detected language is diagnostic metadata only unless runtime configuration explicitly enables adaptive source language mode.';
 
   return [
     `Configured source locale hint: ${request.sourceLanguage}`,
     `Target language: ${providerTargetLanguage}`,
     "Translate the spoken text naturally for a live conversation.",
-    "Infer the dominant spoken language from the transcript and return only its ISO 639-1 or ISO 639-3 code when clear.",
+    detectedLanguageMode === "off"
+      ? null
+      : "Infer the dominant spoken language from the transcript and return only its ISO 639-1 or ISO 639-3 code when clear.",
     isPartial ? "The utterance may be incomplete because it comes from a live partial capture." : null,
-    'Return strict JSON with keys "translation" and "detected_language". Use null for "detected_language" when unclear.',
+    detectedLanguageInstruction,
     "",
     request.text
   ]
@@ -450,7 +460,11 @@ export class TranslationProviderService {
     const translatedTurn = await this.translateSpeechTurnWithChatGpt(
       {
         provider: "chatgpt",
-        sourceLanguage: resolveSpeechTurnSourceLanguage(request.sourceLanguage, transcription.detectedLanguage),
+        sourceLanguage: resolveSpeechTurnSourceLanguage(
+          request.sourceLanguage,
+          transcription.detectedLanguage,
+          this.config.chatGptTranslationDetectedLanguageMode ?? "diagnostic"
+        ),
         targetLanguage: request.targetLanguage,
         text: transcription.transcript
       },
@@ -623,7 +637,11 @@ export class TranslationProviderService {
           },
           {
             role: "user",
-            content: buildSpeechTurnTranslationPrompt(request, isPartial)
+            content: buildSpeechTurnTranslationPrompt(
+              request,
+              isPartial,
+              this.config.chatGptTranslationDetectedLanguageMode ?? "diagnostic"
+            )
           }
         ]
       })
@@ -714,7 +732,9 @@ export class TranslationProviderService {
     if (languageHint) {
       formData.append("language", languageHint);
     }
-    const transcriptionPrompt = resolveChatGptTranscriptionPrompt(request.sourceLanguage);
+    const transcriptionPrompt = resolveChatGptTranscriptionPrompt(request.sourceLanguage, {
+      alwaysInclude: this.config.chatGptSttLanguagePromptEnabled !== false
+    });
     if (transcriptionPrompt) {
       formData.append("prompt", transcriptionPrompt);
     }

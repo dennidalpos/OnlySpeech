@@ -31,15 +31,21 @@ export const RUNTIME_ENV_FIELDS = [
   { key: "VISITOR_CONVERSATION_HISTORY_ENABLED", defaultValue: "false" },
   { key: "AUDIO_ECHO_CANCELLATION", defaultValue: "true" },
   { key: "AUDIO_NOISE_SUPPRESSION", defaultValue: "true" },
+  { key: "AUDIO_CAPTURE_SETTINGS_DIAGNOSTICS_ENABLED", defaultValue: "false" },
   { key: "AZURE_SPEECH_KEY", defaultValue: "", secret: true },
   { key: "AZURE_SPEECH_REGION", defaultValue: "" },
   { key: "AZURE_TRANSLATOR_KEY", defaultValue: "", secret: true },
   { key: "AZURE_TRANSLATOR_REGION", defaultValue: "" },
   { key: "AZURE_TRANSLATOR_ENDPOINT", defaultValue: "" },
   { key: "TRANSLATION_PROVIDER", defaultValue: "chatgpt" },
+  { key: "PROVIDER_LANGUAGE_CONTRACT_MODE", defaultValue: "strict" },
   { key: "CHATGPT_API_KEY", defaultValue: "", secret: true },
   { key: "CHATGPT_MODEL", defaultValue: "gpt-4.1-mini" },
   { key: "CHATGPT_TRANSCRIBE_MODEL", defaultValue: "gpt-4o-mini-transcribe" },
+  { key: "CHATGPT_STT_LANGUAGE_PROMPT_ENABLED", defaultValue: "true" },
+  { key: "CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE", defaultValue: "diagnostic" },
+  { key: "OPENAI_TTS_LANGUAGE_INSTRUCTIONS_ENABLED", defaultValue: "true" },
+  { key: "AZURE_TTS_LANG_ELEMENT_ENABLED", defaultValue: "true" },
   { key: "OLLAMA_BASE_URL", defaultValue: "http://localhost:11434/api" },
   { key: "OLLAMA_MODEL", defaultValue: "gemma3" },
   { key: "OLLAMA_REQUEST_TIMEOUT_MS", defaultValue: "45000" },
@@ -85,6 +91,12 @@ const ENV_EXAMPLE_INLINE_COMMENTS: Readonly<Partial<Record<RuntimeEnvKey, readon
   ],
   VISITOR_CONVERSATION_HISTORY_ENABLED: [
     "# Keep disabled for privacy-first deployments unless the setup wizard is intentionally used to enable on-screen history."
+  ],
+  PROVIDER_LANGUAGE_CONTRACT_MODE: [
+    "# `strict` keeps provider language mappings fixed to the selected operator/visitor languages; `compatible` allows provider-compatible normalization only."
+  ],
+  CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE: [
+    "# `diagnostic` records detected language metadata without changing configured source/target; use `adaptive` only for controlled tests."
   ],
   OLLAMA_BASE_URL: [
     "# Local Ollama defaults to http://localhost:11434/api; keep this as runtime configuration, not a secret."

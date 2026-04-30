@@ -23,6 +23,8 @@ export interface SetupWizardControlScriptData {
   translationTargetOptionGroupsByProvider: string;
   sourceLocaleByTargetLanguageByProvider: string;
   runtimeDisclosureDefaultsByLanguage: string;
+  providerLanguageContractModeOptions: string;
+  chatGptTranslationDetectedLanguageModeOptions: string;
   logLevelOptions: string;
   initialWizardSection: string;
   initialWizardUiLanguage: string;
