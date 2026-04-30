@@ -114,7 +114,7 @@ export function resolveSpeechStartParameters(options: {
   sourceLanguage: string | null;
 }): SpeechStartParameters {
   return {
-    sourceLanguage: options.sourceLanguage?.trim() || "en-US"
+    sourceLanguage: options.sourceLanguage?.trim() || "en-GB"
   };
 }
 
@@ -126,7 +126,7 @@ export function resolveSideSpeechStartParameters(
     sideState.sourceLanguage?.trim() ||
     resolveSynchronizedSourceLanguage(
       sideState.selectedTargetLanguage ?? sideState.normalizedTargetLanguage,
-      "en-US",
+      "en-GB",
       translationProvider
     );
 

@@ -79,7 +79,7 @@ describe("SessionStore", () => {
     expect(store.getState().sides.B.effectiveUiLanguage).toBe("en");
     expect(store.getState().sides.B.usesEnglishUiFallback).toBe(false);
     expect(store.getState().sides.B.selectedTargetLanguage).toBe("en");
-    expect(store.getState().sides.B.sourceLanguage).toBe("en-US");
+    expect(store.getState().sides.B.sourceLanguage).toBe("en-GB");
     expect(store.getState().sides.B.detectedSourceLanguage).toBeNull();
 
     store.setTargetLanguage("A", "it");
@@ -124,7 +124,7 @@ describe("SessionStore", () => {
     expect(store.getState().sides.A.selectedTargetLanguage).toBe("it");
     expect(store.getState().sides.A.sourceLanguage).toBe("it-IT");
     expect(store.getState().sides.B.selectedTargetLanguage).toBe("en");
-    expect(store.getState().sides.B.sourceLanguage).toBe("en-US");
+    expect(store.getState().sides.B.sourceLanguage).toBe("en-GB");
     expect(store.getState().sides.A.hasCommittedLanguageSelection).toBe(false);
     expect(store.getState().sides.B.hasCommittedLanguageSelection).toBe(false);
     expect(store.getState().sides.A.status).toBe("language-selection");
@@ -140,7 +140,7 @@ describe("SessionStore", () => {
       defaultTargetLangA: "en"
     });
 
-    expect(store.getState().sides.A.sourceLanguage).toBe("en-US");
+    expect(store.getState().sides.A.sourceLanguage).toBe("en-GB");
 
     store.setTargetLanguage("A", "fr");
 
@@ -151,7 +151,7 @@ describe("SessionStore", () => {
   it("keeps the visitor side fixed to the same language chosen in the full-screen selector", () => {
     const store = new SessionStore(createConfig());
 
-    expect(store.getState().sides.B.sourceLanguage).toBe("en-US");
+    expect(store.getState().sides.B.sourceLanguage).toBe("en-GB");
 
     store.setTargetLanguage("B", "ja");
 
@@ -193,7 +193,7 @@ describe("SessionStore", () => {
     expect(store.getState().sides.A.selectedTargetLanguage).toBe("it");
     expect(store.getState().sides.A.sourceLanguage).toBe("it-IT");
     expect(store.getState().sides.B.selectedTargetLanguage).toBe("en");
-    expect(store.getState().sides.B.sourceLanguage).toBe("en-US");
+    expect(store.getState().sides.B.sourceLanguage).toBe("en-GB");
   });
 
   it("starts a new shared session on language change while preserving the opposite side language", () => {
@@ -279,6 +279,26 @@ describe("SessionStore", () => {
         sourceLanguage: "es-MX",
         transcript: "hola",
         translation: "hello"
+      })
+    ]);
+  });
+
+  it("stores canonical british english in history when providers report a regional english alias", () => {
+    const store = new SessionStore(createConfig());
+    store.setHealth(createHealthyState());
+    store.setTargetLanguage("A", "en");
+
+    store.updateSpeech("A", "hello", "ciao", "en-US");
+    store.appendConversationTurn("A", "hello", "ciao", "en-US");
+
+    const state = store.getState();
+    expect(state.sides.A.sourceLanguage).toBe("en-GB");
+    expect(state.sides.A.detectedSourceLanguage).toBe("en-GB");
+    expect(state.conversationHistory).toEqual([
+      expect.objectContaining({
+        sourceLanguage: "en-GB",
+        transcript: "hello",
+        translation: "ciao"
       })
     ]);
   });

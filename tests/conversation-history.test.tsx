@@ -59,6 +59,7 @@ describe("ConversationHistory", () => {
     expect(html).toContain("Station B");
     expect(html).toContain("Auto");
     expect(html).toContain("Inglese");
+    expect(html).not.toContain("Stati Uniti");
     expect(html).toContain("Italiano");
     expect(html).toContain("Buongiorno");
     expect(html).not.toContain("Good morning");
@@ -116,6 +117,33 @@ describe("ConversationHistory", () => {
     expect(html).not.toContain("-&gt; Portoghese (Brasile)");
   });
 
+  it("renders regional english source aliases as the canonical british english runtime language", () => {
+    const html = renderToStaticMarkup(
+      <ConversationHistory
+        title="Conversation history"
+        emptyHint="No confirmed turns yet."
+        speakerLabels={{ A: "Station A", B: "Station B" }}
+        entries={[
+          {
+            id: "turn-1",
+            sequence: 1,
+            speakerSide: "A",
+            transcript: "Hello",
+            translation: "Ciao",
+            sourceLanguage: "en-US",
+            targetLanguage: "it"
+          }
+        ]}
+        viewerSide="A"
+        field="transcript"
+      />
+    );
+
+    expect(html).toContain("Inglese");
+    expect(html).not.toContain("American English");
+    expect(html).not.toContain("Stati Uniti");
+  });
+
   it("avoids italian fallback labels in visitor history metadata when a localized display locale is provided", () => {
     const html = renderToStaticMarkup(
       <ConversationHistory
@@ -130,7 +158,7 @@ describe("ConversationHistory", () => {
             transcript: "Γεια",
             translation: "Hello",
             sourceLanguage: null,
-            targetLanguage: "en-us"
+            targetLanguage: "en"
           },
           {
             id: "turn-2",

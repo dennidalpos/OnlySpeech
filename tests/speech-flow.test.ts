@@ -113,7 +113,7 @@ describe("speech-flow", () => {
   it("uses detected language only when ChatGPT translation detection is adaptive", () => {
     expect(resolveSpeechTurnSourceLanguage("it-IT", "en-US", "diagnostic")).toBe("it-IT");
     expect(resolveSpeechTurnSourceLanguage("it-IT", "en-US", "off")).toBe("it-IT");
-    expect(resolveSpeechTurnSourceLanguage("it-IT", "en-US", "adaptive")).toBe("en-US");
+    expect(resolveSpeechTurnSourceLanguage("it-IT", "en-US", "adaptive")).toBe("en-GB");
   });
 
   it("resolves one provider language contract for representative language pairs", () => {
@@ -148,7 +148,7 @@ describe("speech-flow", () => {
       sourceLanguage: "it-IT"
     });
     expect(resolveSideSpeechStartParameters("chatgpt", createSideState({ sourceLanguage: null }))).toEqual({
-      sourceLanguage: "en-US"
+      sourceLanguage: "en-GB"
     });
   });
 });

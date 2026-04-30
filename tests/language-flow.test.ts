@@ -44,9 +44,9 @@ describe("language-flow", () => {
   it("exposes the same centralized source-locale mapping used by the wizard", () => {
     const sourceLocaleMap = buildInteractionLanguageSourceLocaleMap();
     expect(sourceLocaleMap.it).toBe("it-IT");
-    expect(sourceLocaleMap.en).toBe("en-US");
-    expect(sourceLocaleMap["en-gb"]).toBe("en-GB");
-    expect(sourceLocaleMap["en-us"]).toBe("en-US");
+    expect(sourceLocaleMap.en).toBe("en-GB");
+    expect(sourceLocaleMap["en-gb"]).toBeUndefined();
+    expect(sourceLocaleMap["en-us"]).toBeUndefined();
     expect(sourceLocaleMap.bn).toBe("bn-IN");
     expect(sourceLocaleMap.ur).toBe("ur-IN");
     expect(sourceLocaleMap.yue).toBe("yue-CN");
@@ -71,20 +71,12 @@ describe("language-flow", () => {
       macroAreaLabel: "Americhe",
       macroAreas: ["americas"]
     });
-    expect(choices.find((choice) => choice.value === "en-us")).toMatchObject({
-      macroArea: "americas",
-      regionCode: "US",
-      sourceLocale: "en-US"
-    });
-    expect(choices.find((choice) => choice.value === "en-gb")).toMatchObject({
+    expect(choices.find((choice) => choice.value === "en")).toMatchObject({
       macroArea: "europe",
+      macroAreaLabel: "Europa",
+      macroAreas: ["europe", "oceania"],
       regionCode: "GB",
       sourceLocale: "en-GB"
-    });
-    expect(choices.find((choice) => choice.value === "en")).toMatchObject({
-      macroArea: "americas",
-      macroAreaLabel: "Americhe",
-      macroAreas: ["americas", "oceania"]
     });
     expect(choices.find((choice) => choice.value === "sw")).toMatchObject({
       macroArea: "africa",
@@ -95,10 +87,10 @@ describe("language-flow", () => {
       macroAreaLabel: "Asia",
       macroAreas: ["asia"]
     });
-    expect(choices).toHaveLength(56);
+    expect(choices).toHaveLength(53);
   });
 
-  it("keeps a fixed 56-language baseline while filtering provider support and exposing expansions on demand", () => {
+  it("keeps a fixed 53-language baseline while filtering provider support and exposing expansions on demand", () => {
     const baselineChoices = buildInteractionLanguageChoices().map((choice) => choice.value);
     const chatGptChoices = buildInteractionLanguageChoices("chatgpt").map((choice) => choice.value);
     const azureChoices = buildInteractionLanguageChoices("azure").map((choice) => choice.value);
@@ -108,9 +100,13 @@ describe("language-flow", () => {
 
     expect(baselineChoices).toContain("sq");
     expect(baselineChoices).toContain("yue");
-    expect(chatGptChoices).toContain("en-gb");
-    expect(chatGptChoices).toContain("pt-pt");
+    expect(chatGptChoices).toContain("en");
+    expect(chatGptChoices).toContain("pt");
     expect(chatGptChoices).toContain("sq");
+    expect(chatGptChoices).not.toContain("en-gb");
+    expect(chatGptChoices).not.toContain("en-us");
+    expect(chatGptChoices).not.toContain("fr-ca");
+    expect(chatGptChoices).not.toContain("pt-pt");
     expect(chatGptChoices).not.toContain("yue");
     expect(chatGptChoices).not.toContain("am");
     expect(azureChoices).toContain("sq");
@@ -118,7 +114,6 @@ describe("language-flow", () => {
     expect(expandedChoices).toContain("sl");
     expect(expandedChoices).toContain("sq");
     expect(expandedChoices).toContain("be");
-    expect(expandedChoices).toContain("fr-ca");
     expect(expandedChoices).toContain("kk");
     expect(expandedChoices).toContain("eu");
     expect(expandedChoices).toContain("gl");
@@ -129,6 +124,7 @@ describe("language-flow", () => {
     expect(expandedChoices).toContain("si");
     expect(expandedChoices).toContain("so");
     expect(expandedChoices).toContain("uz");
+    expect(expandedChoices).not.toContain("fr-ca");
     expect(expandedChoices).not.toContain("as");
     expect(expandedChoices).not.toContain("or");
   });
@@ -138,10 +134,10 @@ describe("language-flow", () => {
     const commonSourceLocaleMap = buildCommonProviderInteractionLanguageSourceLocaleMap("azure");
     const commonTargetGroups = buildCommonProviderTranslationTargetOptionGroups("azure");
 
-    expect(COMMON_PROVIDER_INTERACTION_LANGUAGE_COUNT).toBe(68);
-    expect(COMMON_PROVIDER_TRANSLATION_TARGET_LANGUAGE_COUNT).toBe(69);
-    expect(commonChoices).toHaveLength(68);
-    expect(getCommonProviderTranslationTargetLanguageCodes()).toHaveLength(69);
+    expect(COMMON_PROVIDER_INTERACTION_LANGUAGE_COUNT).toBe(64);
+    expect(COMMON_PROVIDER_TRANSLATION_TARGET_LANGUAGE_COUNT).toBe(65);
+    expect(commonChoices).toHaveLength(64);
+    expect(getCommonProviderTranslationTargetLanguageCodes()).toHaveLength(65);
     expect(commonChoices).toContain("ka");
     expect(commonChoices).toContain("sl");
     expect(commonChoices).not.toContain("am");
@@ -289,6 +285,8 @@ describe("language-flow", () => {
 
   it("normalizes provider-detected base languages to the preferred canonical speech locale", () => {
     expect(resolveDetectedSourceLanguageOption("it")?.value).toBe("it-IT");
+    expect(resolveDetectedSourceLanguageOption("en")?.value).toBe("en-GB");
+    expect(resolveDetectedSourceLanguageOption("en-US")?.value).toBe("en-GB");
     expect(resolveDetectedSourceLanguageOption("bn")?.value).toBe("bn-IN");
     expect(resolveDetectedSourceLanguageOption("ur")?.value).toBe("ur-IN");
   });
@@ -296,10 +294,10 @@ describe("language-flow", () => {
   it("normalizes provider and locale aliases to the canonical product-language codes", () => {
     expect(normalizeInteractionLanguage("zh-CN", "chatgpt", "en")).toBe("zh-Hans");
     expect(normalizeInteractionLanguage("zh-TW", "chatgpt", "en")).toBe("zh-Hant");
-    expect(normalizeInteractionLanguage("fr-CA", "chatgpt", "en", { includeProviderExpansions: true })).toBe(
-      "fr-ca"
-    );
-    expect(normalizeInteractionLanguage("pt-PT", "chatgpt", "en")).toBe("pt-pt");
+    expect(normalizeInteractionLanguage("en-US", "chatgpt", "it")).toBe("en");
+    expect(normalizeInteractionLanguage("en-GB", "chatgpt", "it")).toBe("en");
+    expect(normalizeInteractionLanguage("fr-CA", "chatgpt", "en", { includeProviderExpansions: true })).toBe("fr");
+    expect(normalizeInteractionLanguage("pt-PT", "chatgpt", "en")).toBe("pt");
   });
 
   it("keeps every provider-expanded interaction language selectable without falling back to the wizard defaults", () => {

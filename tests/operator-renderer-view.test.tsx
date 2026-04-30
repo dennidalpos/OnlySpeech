@@ -304,17 +304,17 @@ describe("operator renderer view state", () => {
   });
 
   it("can hide macro-area metadata for the visitor language chip", () => {
-    const americanEnglish = buildInteractionLanguageChoices().find((choice) => choice.value === "en-us") ?? null;
+    const english = buildInteractionLanguageChoices().find((choice) => choice.value === "en") ?? null;
     const html = renderToStaticMarkup(
       <LanguageHeaderChip
         title="Language"
-        choice={americanEnglish}
+        choice={english}
         fallbackLabel="-"
         showMeta={false}
       />
     );
 
-    expect(html).toContain("American English");
+    expect(html).toContain("English");
     expect(html).not.toContain("Americhe");
   });
 

@@ -27,6 +27,19 @@ const PREFERRED_SOURCE_LOCALE_BY_LANGUAGE_CODE = Object.freeze(
   )
 ) as Record<string, string>;
 
+const SOURCE_LANGUAGE_VALUE_ALIASES = new Map<string, string>();
+
+for (const entry of CANONICAL_INTERACTION_LANGUAGES) {
+  SOURCE_LANGUAGE_VALUE_ALIASES.set(entry.code.toLowerCase(), entry.preferredSourceLocale);
+  SOURCE_LANGUAGE_VALUE_ALIASES.set(entry.preferredSourceLocale.toLowerCase(), entry.preferredSourceLocale);
+  SOURCE_LANGUAGE_VALUE_ALIASES.set(entry.displayLocale.toLowerCase(), entry.preferredSourceLocale);
+}
+
+SOURCE_LANGUAGE_VALUE_ALIASES.set("en-us", "en-GB");
+SOURCE_LANGUAGE_VALUE_ALIASES.set("en-gb", "en-GB");
+SOURCE_LANGUAGE_VALUE_ALIASES.set("fr-ca", "fr-FR");
+SOURCE_LANGUAGE_VALUE_ALIASES.set("pt-pt", "pt-BR");
+
 export const DEFAULT_INTERACTION_LANGUAGE_CODES = CANONICAL_INTERACTION_LANGUAGES.map((entry) =>
   entry.tier === "baseline" ? entry.code : null
 ).filter((entry): entry is string => entry !== null);
@@ -84,7 +97,11 @@ export function findSourceLanguageOption(value: string | null | undefined): Sour
     return AUTO_SOURCE_LANGUAGE_OPTION;
   }
 
-  return SUPPORTED_SOURCE_LANGUAGE_OPTIONS.find((option) => option.value === value) ?? resolveDerivedSourceLanguageOption(value);
+  const normalizedValue = value.trim().toLowerCase();
+  const aliasedValue = SOURCE_LANGUAGE_VALUE_ALIASES.get(normalizedValue);
+  const lookupValue = aliasedValue ?? value;
+
+  return SUPPORTED_SOURCE_LANGUAGE_OPTIONS.find((option) => option.value === lookupValue) ?? resolveDerivedSourceLanguageOption(lookupValue);
 }
 
 export function resolveDetectedSourceLanguageOption(value: string | null | undefined): SourceLanguageOption | null {

@@ -62,7 +62,7 @@ function createLocalizedSideState(
   const sourceState = {
     sourceLanguage: resolveSynchronizedSourceLanguage(
       effectiveTargetLanguage,
-      "en-US",
+      "en-GB",
       config.translationProvider
     )
   };
@@ -282,7 +282,7 @@ export class SessionStore {
     const synchronizedState = {
       sourceLanguage: resolveSynchronizedSourceLanguage(
         effectiveTargetLanguage,
-        "en-US",
+        "en-GB",
         this.config.translationProvider
       )
     };

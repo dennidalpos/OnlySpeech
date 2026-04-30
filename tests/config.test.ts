@@ -83,8 +83,8 @@ describe("loadRuntimeConfig", () => {
     expect(config.audioNoiseSuppression).toBe(true);
     expect(config.defaultTargetLangA).toBe("en");
     expect(config.defaultTargetLangB).toBe("en");
-    expect(config.defaultSourceLangA).toBe("en-US");
-    expect(config.defaultSourceLangB).toBe("en-US");
+    expect(config.defaultSourceLangA).toBe("en-GB");
+    expect(config.defaultSourceLangB).toBe("en-GB");
     expect(hasSpeechRecognitionConfig(config)).toBe(false);
     expect(hasTranslationProviderConfig(config)).toBe(false);
   });
@@ -130,9 +130,9 @@ describe("loadRuntimeConfig", () => {
     });
 
     expect(config.defaultTargetLangA).toBe("zh-Hans");
-    expect(config.defaultTargetLangB).toBe("pt-pt");
+    expect(config.defaultTargetLangB).toBe("pt");
     expect(config.defaultSourceLangA).toBe("zh-CN");
-    expect(config.defaultSourceLangB).toBe("pt-PT");
+    expect(config.defaultSourceLangB).toBe("pt-BR");
   });
 
   it("falls back to the demo slide default when the configured value is invalid", () => {

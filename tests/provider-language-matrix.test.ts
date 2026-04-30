@@ -6,10 +6,10 @@ describe("provider-language-matrix", () => {
   it("covers the full provider catalogs and exposes the expected ChatGPT transcription policy split", () => {
     const matrix = buildProviderLanguageMatrixSummary();
 
-    expect(matrix.azure.interaction).toHaveLength(83);
-    expect(getSupportedTranslationTargetLanguageCodes("azure", { includeProviderExpansions: true })).toHaveLength(101);
-    expect(matrix.chatgpt.interaction).toHaveLength(70);
-    expect(getSupportedTranslationTargetLanguageCodes("chatgpt", { includeProviderExpansions: true })).toHaveLength(70);
+    expect(matrix.azure.interaction).toHaveLength(79);
+    expect(getSupportedTranslationTargetLanguageCodes("azure", { includeProviderExpansions: true })).toHaveLength(97);
+    expect(matrix.chatgpt.interaction).toHaveLength(66);
+    expect(getSupportedTranslationTargetLanguageCodes("chatgpt", { includeProviderExpansions: true })).toHaveLength(66);
     expect(matrix.ollama.interaction).toHaveLength(
       getSupportedTranslationTargetLanguageCodes("ollama", { includeProviderExpansions: true }).length
     );

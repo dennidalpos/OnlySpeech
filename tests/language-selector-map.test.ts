@@ -49,7 +49,7 @@ describe("language-selector map", () => {
       expect(regionIds, `Language ${languageCode} should appear in a single region.`).toHaveLength(1);
     }
 
-    expect(appearances.get("en")).toEqual(["north-america"]);
+    expect(appearances.get("en")).toEqual(["europe"]);
     expect(appearances.get("es")).toEqual(["north-america"]);
     expect(appearances.get("pt")).toEqual(["south-america"]);
     expect(appearances.get("fr")).toEqual(["europe"]);

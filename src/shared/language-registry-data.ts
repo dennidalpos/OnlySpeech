@@ -44,7 +44,7 @@ export interface ProviderTargetOnlyLanguageDefinition {
   providers: Record<SeedProvider, TranslationProviderLanguageCapabilities>;
 }
 
-export const CANONICAL_INTERACTION_LANGUAGE_BASELINE_COUNT = 56;
+export const CANONICAL_INTERACTION_LANGUAGE_BASELINE_COUNT = 53;
 
 const CANONICAL_INTERACTION_LANGUAGE_SEEDS = Object.freeze([
   {
@@ -61,28 +61,6 @@ const CANONICAL_INTERACTION_LANGUAGE_SEEDS = Object.freeze([
   {
     code: "en",
     label: "Inglese",
-    macroArea: "americas",
-    displayLocale: "en-US",
-    preferredSourceLocale: "en-US",
-    providers: {
-      azure: { enabled: true, targetCode: "en" },
-      chatgpt: { enabled: true, targetCode: "en" }
-    }
-  },
-  {
-    code: "en-us",
-    label: "Inglese (Stati Uniti)",
-    macroArea: "americas",
-    displayLocale: "en-US",
-    preferredSourceLocale: "en-US",
-    providers: {
-      azure: { enabled: true, targetCode: "en" },
-      chatgpt: { enabled: true, targetCode: "en" }
-    }
-  },
-  {
-    code: "en-gb",
-    label: "Inglese (Regno Unito)",
     macroArea: "europe",
     displayLocale: "en-GB",
     preferredSourceLocale: "en-GB",
@@ -620,17 +598,6 @@ const CANONICAL_INTERACTION_LANGUAGE_SEEDS = Object.freeze([
     }
   },
   {
-    code: "pt-pt",
-    label: "Portoghese (Portogallo)",
-    macroArea: "europe",
-    displayLocale: "pt-PT",
-    preferredSourceLocale: "pt-PT",
-    providers: {
-      azure: { enabled: true, targetCode: "pt-pt" },
-      chatgpt: { enabled: true, targetCode: "pt-pt" }
-    }
-  },
-  {
     code: "sr-Cyrl",
     label: "Serbo (cirillico)",
     macroArea: "europe",
@@ -694,17 +661,6 @@ const CANONICAL_INTERACTION_LANGUAGE_SEEDS = Object.freeze([
     providers: {
       azure: { enabled: true, targetCode: "hu" },
       chatgpt: { enabled: true, targetCode: "hu" }
-    }
-  },
-  {
-    code: "fr-ca",
-    label: "Francese (Canada)",
-    macroArea: "americas",
-    displayLocale: "fr-CA",
-    preferredSourceLocale: "fr-CA",
-    providers: {
-      azure: { enabled: true, targetCode: "fr-ca" },
-      chatgpt: { enabled: true, targetCode: "fr-ca" }
     }
   },
   {
@@ -999,19 +955,16 @@ export const CANONICAL_INTERACTION_LANGUAGES: readonly CanonicalInteractionLangu
 );
 
 export const INTERACTION_LANGUAGE_MACRO_AREA_MEMBERSHIPS = Object.freeze({
-  en: ["americas", "oceania"]
+  en: ["europe", "oceania"]
 }) satisfies Readonly<Record<string, readonly LanguageMacroArea[]>>;
 
 export const INTERACTION_LANGUAGE_FLAG_REGION_CODES = Object.freeze({
   ar: "SA",
   az: "AZ",
-  en: "US",
-  "en-gb": "GB",
-  "en-us": "US",
+  en: "GB",
   es: "MX",
   eu: "ES",
   fr: "FR",
-  "fr-ca": "CA",
   gl: "ES",
   hy: "AM",
   ka: "GE",
@@ -1019,7 +972,6 @@ export const INTERACTION_LANGUAGE_FLAG_REGION_CODES = Object.freeze({
   mk: "MK",
   mn: "MN",
   pt: "BR",
-  "pt-pt": "PT",
   ru: "RU",
   si: "LK",
   so: "SO",
@@ -1046,8 +998,6 @@ export const CHATGPT_SPEECH_TO_TEXT_SUPPORTED_LANGUAGE_CODES = Object.freeze([
   "de",
   "el",
   "en",
-  "en-gb",
-  "en-us",
   "es",
   "et",
   "eu",
@@ -1055,7 +1005,6 @@ export const CHATGPT_SPEECH_TO_TEXT_SUPPORTED_LANGUAGE_CODES = Object.freeze([
   "fi",
   "fil",
   "fr",
-  "fr-ca",
   "gl",
   "he",
   "hi",
@@ -1082,7 +1031,6 @@ export const CHATGPT_SPEECH_TO_TEXT_SUPPORTED_LANGUAGE_CODES = Object.freeze([
   "nl",
   "pl",
   "pt",
-  "pt-pt",
   "ro",
   "ru",
   "sq",

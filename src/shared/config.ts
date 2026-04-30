@@ -203,12 +203,12 @@ export function loadRuntimeConfig(env: NodeJS.ProcessEnv = process.env): Runtime
   );
   const defaultSourceLangA = resolveSynchronizedSourceLanguage(
     defaultTargetLangA,
-    "en-US",
+    "en-GB",
     parsed.TRANSLATION_PROVIDER
   );
   const defaultSourceLangB = resolveSynchronizedSourceLanguage(
     defaultTargetLangB,
-    "en-US",
+    "en-GB",
     parsed.TRANSLATION_PROVIDER
   );
 
@@ -260,8 +260,8 @@ export function loadRuntimeConfig(env: NodeJS.ProcessEnv = process.env): Runtime
     ollamaApiKey: parsed.OLLAMA_API_KEY,
     defaultTargetLangA,
     defaultTargetLangB,
-    defaultSourceLangA: defaultSourceLangA ?? "en-US",
-    defaultSourceLangB: defaultSourceLangB ?? "en-US",
+    defaultSourceLangA: defaultSourceLangA ?? "en-GB",
+    defaultSourceLangB: defaultSourceLangB ?? "en-GB",
     logLevel: parsed.LOG_LEVEL
   };
 }

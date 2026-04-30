@@ -9,7 +9,7 @@ describe("resolveSpeechStartParameters", () => {
         sourceLanguage: null
       })
     ).toEqual({
-      sourceLanguage: "en-US"
+      sourceLanguage: "en-GB"
     });
   });
 
@@ -42,7 +42,7 @@ describe("resolveSpeechStartParameters", () => {
         sourceLanguage: null
       })
     ).toEqual({
-      sourceLanguage: "en-US"
+      sourceLanguage: "en-GB"
     });
   });
 });

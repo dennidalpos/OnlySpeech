@@ -37,15 +37,12 @@ const CHATGPT_OFFICIAL_TRANSCRIPTION_HINTS_BY_LANGUAGE_CODE = Object.freeze({
   de: "de",
   el: "el",
   en: "en",
-  "en-gb": "en",
-  "en-us": "en",
   es: "es",
   et: "et",
   fa: "fa",
   fi: "fi",
   fil: "tl",
   fr: "fr",
-  "fr-ca": "fr",
   gl: "gl",
   he: "he",
   hi: "hi",
@@ -70,7 +67,6 @@ const CHATGPT_OFFICIAL_TRANSCRIPTION_HINTS_BY_LANGUAGE_CODE = Object.freeze({
   nl: "nl",
   pl: "pl",
   pt: "pt",
-  "pt-pt": "pt",
   ro: "ro",
   ru: "ru",
   sk: "sk",
@@ -100,6 +96,10 @@ for (const entry of CANONICAL_INTERACTION_LANGUAGES) {
 SOURCE_LOCALE_ALIAS_TO_LANGUAGE_CODE.set("fil-ph", "fil");
 SOURCE_LOCALE_ALIAS_TO_LANGUAGE_CODE.set("tl-ph", "fil");
 SOURCE_LOCALE_ALIAS_TO_LANGUAGE_CODE.set("no-no", "nb");
+SOURCE_LOCALE_ALIAS_TO_LANGUAGE_CODE.set("en-us", "en");
+SOURCE_LOCALE_ALIAS_TO_LANGUAGE_CODE.set("en-gb", "en");
+SOURCE_LOCALE_ALIAS_TO_LANGUAGE_CODE.set("fr-ca", "fr");
+SOURCE_LOCALE_ALIAS_TO_LANGUAGE_CODE.set("pt-pt", "pt");
 SOURCE_LOCALE_ALIAS_TO_LANGUAGE_CODE.set("zh-cn", "zh-Hans");
 SOURCE_LOCALE_ALIAS_TO_LANGUAGE_CODE.set("zh-sg", "zh-Hans");
 SOURCE_LOCALE_ALIAS_TO_LANGUAGE_CODE.set("zh-hans", "zh-Hans");
@@ -167,15 +167,15 @@ function resolveLanguageCodeFromSourceLocale(sourceLanguage: string | null | und
   }
 
   if (normalized.startsWith("fr-")) {
-    return normalized === "fr-ca" ? "fr-ca" : "fr";
+    return "fr";
   }
 
   if (normalized.startsWith("pt-")) {
-    return normalized === "pt-pt" ? "pt-pt" : "pt";
+    return "pt";
   }
 
   if (normalized.startsWith("en-")) {
-    return normalized === "en-gb" ? "en-gb" : normalized === "en-us" ? "en-us" : "en";
+    return "en";
   }
 
   if (normalized.startsWith("sq-")) {

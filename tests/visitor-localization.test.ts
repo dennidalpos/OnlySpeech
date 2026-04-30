@@ -22,39 +22,28 @@ describe("visitor-localization", () => {
   it("builds native language tiles with a visible icon", () => {
     const choices = buildVisitorLanguageChoices();
     const english = choices.find((choice) => choice.value === "en");
-    const englishUnitedStates = choices.find((choice) => choice.value === "en-us");
     const italian = choices.find((choice) => choice.value === "it");
     const japanese = choices.find((choice) => choice.value === "ja");
     const arabic = choices.find((choice) => choice.value === "ar");
     const afrikaans = choices.find((choice) => choice.value === "af");
     const amharic = choices.find((choice) => choice.value === "am");
     const swahili = choices.find((choice) => choice.value === "sw");
-    const portuguesePortugal = choices.find((choice) => choice.value === "pt-pt");
     const albanian = choices.find((choice) => choice.value === "sq");
     const cantonese = choices.find((choice) => choice.value === "yue");
-    const englishUnitedKingdom = choices.find((choice) => choice.value === "en-gb");
 
-    expect(choices).toHaveLength(56);
+    expect(choices).toHaveLength(53);
     expect(english).toMatchObject({
-      value: "en"
-    });
-    expect(englishUnitedKingdom).toMatchObject({
-      value: "en-gb",
+      value: "en",
       regionCode: "GB"
     });
-    expect(englishUnitedStates).toMatchObject({
-      value: "en-us",
-      regionCode: "US"
-    });
     expect(english?.nativeLabel.length).toBeGreaterThan(0);
-    expect(english?.regionCode).toBe("US");
+    expect(english?.regionCode).toBe("GB");
     expect(afrikaans?.regionCode).toBe("ZA");
     expect(amharic?.regionCode).toBe("ET");
     expect(italian?.regionCode).toBe("IT");
     expect(japanese?.nativeLabel.length).toBeGreaterThan(0);
     expect(arabic?.nativeLabel.length).toBeGreaterThan(0);
     expect(swahili?.regionCode).toBe("KE");
-    expect(portuguesePortugal?.regionCode).toBe("PT");
     expect(albanian?.nativeLabel.length).toBeGreaterThan(0);
     expect(cantonese?.regionCode).toBe("HK");
   });
@@ -99,7 +88,7 @@ describe("visitor-localization", () => {
   it("covers the full baseline visitor language catalog without falling back to english", () => {
     const choices = buildVisitorLanguageChoices();
 
-    expect(choices).toHaveLength(56);
+    expect(choices).toHaveLength(53);
     expect(getVisitorLocalizationLanguageKeys()).toContain("bg");
     expect(getVisitorLocalizationLanguageKeys()).toContain("sr-Cyrl");
     expect(getVisitorLocalizationLanguageKeys()).toContain("zh-Hant");
@@ -122,7 +111,7 @@ describe("visitor-localization", () => {
   it("covers the full chatgpt expanded language catalog without english fallback", () => {
     const choices = buildInteractionLanguageChoices("chatgpt", { includeProviderExpansions: true });
 
-    expect(choices).toHaveLength(70);
+    expect(choices).toHaveLength(66);
 
     for (const choice of choices) {
       expect(isVisitorLocalizationReady(choice.value)).toBe(true);
