@@ -56,7 +56,7 @@ The tagged release workflow is the canonical place where signing inputs are vali
 
 These outputs improve auditability, but they do not replace customer-specific legal review, controller identification, DPA or SCC work, provider-region choices, or deployment-specific retention commitments.
 
-Vendored local tool copies under `tools/` are outside the automatically generated compliance bundle unless a future packaging contract adds them explicitly. Repository-owned helper utilities live under `tooling/` and remain part of the repository-controlled implementation surface.
+Vendored local tool copies under `tools/` are outside the automatically generated compliance bundle unless a future packaging contract adds them explicitly. Repository-owned helper utilities live under `scripts/support/` and remain part of the repository-controlled implementation surface.
 
 ## External Services Boundary
 

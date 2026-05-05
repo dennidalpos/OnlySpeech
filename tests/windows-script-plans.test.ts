@@ -6,11 +6,11 @@ import { afterEach, describe, expect, it } from "vitest";
 
 const describeWindows = process.platform === "win32" ? describe : describe.skip;
 const repoRoot = process.cwd();
-const helperPath = join(repoRoot, "scripts", "internal", "lib", "plans.ps1");
-const runtimeLogsScriptPath = join(repoRoot, "scripts", "internal", "runtime", "manage-runtime-logs.ps1");
-const windowsStartScriptPath = join(repoRoot, "scripts", "internal", "runtime", "run-workstation.ps1");
-const commissioningArtifactScriptPath = join(repoRoot, "scripts", "internal", "commissioning", "write-commissioning-artifact.ps1");
-const workstationRuntimeDoctorScriptPath = join(repoRoot, "scripts", "internal", "runtime", "workstation-runtime-doctor.ps1");
+const helperPath = join(repoRoot, "scripts", "support", "lib", "plans.ps1");
+const runtimeLogsScriptPath = join(repoRoot, "scripts", "support", "runtime", "manage-runtime-logs.ps1");
+const windowsStartScriptPath = join(repoRoot, "scripts", "support", "runtime", "run-workstation.ps1");
+const commissioningArtifactScriptPath = join(repoRoot, "scripts", "support", "commissioning", "write-commissioning-artifact.ps1");
+const workstationRuntimeDoctorScriptPath = join(repoRoot, "scripts", "support", "runtime", "workstation-runtime-doctor.ps1");
 const tempDirectories: string[] = [];
 
 function normalizeExistingPath(path: string): string {
@@ -103,7 +103,7 @@ describeWindows("windows script helpers", () => {
     ]);
 
     expect(output).toContain("[start] powershell.exe -ExecutionPolicy Bypass -File");
-    expect(output).toContain(join(repoRoot, "scripts", "internal", "runtime", "start-local.ps1"));
+    expect(output).toContain(join(repoRoot, "scripts", "support", "runtime", "start-local.ps1"));
   });
 
   it("launches the packaged executable without an empty ArgumentList when no wizard arguments are requested", () => {

@@ -10,7 +10,7 @@ This document is the long-form technical contract for the repository. It does no
 
 - `README.md` is the repository overview and quick-start command map.
 - `docs/PROJECT_SPEC.md` is the primary technical contract; the rest of `docs/` contains the supporting runbooks, product notes, and buyer-facing collateral referenced from that contract.
-- `scripts/README.md` is the canonical script index and PowerShell side-effect map.
+- `scripts/script.md` is the canonical script index, invocation map, and PowerShell side-effect map.
 - `.github/workflows/*.yml` are the canonical CI and tagged-release workflow definitions.
 - `PROJECT_STATUS.json` tracks only explicit residual follow-up that is intentionally left open after repository changes; it is not a changelog.
 
@@ -62,11 +62,11 @@ Not supported by the repository contract:
 - `src/services`: audio, session, privacy, logging, and speech provider services.
 - `src/tools`: setup-wizard HTML/preload fragments and helper output definitions.
 - `tests`: unit, integration, DOM, script-plan, and Electron end-to-end tests.
-- `scripts/public`: stable PowerShell wrappers exposed through npm.
-- `scripts/internal`: implementation scripts for runtime, workspace, packaging, release, docs, and commissioning flows.
-- `tooling`: repo-owned helper utilities.
+- `scripts/*.ps1`: stable PowerShell wrappers exposed through npm.
+- `scripts/support`: implementation scripts and helper utilities for runtime, workspace, packaging, release, docs, and commissioning flows.
 - `tools`: local or vendored tool payloads; not part of the packaged runtime contract unless a specific flow documents them.
-- `build`: icons and packaging assets.
+- `build`: icons, brand source SVGs, exported logo PNGs, and packaging assets.
+- `public`: Vite-copied static assets consumed by runtime HTML, including favicon and social metadata images.
 - `docs`: technical docs, buyer material, internal runbooks, product collateral, optional generated screenshot collateral when explicitly produced, and decisions.
 - `media`: tracked source or marketplace media that must stay versioned.
 
@@ -168,7 +168,7 @@ The deterministic local path is:
 5. `npm run package` for public Windows packaging
 6. `npm run release:customer-bundle` after packaged artifacts already exist
 
-Detailed script ownership and side effects live in `scripts/README.md`.
+Detailed script ownership and side effects live in `scripts/script.md`.
 
 ## Diagnostics And Verification
 
@@ -193,7 +193,7 @@ Supported verification modifiers include `-SkipInstall`, `-SkipPack`, `-SkipPack
 - Internal verification and tagged-release flows also validate `win-unpacked` before retaining the versioned unpacked zip.
 - The app is packaged with `asar`.
 - Artifact names are deterministic from product name, version, architecture, and target.
-- Packaging compatibility helpers live under `tooling/packaging/`.
+- Packaging compatibility helpers live under `scripts/support/packaging/`.
 - Packaged autostart is wizard-managed through the current user's Windows Run entry and can be enabled or disabled from the setup wizard without admin rights.
 
 ## Release Contract
@@ -221,6 +221,7 @@ Repo-local generated outputs are ignored by `.gitignore`. Optional screenshot an
 
 ## Supporting Documentation
 
+- `docs/product/brand-assets.md`: brand asset paths, naming, sizes, regeneration command, and app/installer/social consumers.
 - `docs/product/provider-setup.md`: provider setup and official provider link map.
 - `docs/customer-bundle/*`: buyer-facing release bundle documents.
 - `docs/internal/Privacy_and_Commercial_Distribution.md`: repository policy for privacy and commercial distribution boundaries.

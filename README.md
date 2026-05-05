@@ -1,8 +1,9 @@
-<p align="center"><img src="build/icon.png" alt="OnlySpeech logo" width="96" /></p>
+<p align="center"><img src="build/brand/onlyspeech-logo-dark-920x240.png" alt="OnlySpeech logo" width="460" /></p>
 
 <h1 align="center">OnlySpeech</h1>
 
 <p align="center"><strong>Windows-first desktop workstation for guided two-person speech translation.</strong></p>
+<p align="center"><sub>Installer icon source: <code>build/icon.png</code></sub></p>
 
 ## Overview
 
@@ -27,6 +28,7 @@ The product boundary is intentionally narrow: one Windows PC, guided in-person c
 - Windows x64 for supported development, CI parity, packaging, and runtime validation.
 - PowerShell on Windows for repository scripts.
 - Node.js 22+ and npm 10+.
+- Packaged workstation: Windows 10/11 x64, built-in Windows PowerShell 5.1, built-in `powercfg.exe`, and Windows Media Foundation components. The NSIS installer blocks before installation when these software prerequisites are missing; portable launch repeats the runtime-safe Windows/Media Foundation check.
 - Two active displays for live workstation deployment.
 - Either two assignable microphones or one shared assignable microphone.
 - Internet access and customer-owned Azure Speech or OpenAI credentials for live `kiosk` speech.
@@ -39,6 +41,15 @@ The product boundary is intentionally narrow: one Windows PC, guided in-person c
 3. Use `npm run dev` for the watch workspace, or `npm run start` for a direct source launch.
 4. Complete configuration through the integrated setup wizard, or use the `.env` contract implemented in source and described in [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md).
 5. For packaged workstation reset support, use `npm run clean:workstation`.
+
+## Packaged Workstation Preflight
+
+The installer verifies required software before copying the app:
+
+- Windows 10/11 x64: required because OnlySpeech is packaged and validated as a Windows x64 Electron workstation app. Verify with `winver` and `[Environment]::Is64BitOperatingSystem`.
+- Windows PowerShell 5.1: required for the packaged kiosk power-settings step. Verify with `$PSVersionTable.PSVersion`.
+- Windows `powercfg.exe`: required to apply kiosk power and display timeout settings. Verify with `powercfg /?`.
+- Windows Media Foundation: required for Electron microphone capture and live speech validation. On Windows N editions, install the official Microsoft Media Feature Pack and reboot. Verify with `Test-Path "$env:SystemRoot\System32\mfplat.dll"` and `Test-Path "$env:SystemRoot\System32\mfreadwrite.dll"`.
 
 ## Commands
 
@@ -66,7 +77,7 @@ The product boundary is intentionally narrow: one Windows PC, guided in-person c
 | `npm run release:compliance` | Write third-party notices and SBOM artifacts. |
 | `npm run release:customer-bundle` | Assemble the customer-facing release bundle from existing package outputs and docs. |
 
-The complete PowerShell script classification and side-effect map lives in [scripts/README.md](scripts/README.md).
+The complete PowerShell script classification and side-effect map lives in [scripts/script.md](scripts/script.md).
 
 ## Project Status
 
@@ -77,7 +88,8 @@ Open residual work is limited to items that require real hardware, retained comp
 ## Technical Documentation
 
 - [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md): primary technical contract for runtime, configuration, verification, packaging, release, and output boundaries.
-- [scripts/README.md](scripts/README.md): canonical npm/PowerShell script index, classification, and side-effect map.
+- [docs/product/brand-assets.md](docs/product/brand-assets.md): brand asset locations, naming, sizes, regeneration, and consumers.
+- [scripts/script.md](scripts/script.md): canonical npm/PowerShell script index, classification, and side-effect map.
 - [docs/product/provider-setup.md](docs/product/provider-setup.md): provider setup boundaries and official documentation links.
 - [docs/internal/testing/language-speech-matrix.md](docs/internal/testing/language-speech-matrix.md): manual live provider speech proof matrix.
 - [docs/internal/testing/packaged-activation-commissioning-runbook.md](docs/internal/testing/packaged-activation-commissioning-runbook.md): real-workstation activation, commissioning, autostart, upgrade, and rollback close-out.

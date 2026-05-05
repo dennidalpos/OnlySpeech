@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 const describeWindows = process.platform === "win32" ? describe : describe.skip;
 const repoRoot = process.cwd();
-const scriptPath = join(repoRoot, "scripts", "internal", "commissioning", "run-target-station-automation.ps1");
+const scriptPath = join(repoRoot, "scripts", "support", "commissioning", "run-target-station-automation.ps1");
 
 describeWindows("run-target-station-automation.ps1", () => {
   it("prints the automation phases and planned outputs in dry-run mode", () => {

@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 const describeWindows = process.platform === "win32" ? describe : describe.skip;
 const repoRoot = process.cwd();
-const scriptPath = join(repoRoot, "scripts", "internal", "packaging", "package-release-artifacts.ps1");
+const scriptPath = join(repoRoot, "scripts", "support", "packaging", "package-release-artifacts.ps1");
 const customerBundleWriteTimeoutMs = 15000;
 const tempDirectories: string[] = [];
 

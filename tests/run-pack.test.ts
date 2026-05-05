@@ -4,7 +4,7 @@ import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 
 const repoRoot = process.cwd();
-const scriptPath = join(repoRoot, "scripts", "internal", "packaging", "package-core.ps1");
+const scriptPath = join(repoRoot, "scripts", "support", "packaging", "package-core.ps1");
 const exampleRepoRoot = String.raw`D:\Repo`;
 
 function runPowerShellJson(script: string): unknown {
@@ -53,11 +53,11 @@ describe("New-PackEnvironment", () => {
       `& { . '${scriptPath}'; $envMap = @{ PATH = 'C:\\Windows\\System32' }; New-PackEnvironment -Environment $envMap -RepoRoot '${exampleRepoRoot}' | ConvertTo-Json -Compress }`
     ) as { NODE_OPTIONS: string };
 
-    expect(result.NODE_OPTIONS).toContain(`--require=${exampleRepoRoot}\\tooling\\packaging\\electron-builder-compat-preload.cjs`);
+    expect(result.NODE_OPTIONS).toContain(`--require=${exampleRepoRoot}\\scripts\\support\\packaging\\electron-builder-compat-preload.cjs`);
   });
 
   it("does not duplicate the preload flag", () => {
-    const preloadFlag = `--require=${exampleRepoRoot}\\tooling\\packaging\\electron-builder-compat-preload.cjs`;
+    const preloadFlag = `--require=${exampleRepoRoot}\\scripts\\support\\packaging\\electron-builder-compat-preload.cjs`;
     const result = runPowerShellJson(
       `& { . '${scriptPath}'; $envMap = @{ NODE_OPTIONS = '${preloadFlag}' }; New-PackEnvironment -Environment $envMap -RepoRoot '${exampleRepoRoot}' | ConvertTo-Json -Compress }`
     ) as { NODE_OPTIONS: string };
@@ -148,6 +148,20 @@ describe("Get-PublicPackageArchiveName", () => {
 });
 
 describe("package.json Windows packaging metadata", () => {
+  it("keeps build/icon.ico as a non-empty ICO with embedded image payloads", () => {
+    const bytes = readFileSync(join(process.cwd(), "build", "icon.ico"));
+    const imageCount = bytes.readUInt16LE(4);
+    const firstImageSize = bytes.readUInt32LE(14);
+    const firstImageOffset = bytes.readUInt32LE(18);
+
+    expect(bytes.readUInt16LE(0)).toBe(0);
+    expect(bytes.readUInt16LE(2)).toBe(1);
+    expect(imageCount).toBeGreaterThanOrEqual(1);
+    expect(firstImageSize).toBeGreaterThan(0);
+    expect(firstImageOffset).toBeGreaterThanOrEqual(6 + imageCount * 16);
+    expect(bytes.length).toBeGreaterThan(firstImageOffset + firstImageSize);
+  });
+
   it("brands the NSIS installer and shortcut configuration with the real app icon", () => {
     const packageJson = JSON.parse(readFileSync(join(process.cwd(), "package.json"), "utf8")) as {
       build: {
@@ -187,7 +201,7 @@ describe("package.json Windows packaging metadata", () => {
       npm: ">=10"
     });
     expect(packageJson.scripts.bootstrap).toBe(
-      "powershell -ExecutionPolicy Bypass -File ./scripts/public/bootstrap.ps1"
+      "powershell -ExecutionPolicy Bypass -File ./scripts/bootstrap.ps1"
     );
     expect(packageJson.devDependencies["@rollup/rollup-win32-x64-msvc"]).toBe("4.60.1");
   });

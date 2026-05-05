@@ -1,0 +1,15 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">OnlySpeech mark</title>
+  <desc id="desc">Two coordinated speech arcs for a two-person translation workstation.</desc>
+  <defs>
+    <linearGradient id="tile" x1="32" y1="24" x2="224" y2="232" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fffaf4"/>
+      <stop offset="1" stop-color="#d7ddd8"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="58" fill="url(#tile)"/>
+  <circle cx="78" cy="100" r="20" fill="#1b88cc"/>
+  <circle cx="174" cy="136" r="20" fill="#ff9151"/>
+  <path d="M70 78 C106 44 154 44 190 78" fill="none" stroke="#1b88cc" stroke-width="18" stroke-linecap="round"/>
+  <path d="M66 180 C104 211 153 211 190 178" fill="none" stroke="#ff9151" stroke-width="18" stroke-linecap="round"/>
+</svg>

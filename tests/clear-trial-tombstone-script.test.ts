@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 const describeWindows = process.platform === "win32" ? describe : describe.skip;
 const repoRoot = process.cwd();
-const scriptPath = join(repoRoot, "scripts", "internal", "runtime", "clear-trial-tombstone.ps1");
+const scriptPath = join(repoRoot, "scripts", "support", "runtime", "clear-trial-tombstone.ps1");
 
 function toPowerShellString(value: string): string {
   return `'${value.replace(/'/g, "''")}'`;

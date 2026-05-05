@@ -5,7 +5,7 @@ import { spawnSync } from "node:child_process";
 import { afterEach, describe, expect, it } from "vitest";
 
 const repoRoot = process.cwd();
-const helperPath = join(repoRoot, "scripts", "internal", "lib", "repo.ps1");
+const helperPath = join(repoRoot, "scripts", "support", "lib", "repo.ps1");
 const tempDirectories: string[] = [];
 
 function createTempDirectory(name: string): string {

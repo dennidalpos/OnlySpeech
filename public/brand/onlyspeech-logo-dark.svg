@@ -1,0 +1,14 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 240" role="img" aria-labelledby="title desc">
+  <title id="title">OnlySpeech logo</title>
+  <desc id="desc">OnlySpeech wordmark with compact translation mark.</desc>
+  <rect width="920" height="240" fill="none"/>
+  <g transform="translate(30 30) scale(.703125)">
+    <rect width="256" height="256" rx="58" fill="#091018"/>
+    <circle cx="78" cy="100" r="20" fill="#55d6ff"/>
+    <circle cx="174" cy="136" r="20" fill="#ffb54a"/>
+    <path d="M70 78 C106 44 154 44 190 78" fill="none" stroke="#55d6ff" stroke-width="18" stroke-linecap="round"/>
+    <path d="M66 180 C104 211 153 211 190 178" fill="none" stroke="#ffb54a" stroke-width="18" stroke-linecap="round"/>
+  </g>
+  <text x="245" y="112" fill="#f4f7fb" font-family="Segoe UI, Arial, sans-serif" font-size="68" font-weight="700">OnlySpeech</text>
+  <text x="249" y="159" fill="#bfd2de" font-family="Segoe UI, Arial, sans-serif" font-size="23">Windows desktop speech translation</text>
+</svg>

@@ -14,6 +14,7 @@
 /agent-analysis/
 /.vite/
 *.tsbuildinfo
+/build/configure-power-settings.ps1
 
 # Local runtime configuration generated or overridden per workstation
 /.env
@@ -46,7 +47,7 @@ Desktop.ini
 ~$*
 
 # Generated product collateral under docs/ is intentionally versioned.
-# /tooling contains repo-owned tracked helpers; ignore only observed local or vendor payloads under /tools.
+# /tools contains ignored local or vendored payloads.
 /tools/nssm/
 /tools/wix314-binaries/
 /tools/npm/

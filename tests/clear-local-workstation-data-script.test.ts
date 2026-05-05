@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 const describeWindows = process.platform === "win32" ? describe : describe.skip;
 const repoRoot = process.cwd();
-const scriptPath = join(repoRoot, "scripts", "internal", "runtime", "clear-local-workstation-data.ps1");
+const scriptPath = join(repoRoot, "scripts", "support", "runtime", "clear-local-workstation-data.ps1");
 const tempDirectories: string[] = [];
 
 function createTempDirectory(name: string): string {

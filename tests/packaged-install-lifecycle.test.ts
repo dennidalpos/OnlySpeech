@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 const describeWindows = process.platform === "win32" ? describe : describe.skip;
 const repoRoot = process.cwd();
-const lifecycleScriptPath = join(repoRoot, "scripts", "internal", "commissioning", "test-packaged-install-lifecycle.ps1");
+const lifecycleScriptPath = join(repoRoot, "scripts", "support", "commissioning", "test-packaged-install-lifecycle.ps1");
 const tempDirectories: string[] = [];
 
 function createTempDirectory(name: string): string {
@@ -22,6 +22,37 @@ afterEach(() => {
 });
 
 describeWindows("test-packaged-install-lifecycle.ps1", () => {
+  it("prints the lifecycle plan in dry-run mode before packages are built", () => {
+    const packageRoot = join(createTempDirectory("onlyspeech-missing-packages"), "packages");
+
+    const result = spawnSync(
+      "powershell.exe",
+      [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        lifecycleScriptPath,
+        "-PackageRoot",
+        packageRoot,
+        "-DryRun"
+      ],
+      {
+        cwd: repoRoot,
+        encoding: "utf8"
+      }
+    );
+
+    if (result.status !== 0) {
+      throw new Error([result.stdout.trim(), result.stderr.trim()].filter(Boolean).join("\n"));
+    }
+
+    expect(result.stdout).toContain("[layout]");
+    expect(result.stdout).toContain("OnlySpeech-0.1.0-x64-setup.exe");
+    expect(result.stdout).toContain("OnlySpeech-0.1.0-x64-portable.exe");
+    expect(result.stdout).toContain("[current-install]");
+  });
+
   it("prints the current package lifecycle steps in dry-run mode", () => {
     const packageRoot = createTempDirectory("onlyspeech-packages");
     const unpackedRoot = join(packageRoot, "win-unpacked");

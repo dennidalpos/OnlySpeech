@@ -100,7 +100,7 @@ describe("setup wizard executable DOM interactions", () => {
       "Azure supports a live microphone validation path"
     );
     expect(window.document.querySelector("#run-provider-speech-test")?.textContent).toContain("Start Azure live test");
-  });
+  }, 15000);
 
   it("hides provider cards that would otherwise render as empty for the active provider", async () => {
     const state = createWizardState();

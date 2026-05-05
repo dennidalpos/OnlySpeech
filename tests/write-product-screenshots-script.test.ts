@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 const describeWindows = process.platform === "win32" ? describe : describe.skip;
 const repoRoot = process.cwd();
-const scriptPath = join(repoRoot, "scripts", "internal", "docs", "write-product-screenshots.ps1");
+const scriptPath = join(repoRoot, "scripts", "support", "docs", "write-product-screenshots.ps1");
 
 describeWindows("write-product-screenshots.ps1", () => {
   it("prints the compile and capture plan in dry-run mode", () => {
@@ -30,6 +30,6 @@ describeWindows("write-product-screenshots.ps1", () => {
 
     expect(result.stdout).toContain("[compile] npm run compile");
     expect(result.stdout).toContain("[product-screenshots] node");
-    expect(result.stdout).toContain("tooling\\docs\\capture-product-screenshots.mjs");
+    expect(result.stdout).toContain("scripts\\support\\docs\\capture-product-screenshots.mjs");
   });
 });

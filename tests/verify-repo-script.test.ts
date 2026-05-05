@@ -5,17 +5,17 @@ import { describe, expect, it } from "vitest";
 
 const describeWindows = process.platform === "win32" ? describe : describe.skip;
 const repoRoot = process.cwd();
-const scriptPath = join(repoRoot, "scripts", "internal", "workspace", "verify-repo.ps1");
-const doctorScriptPath = join(repoRoot, "scripts", "internal", "workspace", "doctor.ps1");
+const scriptPath = join(repoRoot, "scripts", "support", "workspace", "verify-repo.ps1");
+const doctorScriptPath = join(repoRoot, "scripts", "support", "workspace", "doctor.ps1");
 const packageJsonPath = join(repoRoot, "package.json");
-const scriptsReadmePath = join(repoRoot, "scripts", "README.md");
+const scriptsIndexPath = join(repoRoot, "scripts", "script.md");
 const ciWorkflowPath = join(repoRoot, ".github", "workflows", "ci.yml");
 const releaseWorkflowPath = join(repoRoot, ".github", "workflows", "release.yml");
-const publicBootstrapScriptPath = join(repoRoot, "scripts", "public", "bootstrap.ps1");
-const publicCleanWorkstationScriptPath = join(repoRoot, "scripts", "public", "clean-workstation.ps1");
-const publicGateScriptPath = join(repoRoot, "scripts", "public", "gate.ps1");
-const publicLicenseKeygenScriptPath = join(repoRoot, "scripts", "public", "license-keygen.ps1");
-const powerSettingsScriptPath = join(repoRoot, "build", "configure-power-settings.ps1");
+const publicBootstrapScriptPath = join(repoRoot, "scripts", "bootstrap.ps1");
+const publicCleanWorkstationScriptPath = join(repoRoot, "scripts", "clean-workstation.ps1");
+const publicGateScriptPath = join(repoRoot, "scripts", "gate.ps1");
+const publicLicenseKeygenScriptPath = join(repoRoot, "scripts", "license-keygen.ps1");
+const powerSettingsScriptPath = join(repoRoot, "scripts", "support", "packaging", "configure-power-settings.ps1");
 const removedPowerSettingsWrapperPath = join(
   repoRoot,
   "scripts",
@@ -83,14 +83,14 @@ describeWindows("verify-repo.ps1", () => {
     }
 
     expect(result.stdout).toContain("[clean-workstation] powershell.exe");
-    expect(result.stdout).toContain("scripts\\public\\clean-workstation.ps1");
+    expect(result.stdout).toContain("scripts\\clean-workstation.ps1");
     expect(result.stdout).toContain("[bootstrap] npm run bootstrap -- -ForceRefresh");
   });
 
   it("keeps the public gate wrapper pointed at canonical repository verification", () => {
     const script = readFileSync(publicGateScriptPath, "utf8");
 
-    expect(script).toContain("scripts\\internal\\workspace\\verify-repo.ps1");
+    expect(script).toContain("scripts\\support\\workspace\\verify-repo.ps1");
     expect(script).toContain("-CleanWorkstationData");
     expect(script).toContain("-ForceRefreshDependencies");
     expect(script).toContain("-EnablePackagedAutomation");
@@ -154,10 +154,10 @@ describeWindows("verify-repo.ps1", () => {
       "-WriteTargetStationValidationTemplatePath ./artifacts/logs/target-station-validation.json"
     );
     expect(packageJson.scripts["commission:automation"]).toContain(
-      "./scripts/internal/commissioning/run-target-station-automation.ps1 -UpdateValidationPath ./artifacts/logs/target-station-validation.json"
+      "./scripts/support/commissioning/run-target-station-automation.ps1 -UpdateValidationPath ./artifacts/logs/target-station-validation.json"
     );
     expect(packageJson.scripts["speech:matrix-template"]).toContain(
-      "./scripts/internal/commissioning/write-live-provider-speech-proof-artifact.ps1"
+      "./scripts/support/commissioning/write-live-provider-speech-proof-artifact.ps1"
     );
   });
 
@@ -167,28 +167,28 @@ describeWindows("verify-repo.ps1", () => {
     };
 
     expect(packageJson.scripts["clean:repo"]).toBe(
-      "powershell -ExecutionPolicy Bypass -File ./scripts/internal/workspace/clean-repo.ps1 -KeepDependencies -KeepEnvFile -KeepWorkstationData -KeepAutostart"
+      "powershell -ExecutionPolicy Bypass -File ./scripts/support/workspace/clean-repo.ps1 -KeepDependencies -KeepEnvFile -KeepWorkstationData -KeepAutostart"
     );
     expect(packageJson.scripts["clean:reset"]).toBe(
-      "powershell -ExecutionPolicy Bypass -File ./scripts/internal/workspace/reset-repo.ps1"
+      "powershell -ExecutionPolicy Bypass -File ./scripts/support/workspace/reset-repo.ps1"
     );
     expect(packageJson.scripts["audit:packaging"]).toBe(
-      "powershell -ExecutionPolicy Bypass -File ./scripts/internal/packaging/package-audit.ps1"
+      "powershell -ExecutionPolicy Bypass -File ./scripts/support/packaging/package-audit.ps1"
     );
     expect(packageJson.scripts["package:internal"]).toBe(
-      "powershell -ExecutionPolicy Bypass -File ./scripts/internal/packaging/package-core.ps1 -Profile Internal"
+      "powershell -ExecutionPolicy Bypass -File ./scripts/support/packaging/package-core.ps1 -Profile Internal"
     );
     expect(packageJson.scripts["verify:repo"]).toBe(
-      "powershell -ExecutionPolicy Bypass -File ./scripts/internal/workspace/verify-repo.ps1"
+      "powershell -ExecutionPolicy Bypass -File ./scripts/support/workspace/verify-repo.ps1"
     );
     expect(packageJson.scripts["docs:screenshots"]).toBe(
-      "powershell -ExecutionPolicy Bypass -File ./scripts/internal/docs/write-product-screenshots.ps1"
+      "powershell -ExecutionPolicy Bypass -File ./scripts/support/docs/write-product-screenshots.ps1"
     );
     expect(packageJson.scripts["test:packaged-lifecycle"]).toBe(
-      "powershell -ExecutionPolicy Bypass -File ./scripts/internal/commissioning/test-packaged-install-lifecycle.ps1"
+      "powershell -ExecutionPolicy Bypass -File ./scripts/support/commissioning/test-packaged-install-lifecycle.ps1"
     );
     expect(packageJson.scripts["test:packaged-automation"]).toBe(
-      "powershell -ExecutionPolicy Bypass -File ./scripts/internal/commissioning/test-packaged-runtime-automation.ps1"
+      "powershell -ExecutionPolicy Bypass -File ./scripts/support/commissioning/test-packaged-runtime-automation.ps1"
     );
   });
 
@@ -198,19 +198,19 @@ describeWindows("verify-repo.ps1", () => {
     };
 
     expect(packageJson.scripts.bootstrap).toBe(
-      "powershell -ExecutionPolicy Bypass -File ./scripts/public/bootstrap.ps1"
+      "powershell -ExecutionPolicy Bypass -File ./scripts/bootstrap.ps1"
     );
-    expect(packageJson.scripts.dev).toBe("powershell -ExecutionPolicy Bypass -File ./scripts/public/dev.ps1");
-    expect(packageJson.scripts.start).toBe("powershell -ExecutionPolicy Bypass -File ./scripts/public/start.ps1");
-    expect(packageJson.scripts.build).toBe("powershell -ExecutionPolicy Bypass -File ./scripts/public/build.ps1");
-    expect(packageJson.scripts.gate).toBe("powershell -ExecutionPolicy Bypass -File ./scripts/public/gate.ps1");
-    expect(packageJson.scripts.package).toBe("powershell -ExecutionPolicy Bypass -File ./scripts/public/package.ps1");
-    expect(packageJson.scripts.clean).toBe("powershell -ExecutionPolicy Bypass -File ./scripts/public/clean.ps1");
+    expect(packageJson.scripts.dev).toBe("powershell -ExecutionPolicy Bypass -File ./scripts/dev.ps1");
+    expect(packageJson.scripts.start).toBe("powershell -ExecutionPolicy Bypass -File ./scripts/start.ps1");
+    expect(packageJson.scripts.build).toBe("powershell -ExecutionPolicy Bypass -File ./scripts/build.ps1");
+    expect(packageJson.scripts.gate).toBe("powershell -ExecutionPolicy Bypass -File ./scripts/gate.ps1");
+    expect(packageJson.scripts.package).toBe("powershell -ExecutionPolicy Bypass -File ./scripts/package.ps1");
+    expect(packageJson.scripts.clean).toBe("powershell -ExecutionPolicy Bypass -File ./scripts/clean.ps1");
     expect(packageJson.scripts["clean:workstation"]).toBe(
-      "powershell -ExecutionPolicy Bypass -File ./scripts/public/clean-workstation.ps1"
+      "powershell -ExecutionPolicy Bypass -File ./scripts/clean-workstation.ps1"
     );
     expect(packageJson.scripts["license:keygen"]).toBe(
-      "powershell -ExecutionPolicy Bypass -File ./scripts/public/license-keygen.ps1"
+      "powershell -ExecutionPolicy Bypass -File ./scripts/license-keygen.ps1"
     );
 
     expect(packageJson.scripts.doctor).toBeUndefined();
@@ -224,37 +224,37 @@ describeWindows("verify-repo.ps1", () => {
     expect(packageJson.scripts["startup:shortcut"]).toBeUndefined();
   });
 
-  it("keeps scripts/README.md as the canonical script index", () => {
-    const scriptsReadme = readFileSync(scriptsReadmePath, "utf8");
+  it("keeps scripts/script.md as the canonical script index", () => {
+    const scriptsIndex = readFileSync(scriptsIndexPath, "utf8");
 
-    expect(scriptsReadme).toContain("## Script Classification");
-    expect(scriptsReadme).toContain("| agents | none |");
-    expect(scriptsReadme).toContain("| legacy | none |");
-    expect(scriptsReadme).toContain("| removable | none currently tracked |");
-    expect(scriptsReadme).toContain("scripts/public/bootstrap.ps1");
-    expect(scriptsReadme).toContain("scripts/public/dev.ps1");
-    expect(scriptsReadme).toContain("scripts/public/start.ps1");
-    expect(scriptsReadme).toContain("scripts/public/build.ps1");
-    expect(scriptsReadme).toContain("scripts/public/gate.ps1");
-    expect(scriptsReadme).toContain("scripts/public/package.ps1");
-    expect(scriptsReadme).toContain("scripts/public/clean.ps1");
-    expect(scriptsReadme).toContain("scripts/public/clean-workstation.ps1");
-    expect(scriptsReadme).toContain("scripts/public/license-keygen.ps1");
-    expect(scriptsReadme).toContain("clear-local-workstation-data.ps1");
-    expect(scriptsReadme).toContain("clear-trial-tombstone.ps1");
-    expect(scriptsReadme).toContain("write-product-demo-video.ps1");
-    expect(scriptsReadme).not.toContain("scripts/internal/runtime/startup");
-    expect(scriptsReadme).not.toContain("configure-power-settings.ps1`: wrapper");
-    expect(scriptsReadme).not.toContain("scripts/public/start-source.ps1");
-    expect(scriptsReadme).not.toContain("audit-supported-scripts");
+    expect(scriptsIndex).toContain("## Script Classification");
+    expect(scriptsIndex).toContain("| agents | none |");
+    expect(scriptsIndex).toContain("| legacy | none |");
+    expect(scriptsIndex).toContain("| removable | none currently tracked |");
+    expect(scriptsIndex).toContain("scripts/bootstrap.ps1");
+    expect(scriptsIndex).toContain("scripts/dev.ps1");
+    expect(scriptsIndex).toContain("scripts/start.ps1");
+    expect(scriptsIndex).toContain("scripts/build.ps1");
+    expect(scriptsIndex).toContain("scripts/gate.ps1");
+    expect(scriptsIndex).toContain("scripts/package.ps1");
+    expect(scriptsIndex).toContain("scripts/clean.ps1");
+    expect(scriptsIndex).toContain("scripts/clean-workstation.ps1");
+    expect(scriptsIndex).toContain("scripts/license-keygen.ps1");
+    expect(scriptsIndex).toContain("clear-local-workstation-data.ps1");
+    expect(scriptsIndex).toContain("clear-trial-tombstone.ps1");
+    expect(scriptsIndex).toContain("write-product-demo-video.ps1");
+    expect(scriptsIndex).not.toContain("scripts/support/runtime/startup");
+    expect(scriptsIndex).not.toContain("configure-power-settings.ps1`: wrapper");
+    expect(scriptsIndex).not.toContain("scripts/start-source.ps1");
+    expect(scriptsIndex).not.toContain("audit-supported-scripts");
   });
 
-  it("keeps build/configure-power-settings.ps1 as the only tracked power-settings script", () => {
+  it("keeps scripts/support/packaging/configure-power-settings.ps1 as the only tracked power-settings script", () => {
     const script = readFileSync(powerSettingsScriptPath, "utf8");
 
     expect(existsSync(removedPowerSettingsWrapperPath)).toBe(false);
-    expect(script).toContain("build/configure-power-settings.ps1");
-    expect(script).not.toContain("scripts/internal/shared/configure-power-settings.ps1");
+    expect(script).toContain("scripts/support/packaging/configure-power-settings.ps1");
+    expect(script).not.toContain("scripts/support/shared/configure-power-settings.ps1");
   });
 
   it("keeps docs/PROJECT_SPEC.md aligned with the stable npm surface", () => {
@@ -293,7 +293,7 @@ describeWindows("verify-repo.ps1", () => {
 
     expect(projectSpec).toContain("README.md` is the repository overview and quick-start command map");
     expect(projectSpec).toContain("docs/PROJECT_SPEC.md` is the primary technical contract");
-    expect(projectSpec).toContain("scripts/README.md");
+    expect(projectSpec).toContain("scripts/script.md");
     expect(projectSpec).toContain(".github/workflows/*.yml");
     expect(projectSpec).toContain("docs/customer-bundle/*");
     expect(projectSpec).not.toContain("docs/product/Marketplace_Sales_Package.md");

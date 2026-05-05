@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vitest";
 
 const repoRoot = process.cwd();
-const scriptPath = join(repoRoot, "scripts", "internal", "packaging", "check-windows-signing.ps1");
+const scriptPath = join(repoRoot, "scripts", "support", "packaging", "check-windows-signing.ps1");
 
 function runPowerShellJson(script: string): unknown {
   const result = spawnSync(

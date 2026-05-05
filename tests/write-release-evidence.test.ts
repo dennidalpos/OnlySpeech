@@ -6,7 +6,7 @@ import { createHash } from "node:crypto";
 import { afterEach, describe, expect, it } from "vitest";
 
 const repoRoot = process.cwd();
-const scriptPath = join(repoRoot, "scripts", "internal", "packaging", "write-release-evidence.ps1");
+const scriptPath = join(repoRoot, "scripts", "support", "packaging", "write-release-evidence.ps1");
 const tempDirectories: string[] = [];
 
 function createTempDirectory(name: string): string {

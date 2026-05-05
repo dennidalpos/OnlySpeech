@@ -20,12 +20,14 @@ Seller-facing marketplace copy is intentionally kept outside the buyer bundle.
 
 Prepare the workstation with:
 
-- Windows x64;
+- Windows 10/11 x64 with built-in Windows PowerShell 5.1, `powercfg.exe`, and Windows Media Foundation components;
 - two active displays for the supported operator and visitor layout;
 - either two assignable microphones or one shared assignable microphone;
 - the customer email and activation code delivered after purchase for that workstation;
 - internet access when live `kiosk` speech is required;
 - customer-owned credentials for the selected live provider: `azure` or `chatgpt`.
+
+The setup executable checks these Windows software prerequisites before installation. If it blocks, follow the message shown by setup. On Windows N editions, install the official Microsoft Media Feature Pack and reboot before retrying.
 
 If the workstation will be used in `demo` mode only, provider credentials and live microphones are not required for the scripted validation loop.
 

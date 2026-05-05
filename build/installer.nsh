@@ -8,10 +8,39 @@
 ; enabled or disabled without admin rights.
 ;
 ; Hooks used:
+;   customInit      - blocks unsupported Windows client images before install
 ;   customInstall   - removes legacy HKLM startup registry entry + configures power settings
 ;   customUnInstall - removes legacy HKLM startup registry entry on uninstall
 
 !include "LogicLib.nsh"
+
+; ---------------------------------------------------------------------------
+; Pre-install prerequisite checks
+; ---------------------------------------------------------------------------
+!macro customInit
+  IfFileExists "$SYSDIR\WindowsPowerShell\v1.0\powershell.exe" powershell_present powershell_missing
+
+  powershell_missing:
+    IfSilent powershell_missing_silent
+    MessageBox MB_ICONSTOP|MB_OK "OnlySpeech setup cannot continue because Windows PowerShell 5.1 is missing. Required: built-in Windows PowerShell 5.1. Why: setup uses a packaged PowerShell script for kiosk power settings. Install: enable or repair Windows PowerShell on Windows 10/11. Verify: $$PSVersionTable.PSVersion."
+  powershell_missing_silent:
+    Abort
+
+  powershell_present:
+    SetOutPath "$PLUGINSDIR"
+    File /oname=assert-installer-prerequisites.ps1 "${BUILD_RESOURCES_DIR}\assert-installer-prerequisites.ps1"
+    nsExec::ExecToStack \
+      '"$SYSDIR\WindowsPowerShell\v1.0\powershell.exe" -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File "$PLUGINSDIR\assert-installer-prerequisites.ps1"'
+    Pop $0
+    Pop $1
+    ${If} $0 != 0
+      DetailPrint "$1"
+      IfSilent prerequisite_failed_silent
+      MessageBox MB_ICONSTOP|MB_OK "$1"
+    prerequisite_failed_silent:
+      Abort
+    ${EndIf}
+!macroend
 
 ; ---------------------------------------------------------------------------
 ; Post-install actions

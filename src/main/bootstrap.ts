@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { app, safeStorage, type BrowserWindow } from "electron";
+import { app, dialog, safeStorage, type BrowserWindow } from "electron";
 import { loadRuntimeConfig } from "../shared/config.js";
 import { registerIpcHandlers } from "./ipc.js";
 import { KioskManager } from "./kiosk-manager.js";
@@ -32,6 +32,10 @@ import type {
   TrialAvailabilityState
 } from "../shared/types.js";
 import { reportRuntimeDiagnostic } from "../shared/runtime-diagnostics.js";
+import {
+  formatPackagedRuntimePrerequisiteFailure,
+  getPackagedRuntimePrerequisites
+} from "./runtime-prerequisites.js";
 import {
   createActivationGateState,
   inspectPersistedActivationForRuntime,
@@ -426,8 +430,28 @@ const testAutomationServer = isTestAutomationEnabled({ isPackaged: app.isPackage
     })
   : null;
 
+function assertPackagedRuntimePrerequisites(): boolean {
+  if (!app.isPackaged) {
+    return true;
+  }
+
+  const message = formatPackagedRuntimePrerequisiteFailure(getPackagedRuntimePrerequisites());
+  if (message === "") {
+    return true;
+  }
+
+  reportRuntimeDiagnostic("error", message);
+  dialog.showErrorBox("OnlySpeech prerequisite check failed", message);
+  return false;
+}
+
 app.whenReady()
   .then(async () => {
+    if (!assertPackagedRuntimePrerequisites()) {
+      app.exit(1);
+      return;
+    }
+
     setupWizardAccessManager.ensureInitialized();
 
     registerIpcHandlers({

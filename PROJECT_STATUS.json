@@ -9,7 +9,7 @@
       "scope": "core",
       "risk": "HIGH",
       "area": "packaging",
-      "summary": "Su workstation Windows dedicata, eseguire `scripts/internal/commissioning/test-packaged-install-lifecycle.ps1` con `-PreviousInstallerPath` e `-RollbackInstallerPath` usando installer retained reali per confermare upgrade e rollback della delivery Windows ufficiale. Il repository mantiene il percorso e la dry-run coverage, ma la prova reale resta esterna.",
+      "summary": "Su workstation Windows dedicata, eseguire `scripts/support/commissioning/test-packaged-install-lifecycle.ps1` con `-PreviousInstallerPath` e `-RollbackInstallerPath` usando installer retained reali per confermare upgrade e rollback della delivery Windows ufficiale. Il repository mantiene il percorso e la dry-run coverage, ma la prova reale resta esterna.",
       "done_when": [
         "Upgrade da una versione supportata verificato realmente",
         "Rollback alla baseline prevista verificato realmente",

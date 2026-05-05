@@ -127,7 +127,8 @@ The buyer must provide credentials for the selected Azure Speech or OpenAI provi
 
 ## Visual Asset Guidance
 
-- Use the shipped application icon from `build/icon.png` or `build/icon.ico` as the canonical verified visual asset.
+- Use the shipped application icon from `build/icon.png` or `build/icon.ico` as the canonical verified installer visual asset.
+- Use the logo, favicon, and social media exports documented in `docs/product/brand-assets.md` for repository, marketplace, and social presentation surfaces.
 - Use regenerated screenshots from `docs/product/screenshots/` only when `npm run docs:screenshots` has been run for the current repository state and the resulting images have been reviewed.
-- Use a silent marketplace demo video only when it has been explicitly regenerated for the current repository state with `scripts/internal/docs/write-product-demo-video.ps1`.
+- Use a silent marketplace demo video only when it has been explicitly regenerated for the current repository state with `scripts/support/docs/write-product-demo-video.ps1`.
 - Do not market screenshots, posters, or demo video as repository-tracked collateral unless the corresponding files actually exist in the reviewed workspace.

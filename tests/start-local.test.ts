@@ -5,7 +5,7 @@ import { spawnSync } from "node:child_process";
 import { afterEach, describe, expect, it } from "vitest";
 
 const repoRoot = process.cwd();
-const scriptPath = join(repoRoot, "scripts", "internal", "runtime", "start-local.ps1");
+const scriptPath = join(repoRoot, "scripts", "support", "runtime", "start-local.ps1");
 const tempDirectories: string[] = [];
 
 function runPowerShellJson(script: string): unknown {
@@ -188,7 +188,7 @@ describe("start-local launcher", () => {
       scripts: Record<string, string>;
     };
 
-    expect(packageJson.scripts.start).toBe("powershell -ExecutionPolicy Bypass -File ./scripts/public/start.ps1");
+    expect(packageJson.scripts.start).toBe("powershell -ExecutionPolicy Bypass -File ./scripts/start.ps1");
     expect(packageJson.scripts["start:source"]).toBeUndefined();
     expect(packageJson.scripts["start:smoke"]).toBeUndefined();
   });
