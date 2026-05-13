@@ -128,9 +128,10 @@ export class KioskDisplayRuntime {
             .filter((value) => typeof value === "string");
 
         const selectedTile = document.querySelector(".visitor-language-tile.selected");
-        const secondaryButtons = Array.from(document.querySelectorAll("button.secondary-button"))
-          .map((button) => normalizeText(button.textContent ?? null))
-          .filter((value) => typeof value === "string");
+        const queryFirstText = (selector) => {
+          const element = document.querySelector(selector);
+          return normalizeText(element?.textContent ?? null);
+        };
         const statusBadge = Array.from(document.querySelectorAll(".status-badge, [class*='status-badge']"))
           .map((element) => normalizeText(element.textContent ?? null))
           .find((value) => typeof value === "string") ?? null;
@@ -165,7 +166,7 @@ export class KioskDisplayRuntime {
           currentLanguageChipEnglish: queryText(".header-chip-row .header-chip .header-chip-english"),
           currentLanguageChipConfigured: queryText(".header-chip-row .header-chip .header-chip-configured"),
           currentLanguageChipMeta: queryText(".header-chip-row .header-chip .header-chip-meta"),
-          changeLanguageLabel: secondaryButtons[0] ?? null,
+          changeLanguageLabel: queryFirstText(".visitor-actions button.secondary-button, .action-area button.secondary-button"),
           statusLabel: statusBadge
         };
       })();

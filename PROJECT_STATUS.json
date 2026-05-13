@@ -1,21 +1,98 @@
 {
+  "project_name": "OnlySpeech",
+  "status": "active",
+  "current_phase": "verification",
+  "last_updated": "2026-05-13T21:02:00+02:00",
+  "production_target": true,
+  "summary": "Windows-first Electron kiosk for guided two-person live speech translation.",
+  "active_objective": "Repository verification is passing after the Electron E2E visitor non-Latin flow fix.",
+  "assumptions": [
+    "README and existing status entries are treated as claims to verify against code and commands.",
+    "The packaging audit task is chosen because higher-priority residual tasks require real Windows target hardware or live provider credentials."
+  ],
+  "decisions": [
+    "Audit artifacts will be written at repository root as AUDIT_CRITICO.md, APP_FLOW.md, AUDIT_FINDINGS.json, and AUDIT_ACTION_PLAN.md.",
+    "Packaging audit should treat zero npm audit vulnerabilities as a passing release gate state instead of requiring stale known findings."
+  ],
+  "current_tasks": [],
+  "next_tasks": [
+    "Validate packaged activation and commissioning on real Windows target hardware.",
+    "Validate live provider speech end-to-end with real credentials, microphone input, and playback.",
+    "Validate packaged autostart via HKCU Run key at real Windows logon."
+  ],
+  "blockers": [],
+  "risks": [
+    "Live provider, hardware, installer upgrade, rollback, and accessibility claims cannot be fully proven from static repository checks alone.",
+    "Existing local .env is present and must not be disclosed in audit outputs.",
+    "Provider secrets are currently passed to Electron renderers for parts of STT/TTS flow."
+  ],
+  "dependencies": {
+    "runtime": [
+      "Node.js >=22",
+      "npm >=10",
+      "Electron",
+      "React",
+      "Azure Speech SDK",
+      "OpenAI-compatible HTTP APIs through fetch",
+      "Ollama-compatible HTTP API for translation diagnostics/demo"
+    ],
+    "development": [
+      "TypeScript",
+      "Vite",
+      "Vitest",
+      "PowerShell",
+      "electron-builder"
+    ],
+    "external_services": [
+      "Azure Speech",
+      "OpenAI API",
+      "Optional Ollama host"
+    ]
+  },
+  "quality_gates": {
+    "format": "not_available",
+    "lint": "not_available",
+    "typecheck": "passed",
+    "tests": "passed",
+    "build": "passed",
+    "security_review": "completed_with_findings"
+  },
+  "commands": {
+    "install": "npm run bootstrap",
+    "dev": "npm run dev",
+    "test": "npm test",
+    "lint": "",
+    "typecheck": "npm run build:main",
+    "build": "npm run build",
+    "start": "npm run start"
+  },
+  "environment": {
+    "os_target": "Windows",
+    "shell": "PowerShell",
+    "required_env_vars": [
+      "ONLYSPEECH_RUNTIME_MODE",
+      "ONLYSPEECH_TRANSLATION_PROVIDER",
+      "AZURE_SPEECH_KEY",
+      "AZURE_SPEECH_REGION",
+      "OPENAI_API_KEY",
+      "OPENAI_TRANSLATION_MODEL",
+      "OLLAMA_BASE_URL"
+    ],
+    "env_files": [
+      ".env",
+      ".env.example"
+    ]
+  },
+  "last_completed_work": "Fixed the Electron automation inspector for the Station B non-Latin visitor session proof and verified npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation.",
+  "open_questions": [
+    "Which runtime mode and provider combination is considered the production default for customer deployments?",
+    "What exact hardware/display/microphone matrix is contractually supported?",
+    "Is the Electron renderer intended to be trusted enough to receive provider secrets?",
+    "Should REQUIRED_MICROPHONES be a hard runtime constraint?"
+  ],
+  "handoff_notes": "Audit artifacts are present at repository root. npm run test:e2e, npm test, and npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation passed on 2026-05-13. The full repository gate produced retained package, release evidence, notices, and SBOM artifacts under artifacts/. Doctor still warns that configured display and microphone IDs are not currently available on this workstation; real hardware/provider validations remain open."
+  ,
   "tasks": [
-    {
-      "id": "residual-upgrade-rollback-validation",
-      "title": "Verificare upgrade e rollback installer su baseline versionata",
-      "status": "open",
-      "priority": 1,
-      "execution_order": 3,
-      "scope": "core",
-      "risk": "HIGH",
-      "area": "packaging",
-      "summary": "Su workstation Windows dedicata, eseguire `scripts/support/commissioning/test-packaged-install-lifecycle.ps1` con `-PreviousInstallerPath` e `-RollbackInstallerPath` usando installer retained reali per confermare upgrade e rollback della delivery Windows ufficiale. Il repository mantiene il percorso e la dry-run coverage, ma la prova reale resta esterna.",
-      "done_when": [
-        "Upgrade da una versione supportata verificato realmente",
-        "Rollback alla baseline prevista verificato realmente",
-        "Esito e limiti residui registrati nella documentazione release/commissioning pertinente"
-      ]
-    },
     {
       "id": "residual-packaged-activation-commissioning-validation",
       "title": "Validare activation e commissioning su workstation packaged reale",
@@ -25,12 +102,7 @@
       "scope": "core",
       "risk": "HIGH",
       "area": "commissioning",
-      "summary": "Su target Windows packaged reale, completare la validazione activation con materiale cliente reale e chiudere il commissioning target-station usando `npm run activation:template`, `npm run commission:template`, `npm run commission:automation` e `npm run commission:handover`. Il repository genera i template e copre la superficie automatizzata, ma non puo validare activation acquistata, hardware target, touch input e conferme operatore senza workstation reale.",
-      "done_when": [
-        "`artifacts/logs/activation-validation.json` contiene esiti reali non pending per gli scenari applicabili",
-        "`artifacts/logs/commissioning-evidence.json` non riporta fallback o remaining target-station checks",
-        "Hardware target, touch input quando applicabile, display e microphone mapping sono confermati sul target reale"
-      ]
+      "summary": "Validazione con materiale cliente reale, hardware target, touch input, display e microphone mapping su workstation Windows packaged reale."
     },
     {
       "id": "residual-live-provider-speech-proof",
@@ -41,29 +113,18 @@
       "scope": "core",
       "risk": "HIGH",
       "area": "runtime",
-      "summary": "Su workstation Windows target-equivalent con credenziali provider reali, eseguire la matrice `Microphone input -> STT -> translation -> TTS playback` per i provider live `azure` e/o `chatgpt` applicabili e registrare la prova in `artifacts/logs/live-provider-speech-proof.json`. I test repository coprono policy, routing e request shaping, ma non provano microfono, provider live e playback reale.",
-      "done_when": [
-        "`npm run speech:matrix-template` e stato aggiornato con esiti reali per gli scenari applicabili",
-        "STT, traduzione e TTS provider-owned sono confermati per il provider live selezionato",
-        "Eventuali scenari non applicabili sono marcati con motivazione esplicita"
-      ]
+      "summary": "Validazione Microphone input -> STT -> translation -> TTS playback con provider live e credenziali reali."
     },
     {
-      "id": "residual-language-audio-quality-live-matrix",
-      "title": "Validare live matrice lingua e qualita audio STT/TTS",
+      "id": "residual-upgrade-rollback-validation",
+      "title": "Verificare upgrade e rollback installer su baseline versionata",
       "status": "open",
       "priority": 1,
-      "execution_order": 9,
+      "execution_order": 3,
       "scope": "core",
       "risk": "HIGH",
-      "area": "runtime",
-      "summary": "Dopo l'introduzione del contratto lingua provider e delle opzioni wizard per prompt STT ChatGPT, detection traduzione, istruzioni TTS OpenAI, `<lang>` Azure TTS e diagnostica `getSettings()` audio, resta da validare su hardware reale e provider live l'effetto operativo per tutte le lingue campione. I test repository confermano mapping, payload, wizard e build, ma non possono misurare interpretazione in presenza di rumore/voci sovrapposte, efficacia reale di echo cancellation/noise suppression o pronuncia TTS del provider.",
-      "done_when": [
-        "Matrice live eseguita almeno per it/en, fr/de, es/pt, zh-Hans/ja e una lingua gestita solo con prompt fallback ChatGPT",
-        "Per ogni provider applicabile sono registrati source locale STT, target traduzione, locale/voce TTS, capability e opzioni wizard attive",
-        "Echo cancellation e noise suppression sono provati con diagnostica `getSettings()` abilitata e risultati annotati senza salvare audio",
-        "Eventuali degradi, blocchi capability o lingue non applicabili sono marcati con motivazione esplicita"
-      ]
+      "area": "packaging",
+      "summary": "Validazione reale di upgrade e rollback usando installer retained reali su workstation Windows dedicata."
     },
     {
       "id": "residual-packaged-autostart-live-validation",
@@ -74,28 +135,7 @@
       "scope": "core",
       "risk": "HIGH",
       "area": "runtime",
-      "summary": "Su workstation Windows packaged reale, abilitare/disabilitare l'autostart dal setup wizard e verificare il comportamento effettivo al logon dell'utente corrente sul solo meccanismo `current-user-run-key`. Il repository copre il contratto HKCU Run key e l'UI, ma non puo provare il logon reale da solo.",
-      "done_when": [
-        "Enable autostart verificato realmente al logon",
-        "Disable autostart verificato realmente al logon",
-        "Nessun path residuo shortcut/task richiesto dal flusso operativo"
-      ]
-    },
-    {
-      "id": "residual-azure-speech-sdk-nested-uuid-audit",
-      "title": "Chiudere advisory npm residuo su uuid annidato nello Speech SDK",
-      "status": "blocked",
-      "priority": 2,
-      "execution_order": 4,
-      "scope": "core",
-      "risk": "MEDIUM",
-      "area": "dependencies",
-      "summary": "`npm audit` resta con 2 finding moderate collegati a `microsoft-cognitiveservices-speech-sdk@1.49.0` -> `uuid@9.0.1`. Verifica del 2026-04-28: `npm view microsoft-cognitiveservices-speech-sdk version dependencies --json` riporta ancora la versione `1.49.0` con dipendenza `uuid:^9.0.0`; non esiste quindi una versione supportata che rimuova il nested `uuid <14`. I finding diretti risolvibili senza forzature sono stati aggiornati nel lockfile (`@xmldom/xmldom`, `postcss`, `uuid` diretto). La correzione npm proposta per il residuo e un downgrade semver-major dello Speech SDK a `1.13.1`, non compatibile con il percorso live Azure corrente senza validazione dedicata; override manuali del nested `uuid` restano bloccati finche non validati su Azure live speech.",
-      "done_when": [
-        "Una versione supportata dello Speech SDK rimuove il nested `uuid <14` oppure viene validata una sostituzione esplicita compatibile con Azure live speech",
-        "`npm audit --json` non riporta piu finding per `microsoft-cognitiveservices-speech-sdk` o nested `uuid`",
-        "`npm run audit:packaging` torna a uno stato atteso senza vulnerabilita residue"
-      ]
+      "summary": "Validazione reale enable/disable autostart al logon dell'utente corrente."
     }
   ]
 }

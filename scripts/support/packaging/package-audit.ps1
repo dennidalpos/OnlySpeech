@@ -46,21 +46,15 @@ function New-PackagingAuditMismatch {
 
 function Get-ExpectedPackagingAuditState {
   return [ordered]@{
-    expectedFix = [ordered]@{
-      name = "microsoft-cognitiveservices-speech-sdk"
-      isSemVerMajor = $true
-    }
-    expectedVulnerabilities = @(
-      "microsoft-cognitiveservices-speech-sdk",
-      "uuid"
-    )
+    expectedFix = $null
+    expectedVulnerabilities = @()
     expectedCounts = [ordered]@{
       info = 0
       low = 0
-      moderate = 2
+      moderate = 0
       high = 0
       critical = 0
-      total = 2
+      total = 0
     }
   }
 }
@@ -102,6 +96,10 @@ function Validate-PackagingAuditReport {
       continue
     }
 
+    if ($null -eq $expectedFix) {
+      return New-PackagingAuditMismatch -Message "Unexpected fixAvailable for ${name}: no vulnerability findings are expected."
+    }
+
     $fixName = [string](Get-ObjectPropertyValue $fixAvailable "name")
     $isSemVerMajor = [bool](Get-ObjectPropertyValue $fixAvailable "isSemVerMajor" $false)
     if ($fixName -ne [string](Get-ObjectPropertyValue $expectedFix "name") -or $isSemVerMajor -ne [bool](Get-ObjectPropertyValue $expectedFix "isSemVerMajor")) {
@@ -111,7 +109,7 @@ function Validate-PackagingAuditReport {
 
   return [ordered]@{
     ok = $true
-    message = "Packaging audit matches the current known packaging dependency state ($([int](Get-ObjectPropertyValue $actualCounts 'total' 0)) findings)."
+    message = "Packaging audit matches the current expected dependency state ($([int](Get-ObjectPropertyValue $actualCounts 'total' 0)) findings)."
   }
 }
 

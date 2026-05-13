@@ -20,14 +20,14 @@ function runPowerShellJson(script: string): unknown {
 }
 
 function getExpectedState(): {
-  expectedFix: { name: string; isSemVerMajor: boolean };
+  expectedFix: { name: string; isSemVerMajor: boolean } | null;
   expectedVulnerabilities: string[];
   expectedCounts: Record<string, number>;
 } {
   return runPowerShellJson(
     `& { . '${scriptPath}'; Get-ExpectedPackagingAuditState | ConvertTo-Json -Depth 6 -Compress }`
   ) as {
-    expectedFix: { name: string; isSemVerMajor: boolean };
+    expectedFix: { name: string; isSemVerMajor: boolean } | null;
     expectedVulnerabilities: string[];
     expectedCounts: Record<string, number>;
   };
@@ -41,27 +41,17 @@ function validateReport(report: unknown) {
 }
 
 describe("Validate-PackagingAuditReport", () => {
-  it("accepts the current known audit shape", { timeout: 15000 }, () => {
+  it("accepts the current expected clean audit shape", { timeout: 15000 }, () => {
     const expected = getExpectedState();
-    const vulnerabilities = Object.fromEntries(
-      expected.expectedVulnerabilities.map((name) => [
-        name,
-        {
-          name,
-          severity: "moderate",
-          fixAvailable: { ...expected.expectedFix }
-        }
-      ])
-    );
 
     expect(
       validateReport({
-        vulnerabilities,
+        vulnerabilities: {},
         metadata: { vulnerabilities: { ...expected.expectedCounts } }
       })
     ).toEqual({
       ok: true,
-      message: "Packaging audit matches the current known packaging dependency state (2 findings)."
+      message: "Packaging audit matches the current expected dependency state (0 findings)."
     });
   });
 
@@ -74,7 +64,7 @@ describe("Validate-PackagingAuditReport", () => {
       })
     ).toEqual({
       ok: false,
-      message: "Unexpected total count: expected 2, found 21."
+      message: "Unexpected total count: expected 0, found 21."
     });
   });
 
@@ -86,43 +76,39 @@ describe("Validate-PackagingAuditReport", () => {
           electronBuilder: {
             name: "electronBuilder",
             severity: "moderate",
-            fixAvailable: { ...expected.expectedFix }
+            fixAvailable: true
           },
           uuid: {
             name: "uuid",
             severity: "moderate",
-            fixAvailable: { ...expected.expectedFix }
+            fixAvailable: true
           }
         },
-        metadata: { vulnerabilities: { ...expected.expectedCounts } }
+        metadata: { vulnerabilities: { ...expected.expectedCounts, moderate: 2, total: 2 } }
       })
     ).toEqual({
       ok: false,
-      message: "Unexpected vulnerability list. Expected microsoft-cognitiveservices-speech-sdk, uuid. Found electronBuilder, uuid."
+      message: "Unexpected moderate count: expected 0, found 2."
     });
   });
 
-  it("accepts npm audit entries that collapse fixAvailable to true", () => {
-    const expected = getExpectedState();
-    const vulnerabilities = Object.fromEntries(
-      expected.expectedVulnerabilities.map((name) => [
-        name,
-        {
-          name,
-          severity: "moderate",
-          fixAvailable: name === "uuid" ? true : { ...expected.expectedFix }
-        }
-      ])
-    );
-
+  it("rejects vulnerability entries when counts claim a clean audit", () => {
     expect(
       validateReport({
-        vulnerabilities,
-        metadata: { vulnerabilities: { ...expected.expectedCounts } }
+        vulnerabilities: {
+          uuid: {
+            name: "uuid",
+            severity: "moderate",
+            fixAvailable: true
+          }
+        },
+        metadata: {
+          vulnerabilities: { info: 0, low: 0, moderate: 0, high: 0, critical: 0, total: 0 }
+        }
       })
     ).toEqual({
-      ok: true,
-      message: "Packaging audit matches the current known packaging dependency state (2 findings)."
+      ok: false,
+      message: "Unexpected vulnerability list length: expected 0, found 1."
     });
   });
 });
