@@ -71,6 +71,7 @@ The installer verifies required software before copying the app:
 | `npm run activation:template` | Write the packaged activation validation artifact template. |
 | `npm run commission:template` | Write the target-station validation template and commissioning template artifact. |
 | `npm run commission:automation` | Run target-station automation against the packaged profile when available. |
+| `npm run commission:closeout-template` | Write the packaged close-out validation template for autostart and retained-installer upgrade/rollback evidence. |
 | `npm run commission:handover` | Write final commissioning evidence from retained target-station validation. |
 | `npm run speech:matrix-template` | Write the live provider speech proof template. |
 | `npm run release:evidence` | Write release evidence metadata for existing packaged outputs. |

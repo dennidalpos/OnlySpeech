@@ -1,0 +1,370 @@
+<mxfile host="Electron" agent="Codex" pages="2">
+  <diagram id="onlyspeech-runtime-workflow" name="Runtime workflow">
+    <mxGraphModel dx="1178" dy="701" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title-runtime" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontSize=24;fontStyle=1;align=left;verticalAlign=middle;" value="OnlySpeech runtime workflow - Windows Electron workstation" vertex="1">
+          <mxGeometry height="40" width="980" x="40" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="r1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" value="Electron bootstrap&lt;br&gt;src/main/bootstrap.ts" vertex="1">
+          <mxGeometry height="70" width="160" x="40" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="r2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Resolve runtime root&lt;br&gt;userData / sessionData" vertex="1">
+          <mxGeometry height="70" width="170" x="240" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="r3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Load .env, secure secrets&lt;br&gt;and RuntimeConfig" vertex="1">
+          <mxGeometry height="70" width="190" x="450" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="r4" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" value="Packaged build?" vertex="1">
+          <mxGeometry height="100" width="120" x="700" y="105" as="geometry" />
+        </mxCell>
+        <mxCell id="r5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="Windows prerequisites&lt;br&gt;and activation gate" vertex="1">
+          <mxGeometry height="70" width="190" x="880" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="r6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="Activation window&lt;br&gt;license code or trial" vertex="1">
+          <mxGeometry height="70" width="190" x="1120" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="r7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="Continue startup" vertex="1">
+          <mxGeometry height="60" width="190" x="1120" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="r8" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" value="Runtime env ready&lt;br&gt;and no --setup-wizard?" vertex="1">
+          <mxGeometry height="120" width="170" x="890" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="r9" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" value="Setup Wizard&lt;br&gt;access, displays, mics,&lt;br&gt;provider, languages, license" vertex="1">
+          <mxGeometry height="90" width="230" x="610" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="r10" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Persist workstation config&lt;br&gt;.env, secure secrets,&lt;br&gt;autostart, diagnostics" vertex="1">
+          <mxGeometry height="80" width="210" x="880" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="r11" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="Start KioskManager" vertex="1">
+          <mxGeometry height="60" width="190" x="1120" y="295" as="geometry" />
+        </mxCell>
+        <mxCell id="r12" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="DisplayManager assigns&lt;br&gt;Station A and Station B" vertex="1">
+          <mxGeometry height="70" width="190" x="1120" y="425" as="geometry" />
+        </mxCell>
+        <mxCell id="r13" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Create BrowserWindow&lt;br&gt;runtime surfaces A/B" vertex="1">
+          <mxGeometry height="70" width="210" x="880" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="r14" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Renderer ready&lt;br&gt;and microphone probe" vertex="1">
+          <mxGeometry height="70" width="190" x="630" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="r15" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" value="Blocking issues?" vertex="1">
+          <mxGeometry height="110" width="140" x="430" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="r16" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="RuntimeIssueBanner&lt;br&gt;or TechnicalErrorView" vertex="1">
+          <mxGeometry height="70" width="160" x="430" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="r17" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Language confirmation&lt;br&gt;Station A/B" vertex="1">
+          <mxGeometry height="70" width="160" x="230" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="r18" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="Push-to-talk capture&lt;br&gt;dual-dedicated or shared mic" vertex="1">
+          <mxGeometry height="80" width="160" x="40" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="r19" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" value="Provider path" vertex="1">
+          <mxGeometry height="100" width="120" x="70" y="710" as="geometry" />
+        </mxCell>
+        <mxCell id="r20" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Azure&lt;br&gt;Speech SDK in renderer&lt;br&gt;STT and TTS provider" vertex="1">
+          <mxGeometry height="80" width="170" x="250" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="r21" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="ChatGPT&lt;br&gt;MediaRecorder renderer&lt;br&gt;IPC to OpenAI in main" vertex="1">
+          <mxGeometry height="80" width="170" x="250" y="790" as="geometry" />
+        </mxCell>
+        <mxCell id="r22" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="Ollama&lt;br&gt;translation diagnostics&lt;br&gt;and demo validation only" vertex="1">
+          <mxGeometry height="80" width="170" x="250" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="r23" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Speech and translation events&lt;br&gt;final text, status, errors" vertex="1">
+          <mxGeometry height="80" width="200" x="520" y="790" as="geometry" />
+        </mxCell>
+        <mxCell id="r24" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="SessionStore&lt;br&gt;shared conversation state&lt;br&gt;privacy/idle controls" vertex="1">
+          <mxGeometry height="80" width="200" x="780" y="790" as="geometry" />
+        </mxCell>
+        <mxCell id="r25" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Broadcast AppState&lt;br&gt;to Station A and Station B" vertex="1">
+          <mxGeometry height="70" width="210" x="1050" y="790" as="geometry" />
+        </mxCell>
+        <mxCell id="r26" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Optional provider TTS&lt;br&gt;stop on reset, language change,&lt;br&gt;shutdown or new capture" vertex="1">
+          <mxGeometry height="80" width="210" x="1050" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="r27" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" value="Reset / language change&lt;br&gt;creates or clears shared session" vertex="1">
+          <mxGeometry height="70" width="200" x="780" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="r28" parent="1" style="shape=cylinder3d;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f5f5f5;strokeColor=#666666;" value="Runtime logs&lt;br&gt;no transcript, audio, secrets&lt;br&gt;or raw chat text" vertex="1">
+          <mxGeometry height="70" width="200" x="520" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="r29" parent="1" style="shape=cylinder3d;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f5f5f5;strokeColor=#666666;" value=".env runtime config" vertex="1">
+          <mxGeometry height="60" width="150" x="40" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="r30" parent="1" style="shape=cylinder3d;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f5f5f5;strokeColor=#666666;" value="safeStorage secrets&lt;br&gt;packaged mode" vertex="1">
+          <mxGeometry height="60" width="150" x="220" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="r31" parent="1" style="shape=cylinder3d;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f5f5f5;strokeColor=#666666;" value="Activation state JSON&lt;br&gt;and HKCU trial tombstone" vertex="1">
+          <mxGeometry height="60" width="180" x="400" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r1-r2" edge="1" parent="1" source="r1" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" target="r2" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r2-r3" edge="1" parent="1" source="r2" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" target="r3" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r3-r4" edge="1" parent="1" source="r3" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" target="r4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r4-r5" edge="1" parent="1" source="r4" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" target="r5" value="yes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r4-r7" edge="1" parent="1" source="r4" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" target="r7" value="source mode">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="760" y="230" />
+              <mxPoint x="1120" y="230" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-r5-r6" edge="1" parent="1" source="r5" style="endArrow=block;html=1;rounded=0;strokeColor=#b85450;" target="r6" value="invalid">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="0" y="-18" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-r6-r7" edge="1" parent="1" source="r6" style="endArrow=block;html=1;rounded=0;strokeColor=#82b366;" target="r7" value="valid / trial">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="34" y="-4" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-r5-r7" edge="1" parent="1" source="r5" style="endArrow=block;html=1;rounded=0;strokeColor=#82b366;" target="r7" value="valid">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r7-r8" edge="1" parent="1" source="r7" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" target="r8" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r8-r9" edge="1" parent="1" source="r8" style="endArrow=block;html=1;rounded=0;strokeColor=#9673a6;" target="r9" value="no">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r9-r10" edge="1" parent="1" source="r9" style="endArrow=block;html=1;rounded=0;strokeColor=#9673a6;" target="r10" value="save">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r10-r11" edge="1" parent="1" source="r10" style="endArrow=block;html=1;rounded=0;strokeColor=#82b366;" target="r11" value="launch / restart">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r8-r11" edge="1" parent="1" source="r8" style="endArrow=block;html=1;rounded=0;strokeColor=#82b366;" target="r11" value="yes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r11-r12" edge="1" parent="1" source="r11" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" target="r12" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r12-r13" edge="1" parent="1" source="r12" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" target="r13" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r13-r14" edge="1" parent="1" source="r13" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" target="r14" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r14-r15" edge="1" parent="1" source="r14" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" target="r15" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r15-r16" edge="1" parent="1" source="r15" style="endArrow=block;html=1;rounded=0;strokeColor=#b85450;" target="r16" value="yes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r15-r17" edge="1" parent="1" source="r15" style="endArrow=block;html=1;rounded=0;strokeColor=#82b366;" target="r17" value="no">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r17-r18" edge="1" parent="1" source="r17" style="endArrow=block;html=1;rounded=0;strokeColor=#82b366;" target="r18" value="both sides confirmed">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r18-r19" edge="1" parent="1" source="r18" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" target="r19" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r19-r20" edge="1" parent="1" source="r19" style="endArrow=block;html=1;rounded=0;strokeColor=#6c8ebf;" target="r20" value="azure">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r19-r21" edge="1" parent="1" source="r19" style="endArrow=block;html=1;rounded=0;strokeColor=#6c8ebf;" target="r21" value="chatgpt">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r19-r22" edge="1" parent="1" source="r19" style="endArrow=block;html=1;rounded=0;strokeColor=#d79b00;" target="r22" value="ollama">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r20-r23" edge="1" parent="1" source="r20" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" target="r23" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r21-r23" edge="1" parent="1" source="r21" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" target="r23" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r22-r23" edge="1" parent="1" source="r22" style="endArrow=block;html=1;rounded=0;strokeColor=#d79b00;" target="r23" value="no live STT/TTS">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r23-r24" edge="1" parent="1" source="r23" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" target="r24" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r24-r25" edge="1" parent="1" source="r24" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" target="r25" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r25-r26" edge="1" parent="1" source="r25" style="endArrow=block;html=1;rounded=0;strokeColor=#6c8ebf;" target="r26" value="playback command">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r26-r27" edge="1" parent="1" source="r26" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" target="r27" value="stop/reset">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r27-r24" edge="1" parent="1" source="r27" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" target="r24" value="new session state">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r23-r28" edge="1" parent="1" source="r23" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" target="r28" value="non-sensitive events">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r29-r3" edge="1" parent="1" source="r29" style="endArrow=block;html=1;rounded=0;dashed=1;strokeColor=#666666;" target="r3" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r30-r3" edge="1" parent="1" source="r30" style="endArrow=block;html=1;rounded=0;dashed=1;strokeColor=#666666;" target="r3" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-r31-r5" edge="1" parent="1" source="r31" style="endArrow=block;html=1;rounded=0;dashed=1;strokeColor=#666666;" target="r5" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="onlyspeech-verification-release-workflow" name="Verification and release workflow">
+    <mxGraphModel dx="1600" dy="950" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title-verification" value="OnlySpeech verification, packaging and release workflow" style="text;html=1;strokeColor=none;fillColor=none;fontSize=24;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="980" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="source-note-verification" value="Sources: package.json scripts, README command map, docs/PROJECT_SPEC.md, scripts/script.md, tests directory." style="text;html=1;strokeColor=none;fillColor=none;fontSize=11;align=left;verticalAlign=middle;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="60" width="1180" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="v1" value="Developer workstation&lt;br&gt;Windows x64, PowerShell,&lt;br&gt;Node 22+, npm 10+" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="120" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="v2" value="npm run bootstrap&lt;br&gt;validate baseline and npm ci&lt;br&gt;when dependencies are stale" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="290" y="120" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="v3" value="Local run path&lt;br&gt;npm run dev or npm run start" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="560" y="90" width="210" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="v4" value="Source Electron runtime&lt;br&gt;operator and visitor surfaces" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="830" y="90" width="210" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="v5" value="Repository gate&lt;br&gt;npm run gate / verify:repo" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="560" y="230" width="210" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="v6" value="Clean working outputs&lt;br&gt;preserve .env, deps,&lt;br&gt;workstation data when configured" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="40" y="360" width="190" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="v7" value="Doctor checks&lt;br&gt;platform, lockfile, tools,&lt;br&gt;config, displays, mics" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="270" y="360" width="190" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="v8" value="Automated tests&lt;br&gt;npm test&lt;br&gt;unit, integration, DOM, scripts" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="500" y="360" width="190" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="v9" value="Source smoke and build&lt;br&gt;npm run build" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="730" y="360" width="190" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="v10" value="Compiled Electron E2E&lt;br&gt;tests/electron-e2e.test.ts" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="960" y="360" width="190" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="v11" value="Packaging audit and package&lt;br&gt;electron-builder, NSIS,&lt;br&gt;portable, unpacked archive" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1190" y="360" width="190" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="v12" value="Packaged lifecycle validation&lt;br&gt;installer, portable, runtime checks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1190" y="520" width="190" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="v13" value="Optional packaged automation&lt;br&gt;EnablePackagedAutomation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="960" y="520" width="190" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="v14" value="Release evidence&lt;br&gt;logs, notices, SBOM,&lt;br&gt;commissioning templates" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="730" y="520" width="190" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="v15" value="Customer release bundle&lt;br&gt;buyer docs plus existing packages" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="500" y="520" width="190" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="v16" value="Retained outputs&lt;br&gt;artifacts/packages&lt;br&gt;artifacts/logs" style="shape=cylinder3d;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="270" y="520" width="190" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="v17" value="Tagged release workflow&lt;br&gt;v* tags on windows-latest" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="690" width="210" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="v18" value="Tag and signing checks&lt;br&gt;package version, signing inputs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="300" y="690" width="210" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="v19" value="verify:repo&lt;br&gt;-KeepOutputs&lt;br&gt;-EnablePackagedAutomation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="560" y="690" width="210" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="v20" value="GitHub release assets&lt;br&gt;packages, evidence and diagnostics" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="820" y="690" width="210" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="v21" value="External completion dependencies&lt;br&gt;real hardware, live credentials,&lt;br&gt;activation, autostart, upgrade/rollback" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="680" width="260" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="e-v1-v2" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" edge="1" parent="1" source="v1" target="v2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-v2-v3" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#82b366;" edge="1" parent="1" source="v2" target="v3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-v3-v4" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#82b366;" edge="1" parent="1" source="v3" target="v4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-v2-v5" value="release readiness path" style="endArrow=block;html=1;rounded=0;strokeColor=#d6b656;" edge="1" parent="1" source="v2" target="v5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-v5-v6" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#d6b656;" edge="1" parent="1" source="v5" target="v6">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="665" y="330" />
+              <mxPoint x="135" y="330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-v6-v7" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#d6b656;" edge="1" parent="1" source="v6" target="v7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-v7-v8" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#d6b656;" edge="1" parent="1" source="v7" target="v8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-v8-v9" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#d6b656;" edge="1" parent="1" source="v8" target="v9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-v9-v10" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#d6b656;" edge="1" parent="1" source="v9" target="v10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-v10-v11" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#d6b656;" edge="1" parent="1" source="v10" target="v11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-v11-v12" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#b85450;" edge="1" parent="1" source="v11" target="v12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-v12-v13" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#b85450;" edge="1" parent="1" source="v12" target="v13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-v13-v14" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#9673a6;" edge="1" parent="1" source="v13" target="v14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-v14-v15" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#9673a6;" edge="1" parent="1" source="v14" target="v15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-v15-v16" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" edge="1" parent="1" source="v15" target="v16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-v17-v18" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#6c8ebf;" edge="1" parent="1" source="v17" target="v18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-v18-v19" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#6c8ebf;" edge="1" parent="1" source="v18" target="v19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-v19-v20" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#6c8ebf;" edge="1" parent="1" source="v19" target="v20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-v19-v5" value="same canonical gate" style="endArrow=block;html=1;rounded=0;dashed=1;strokeColor=#6c8ebf;" edge="1" parent="1" source="v19" target="v5">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="665" y="650" />
+              <mxPoint x="665" y="300" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-v20-v21" value="not fully proven by repo-only checks" style="endArrow=block;html=1;rounded=0;strokeColor=#d79b00;" edge="1" parent="1" source="v20" target="v21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

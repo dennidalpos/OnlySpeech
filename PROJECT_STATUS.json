@@ -1,26 +1,30 @@
 {
   "project_name": "OnlySpeech",
   "status": "active",
-  "current_phase": "verification",
-  "last_updated": "2026-05-13T21:02:00+02:00",
+  "current_phase": "external-validation-ready",
+  "last_updated": "2026-05-15T10:30:40+02:00",
   "production_target": true,
   "summary": "Windows-first Electron kiosk for guided two-person live speech translation.",
-  "active_objective": "Repository verification is passing after the Electron E2E visitor non-Latin flow fix.",
+  "active_objective": "Repository support for the residual validation tasks is complete; real workstation/provider evidence is required before those tasks can be closed.",
   "assumptions": [
     "README and existing status entries are treated as claims to verify against code and commands.",
-    "The packaging audit task is chosen because higher-priority residual tasks require real Windows target hardware or live provider credentials."
+    "Residual validation tasks require real Windows target hardware, live provider credentials, retained comparison installers, or a real Windows logon session before they can be marked completed."
   ],
   "decisions": [
     "Audit artifacts will be written at repository root as AUDIT_CRITICO.md, APP_FLOW.md, AUDIT_FINDINGS.json, and AUDIT_ACTION_PLAN.md.",
-    "Packaging audit should treat zero npm audit vulnerabilities as a passing release gate state instead of requiring stale known findings."
+    "Packaging audit should treat zero npm audit vulnerabilities as a passing release gate state instead of requiring stale known findings.",
+    "Autostart and upgrade/rollback close-out evidence will be retained in artifacts/logs/packaged-closeout-validation.json."
   ],
   "current_tasks": [],
   "next_tasks": [
     "Validate packaged activation and commissioning on real Windows target hardware.",
     "Validate live provider speech end-to-end with real credentials, microphone input, and playback.",
-    "Validate packaged autostart via HKCU Run key at real Windows logon."
+    "Refresh close-out artifacts on the target workstation: npm run activation:template, npm run commission:template, npm run speech:matrix-template, npm run commission:closeout-template.",
+    "Run real target-workstation activation, commissioning, live speech, autostart, upgrade, and rollback validation, then update retained artifacts from pending to passed, failed, or not_applicable."
   ],
-  "blockers": [],
+  "blockers": [
+    "Cannot complete real packaged activation, commissioning, autostart, live provider speech, upgrade, or rollback validation from this repository-only session without target hardware, live credentials, retained comparison installers, and real Windows logon access."
+  ],
   "risks": [
     "Live provider, hardware, installer upgrade, rollback, and accessibility claims cannot be fully proven from static repository checks alone.",
     "Existing local .env is present and must not be disclosed in audit outputs.",
@@ -83,7 +87,7 @@
       ".env.example"
     ]
   },
-  "last_completed_work": "Fixed the Electron automation inspector for the Station B non-Latin visitor session proof and verified npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation.",
+  "last_completed_work": "Adjusted docs/architecture/onlyspeech-workflow.drawio runtime edge labels to avoid label overlap; diagram XML validation passed.",
   "open_questions": [
     "Which runtime mode and provider combination is considered the production default for customer deployments?",
     "What exact hardware/display/microphone matrix is contractually supported?",
@@ -96,46 +100,46 @@
     {
       "id": "residual-packaged-activation-commissioning-validation",
       "title": "Validare activation e commissioning su workstation packaged reale",
-      "status": "open",
+      "status": "ready_for_external_validation",
       "priority": 1,
       "execution_order": 1,
       "scope": "core",
       "risk": "HIGH",
       "area": "commissioning",
-      "summary": "Validazione con materiale cliente reale, hardware target, touch input, display e microphone mapping su workstation Windows packaged reale."
+      "summary": "Repository templates and automation are available; close only after artifacts/logs/activation-validation.json and artifacts/logs/commissioning-evidence.json contain retained real-workstation evidence with no pending required checks."
     },
     {
       "id": "residual-live-provider-speech-proof",
       "title": "Validare live provider speech end-to-end su hardware reale",
-      "status": "open",
+      "status": "ready_for_external_validation",
       "priority": 1,
       "execution_order": 2,
       "scope": "core",
       "risk": "HIGH",
       "area": "runtime",
-      "summary": "Validazione Microphone input -> STT -> translation -> TTS playback con provider live e credenziali reali."
+      "summary": "Repository template is available; close only after artifacts/logs/live-provider-speech-proof.json contains retained live-provider evidence for microphone input, STT, translation, and TTS playback."
     },
     {
       "id": "residual-upgrade-rollback-validation",
       "title": "Verificare upgrade e rollback installer su baseline versionata",
-      "status": "open",
+      "status": "ready_for_external_validation",
       "priority": 1,
       "execution_order": 3,
       "scope": "core",
       "risk": "HIGH",
       "area": "packaging",
-      "summary": "Validazione reale di upgrade e rollback usando installer retained reali su workstation Windows dedicata."
+      "summary": "Repository close-out template and lifecycle script are available; close only after artifacts/logs/packaged-closeout-validation.json records retained previous/current/rollback installer evidence."
     },
     {
       "id": "residual-packaged-autostart-live-validation",
       "title": "Validare live l'autostart packaged via HKCU Run key",
-      "status": "open",
+      "status": "ready_for_external_validation",
       "priority": 2,
       "execution_order": 5,
       "scope": "core",
       "risk": "HIGH",
       "area": "runtime",
-      "summary": "Validazione reale enable/disable autostart al logon dell'utente corrente."
+      "summary": "Repository close-out template is available; close only after artifacts/logs/packaged-closeout-validation.json records HKCU Run-key enable/disable and real logon launch/non-launch evidence."
     }
   ]
 }

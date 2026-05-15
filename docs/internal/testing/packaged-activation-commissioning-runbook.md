@@ -16,6 +16,7 @@ This runbook covers:
 - the purchased customer email and activation code for that workstation are available;
 - `artifacts/logs/activation-validation.json` has been refreshed with `npm run activation:template`;
 - `artifacts/logs/target-station-validation.json` has been refreshed with `npm run commission:template`;
+- `artifacts/logs/packaged-closeout-validation.json` has been refreshed with `npm run commission:closeout-template`;
 - the retained local generator workspace under `.local/activation-generator/` remains ignored and is not needed unless support must reproduce a non-production token outside Git.
 
 ## Activation Validation
@@ -52,6 +53,11 @@ The packaged runtime also enforces one local 15-day trial per workstation throug
 ## Packaged Autostart Validation
 
 Validate this only on a real packaged workstation session after installation. Source mode and repository-only checks do not prove the behavior.
+Refresh the packaged close-out checklist first if the file is missing or stale:
+
+```powershell
+npm run commission:closeout-template
+```
 
 The supported contract is a single current-user Windows Run entry managed by the setup wizard:
 
@@ -77,9 +83,16 @@ Retain at minimum:
 - the packaged executable path used for the Run entry;
 - whether any unexpected Startup shortcut or scheduled task was found.
 
+Record the retained notes directly in `artifacts/logs/packaged-closeout-validation.json` under `autostart.scenarios` by changing each scenario from `pending` to `passed`, `failed`, or `not_applicable`, and filling `checked_at`, `evidence`, and `notes`.
+
 ## Upgrade And Rollback Validation
 
 Validate this only when retained comparison installers are available. The repository covers the script path and dry-run behavior, but not the real installer transitions by itself.
+Refresh the packaged close-out checklist first if the file is missing or stale:
+
+```powershell
+npm run commission:closeout-template
+```
 
 Use a dedicated Windows workstation or disposable VM and keep all install roots inside the script-owned lifecycle area.
 
@@ -95,6 +108,8 @@ Expected manual closure:
 - upgrade to the current retained installer succeeds without breaking startup;
 - rollback to the retained rollback baseline succeeds without breaking startup;
 - notes and any retained paths are recorded with the release or commissioning evidence used for the delivery.
+
+Record the retained notes directly in `artifacts/logs/packaged-closeout-validation.json` under `upgrade_rollback.scenarios` by changing each scenario from `pending` to `passed`, `failed`, or `not_applicable`, and filling `checked_at`, `evidence`, and `notes`.
 
 ## Commissioning Close-Out
 
@@ -135,7 +150,7 @@ npm run commission:handover
 
 ## Tracking Notes
 
-If this manual pass is being tracked in `PROJECT_STATUS.json`, close or update the relevant open task only after the retained evidence for that area actually exists. For activation and commissioning this usually means `artifacts/logs/activation-validation.json` and `artifacts/logs/commissioning-evidence.json`; for autostart or retained-installer lifecycle validation it may be an operator note bundle retained alongside the release evidence.
+If this manual pass is being tracked in `PROJECT_STATUS.json`, close or update the relevant open task only after the retained evidence for that area actually exists. For activation and commissioning this usually means `artifacts/logs/activation-validation.json` and `artifacts/logs/commissioning-evidence.json`; for autostart and retained-installer lifecycle validation this means `artifacts/logs/packaged-closeout-validation.json` with the relevant scenario groups closed.
 
 Do not claim signed-release, GitHub-hosted CI, or commercial-review completion unless those external bundles are retained too.
 

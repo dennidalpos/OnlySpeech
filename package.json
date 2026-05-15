@@ -28,6 +28,7 @@
     "commission:handover": "powershell -ExecutionPolicy Bypass -File ./scripts/support/commissioning/write-commissioning-artifact.ps1 -TargetStationValidationPath ./artifacts/logs/target-station-validation.json",
     "commission:template": "powershell -ExecutionPolicy Bypass -File ./scripts/support/commissioning/write-commissioning-artifact.ps1 -OutputPath ./artifacts/build/commissioning-template/commissioning-evidence.json -SkipDoctor -SkipRuntimeLogExport -WriteTargetStationValidationTemplatePath ./artifacts/logs/target-station-validation.json",
     "commission:automation": "powershell -ExecutionPolicy Bypass -File ./scripts/support/commissioning/run-target-station-automation.ps1 -UpdateValidationPath ./artifacts/logs/target-station-validation.json",
+    "commission:closeout-template": "powershell -ExecutionPolicy Bypass -File ./scripts/support/commissioning/write-packaged-closeout-validation-artifact.ps1",
     "activation:template": "powershell -ExecutionPolicy Bypass -File ./scripts/support/commissioning/write-activation-validation-artifact.ps1",
     "speech:matrix-template": "powershell -ExecutionPolicy Bypass -File ./scripts/support/commissioning/write-live-provider-speech-proof-artifact.ps1",
     "verify:repo": "powershell -ExecutionPolicy Bypass -File ./scripts/support/workspace/verify-repo.ps1",
