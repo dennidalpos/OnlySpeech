@@ -1,145 +1,67 @@
 {
   "project_name": "OnlySpeech",
   "status": "active",
-  "current_phase": "external-validation-ready",
-  "last_updated": "2026-05-15T10:30:40+02:00",
+  "current_phase": "windows-production-readiness",
+  "last_updated": "2026-06-02T10:50:00+02:00",
   "production_target": true,
-  "summary": "Windows-first Electron kiosk for guided two-person live speech translation.",
-  "active_objective": "Repository support for the residual validation tasks is complete; real workstation/provider evidence is required before those tasks can be closed.",
-  "assumptions": [
-    "README and existing status entries are treated as claims to verify against code and commands.",
-    "Residual validation tasks require real Windows target hardware, live provider credentials, retained comparison installers, or a real Windows logon session before they can be marked completed."
-  ],
-  "decisions": [
-    "Audit artifacts will be written at repository root as AUDIT_CRITICO.md, APP_FLOW.md, AUDIT_FINDINGS.json, and AUDIT_ACTION_PLAN.md.",
-    "Packaging audit should treat zero npm audit vulnerabilities as a passing release gate state instead of requiring stale known findings.",
-    "Autostart and upgrade/rollback close-out evidence will be retained in artifacts/logs/packaged-closeout-validation.json."
-  ],
-  "current_tasks": [],
-  "next_tasks": [
-    "Validate packaged activation and commissioning on real Windows target hardware.",
-    "Validate live provider speech end-to-end with real credentials, microphone input, and playback.",
-    "Refresh close-out artifacts on the target workstation: npm run activation:template, npm run commission:template, npm run speech:matrix-template, npm run commission:closeout-template.",
-    "Run real target-workstation activation, commissioning, live speech, autostart, upgrade, and rollback validation, then update retained artifacts from pending to passed, failed, or not_applicable."
-  ],
+  "active_objective": "Keep Windows + PowerShell documentation and script guidance aligned with verified production-readiness commands.",
   "blockers": [
-    "Cannot complete real packaged activation, commissioning, autostart, live provider speech, upgrade, or rollback validation from this repository-only session without target hardware, live credentials, retained comparison installers, and real Windows logon access."
+    "Production close-out still requires real Windows target hardware, live provider credentials, retained comparison installers, and real Windows logon access."
   ],
   "risks": [
-    "Live provider, hardware, installer upgrade, rollback, and accessibility claims cannot be fully proven from static repository checks alone.",
-    "Existing local .env is present and must not be disclosed in audit outputs.",
-    "Provider secrets are currently passed to Electron renderers for parts of STT/TTS flow."
+    "Full gate, packaging, e2e, and release-bundle commands are documented but still need to be rerun after documentation cleanup if they are required for this handoff.",
+    "There is no checked-in lint or format command."
   ],
-  "dependencies": {
-    "runtime": [
-      "Node.js >=22",
-      "npm >=10",
-      "Electron",
-      "React",
-      "Azure Speech SDK",
-      "OpenAI-compatible HTTP APIs through fetch",
-      "Ollama-compatible HTTP API for translation diagnostics/demo"
-    ],
-    "development": [
-      "TypeScript",
-      "Vite",
-      "Vitest",
-      "PowerShell",
-      "electron-builder"
-    ],
-    "external_services": [
-      "Azure Speech",
-      "OpenAI API",
-      "Optional Ollama host"
-    ]
-  },
+  "commands_to_confirm": [
+    "npm run test:e2e",
+    "npm run gate -- -KeepOutputs -EnablePackagedAutomation",
+    "npm run package",
+    "npm run release:customer-bundle"
+  ],
   "quality_gates": {
     "format": "not_available",
     "lint": "not_available",
-    "typecheck": "passed",
+    "typecheck": "not_run",
     "tests": "passed",
-    "build": "passed",
-    "security_review": "completed_with_findings"
+    "build": "not_run",
+    "security_review": "failed"
   },
-  "commands": {
-    "install": "npm run bootstrap",
-    "dev": "npm run dev",
-    "test": "npm test",
-    "lint": "",
-    "typecheck": "npm run build:main",
-    "build": "npm run build",
-    "start": "npm run start"
-  },
-  "environment": {
-    "os_target": "Windows",
-    "shell": "PowerShell",
-    "required_env_vars": [
-      "ONLYSPEECH_RUNTIME_MODE",
-      "ONLYSPEECH_TRANSLATION_PROVIDER",
-      "AZURE_SPEECH_KEY",
-      "AZURE_SPEECH_REGION",
-      "OPENAI_API_KEY",
-      "OPENAI_TRANSLATION_MODEL",
-      "OLLAMA_BASE_URL"
-    ],
-    "env_files": [
-      ".env",
-      ".env.example"
-    ]
-  },
-  "last_completed_work": "Adjusted docs/architecture/onlyspeech-workflow.drawio runtime edge labels to avoid label overlap; diagram XML validation passed.",
-  "open_questions": [
-    "Which runtime mode and provider combination is considered the production default for customer deployments?",
-    "What exact hardware/display/microphone matrix is contractually supported?",
-    "Is the Electron renderer intended to be trusted enough to receive provider secrets?",
-    "Should REQUIRED_MICROPHONES be a hard runtime constraint?"
-  ],
-  "handoff_notes": "Audit artifacts are present at repository root. npm run test:e2e, npm test, and npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation passed on 2026-05-13. The full repository gate produced retained package, release evidence, notices, and SBOM artifacts under artifacts/. Doctor still warns that configured display and microphone IDs are not currently available on this workstation; real hardware/provider validations remain open."
-  ,
   "tasks": [
     {
-      "id": "residual-packaged-activation-commissioning-validation",
-      "title": "Validare activation e commissioning su workstation packaged reale",
-      "status": "ready_for_external_validation",
+      "id": "confirm-doc-script-command-surface",
+      "title": "Confirm documented Windows command surface against the full gate",
+      "status": "open",
       "priority": 1,
       "execution_order": 1,
-      "scope": "core",
-      "risk": "HIGH",
-      "area": "commissioning",
-      "summary": "Repository templates and automation are available; close only after artifacts/logs/activation-validation.json and artifacts/logs/commissioning-evidence.json contain retained real-workstation evidence with no pending required checks."
+      "area": "documentation",
+      "summary": "Run or schedule the e2e, gate, package, and release-bundle commands listed in commands_to_confirm."
     },
     {
-      "id": "residual-live-provider-speech-proof",
-      "title": "Validare live provider speech end-to-end su hardware reale",
-      "status": "ready_for_external_validation",
-      "priority": 1,
-      "execution_order": 2,
-      "scope": "core",
-      "risk": "HIGH",
-      "area": "runtime",
-      "summary": "Repository template is available; close only after artifacts/logs/live-provider-speech-proof.json contains retained live-provider evidence for microphone input, STT, translation, and TTS playback."
-    },
-    {
-      "id": "residual-upgrade-rollback-validation",
-      "title": "Verificare upgrade e rollback installer su baseline versionata",
-      "status": "ready_for_external_validation",
-      "priority": 1,
-      "execution_order": 3,
-      "scope": "core",
-      "risk": "HIGH",
-      "area": "packaging",
-      "summary": "Repository close-out template and lifecycle script are available; close only after artifacts/logs/packaged-closeout-validation.json records retained previous/current/rollback installer evidence."
-    },
-    {
-      "id": "residual-packaged-autostart-live-validation",
-      "title": "Validare live l'autostart packaged via HKCU Run key",
-      "status": "ready_for_external_validation",
+      "id": "add-lint-format-command",
+      "title": "Add an explicit lint or format command if required for production gate policy",
+      "status": "open",
       "priority": 2,
-      "execution_order": 5,
-      "scope": "core",
-      "risk": "HIGH",
-      "area": "runtime",
-      "summary": "Repository close-out template is available; close only after artifacts/logs/packaged-closeout-validation.json records HKCU Run-key enable/disable and real logon launch/non-launch evidence."
+      "execution_order": 2,
+      "area": "scripts",
+      "summary": "Choose and implement a Windows-compatible static-quality command, or formally keep lint/format unavailable."
+    },
+    {
+      "id": "close-security-hardening",
+      "title": "Close or accept remaining Electron security hardening items",
+      "status": "open",
+      "priority": 2,
+      "execution_order": 3,
+      "area": "security",
+      "summary": "Resolve renderer-visible provider secrets, global media permission, sandbox disabled, privileged wizard IPC validation, and audio IPC limits before claiming production readiness."
+    },
+    {
+      "id": "complete-target-workstation-validation",
+      "title": "Complete real target-workstation validation",
+      "status": "blocked",
+      "priority": 3,
+      "execution_order": 4,
+      "area": "external-validation",
+      "summary": "Retain evidence for activation, commissioning, live provider speech, autostart, upgrade, and rollback on real Windows hardware."
     }
   ]
 }

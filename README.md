@@ -23,6 +23,16 @@ The product boundary is intentionally narrow: one Windows PC, guided in-person c
 - Windows NSIS installer, portable executable, and versioned unpacked archive outputs.
 - Repository verification for source startup, automated tests, packaging audit, packaged lifecycle checks, release evidence, notices, and SBOM generation.
 
+## Production Readiness
+
+A production Windows deployment is not cleared by source build/test results alone. Treat the app as production-ready only after all of these are true:
+
+- `npm run gate -- -KeepOutputs -EnablePackagedAutomation` passes on Windows.
+- A signed installer or approved portable package is produced from the same verified source.
+- Packaged activation, commissioning, autostart, upgrade, rollback, live provider speech, and audio/language validation are completed on the target workstation.
+- Open security hardening items in [PROJECT_STATUS.json](PROJECT_STATUS.json) are closed or explicitly accepted by the product owner.
+- Retained evidence exists under `artifacts/logs/` for release, compliance, commissioning, activation, live speech, and packaged close-out checks.
+
 ## Requirements
 
 - Windows x64 for supported development, CI parity, packaging, and runtime validation.
@@ -42,6 +52,19 @@ The product boundary is intentionally narrow: one Windows PC, guided in-person c
 4. Complete configuration through the integrated setup wizard, or use the `.env` contract implemented in source and described in [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md).
 5. For packaged workstation reset support, use `npm run clean:workstation`.
 
+## Environment
+
+Runtime configuration is owned by the setup wizard and the source `.env` contract. Do not commit real provider credentials.
+
+Required live-provider values depend on the selected provider:
+
+- `APP_MODE=kiosk` or `demo`.
+- `TRANSLATION_PROVIDER=azure`, `chatgpt`, or `ollama`.
+- Azure live speech: `AZURE_SPEECH_KEY` and `AZURE_SPEECH_REGION`.
+- ChatGPT live speech: `CHATGPT_API_KEY`, `CHATGPT_MODEL`, and `CHATGPT_TRANSCRIBE_MODEL`.
+- Ollama diagnostics/demo: `OLLAMA_BASE_URL` and `OLLAMA_MODEL`.
+- Hardware profile: display IDs, microphone IDs, `MICROPHONE_PTT_MODE`, `REQUIRED_MONITORS`, and `REQUIRED_MICROPHONES`.
+
 ## Packaged Workstation Preflight
 
 The installer verifies required software before copying the app:
@@ -58,6 +81,8 @@ The installer verifies required software before copying the app:
 | `npm run bootstrap` | Validate the Node/npm baseline and restore dependencies with the deterministic install path when needed. |
 | `npm run dev` | Start renderer, main-process compiler, and Electron in watch mode. |
 | `npm run start` | Build stale/missing source outputs and launch Electron locally. |
+| `npm run start -- -SetupWizard` | Launch the source app directly into the integrated setup wizard. |
+| `npm run start -- -SetupWizard -WizardSection provider` | Launch the setup wizard at a supported section: `stations`, `provider`, `languages`, `diagnostics`, or `license`. |
 | `npm run build` | Compile renderer and main outputs. |
 | `npm run compile` | Run `build:renderer` and `build:main` directly. |
 | `npm test` | Run Vitest excluding the compiled Electron e2e test. |
@@ -78,18 +103,30 @@ The installer verifies required software before copying the app:
 | `npm run release:compliance` | Write third-party notices and SBOM artifacts. |
 | `npm run release:customer-bundle` | Assemble the customer-facing release bundle from existing package outputs and docs. |
 
+There is no checked-in lint or format command yet. That gap is tracked in [PROJECT_STATUS.json](PROJECT_STATUS.json).
+
 The complete PowerShell script classification and side-effect map lives in [scripts/script.md](scripts/script.md).
 
 ## Project Status
 
-The repository can be built, tested, packaged, and verified from the tracked source on Windows. CI and tagged release workflows both run the canonical repository verification command with packaged automation enabled.
+The repository has a Windows-first command surface and a canonical verification gate. It is not production-ready until the open security hardening and real-workstation validation tasks in [PROJECT_STATUS.json](PROJECT_STATUS.json) are closed or accepted.
 
-Open residual work is limited to items that require real hardware, retained comparison installers, live provider credentials, dependency remediation that depends on a compatible upstream path, or currently unfinished UI accessibility follow-up. Those items are tracked in [PROJECT_STATUS.json](PROJECT_STATUS.json).
+CI and tagged release workflows run `npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation`.
+
+## Troubleshooting
+
+- Dependency tree inconsistent: run `npm run bootstrap -- -ForceRefresh`.
+- Source launch opens setup instead of kiosk: complete the setup wizard or verify the source `.env` runtime root.
+- Packaged workstation state is stale: run `npm run clean:workstation`, then provision again.
+- Missing microphone or display blockers: reopen setup with `npm run start -- -SetupWizard -WizardSection stations`.
+- Provider checks fail: verify the selected `TRANSLATION_PROVIDER`, required provider credentials, network access, region/model values, and language support.
+- Windows N live speech failure: install Microsoft Media Feature Pack and reboot before rerunning validation.
 
 ## Technical Documentation
 
 - [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md): primary technical contract for runtime, configuration, verification, packaging, release, and output boundaries.
 - [docs/product/brand-assets.md](docs/product/brand-assets.md): brand asset locations, naming, sizes, regeneration, and consumers.
+- [scripts/README.md](scripts/README.md): concise operational script guide.
 - [scripts/script.md](scripts/script.md): canonical npm/PowerShell script index, classification, and side-effect map.
 - [docs/product/provider-setup.md](docs/product/provider-setup.md): provider setup boundaries and official documentation links.
 - [docs/internal/testing/language-speech-matrix.md](docs/internal/testing/language-speech-matrix.md): manual live provider speech proof matrix.

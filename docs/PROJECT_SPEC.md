@@ -2,7 +2,7 @@
 
 ## Objective
 
-OnlySpeech is a Windows-first Electron desktop translation workstation for assisted two-person conversations on one PC with two display surfaces. The repository supports source startup, diagnostics, testing, Windows packaging, packaged lifecycle validation, release evidence generation, customer bundle assembly, and commissioning handover support.
+OnlySpeech is a Windows-first Electron desktop translation workstation for assisted two-person conversations on one PC with two display surfaces. The repository supports source startup, diagnostics, testing, Windows packaging, packaged lifecycle validation, release evidence generation, customer bundle assembly, and commissioning handover support. Passing repository checks does not by itself certify a customer production deployment.
 
 ## Documentation Hierarchy
 
@@ -77,6 +77,7 @@ Not supported by the repository contract:
 - PowerShell is the repository script shell.
 - TypeScript, Vite, React, Electron, Vitest, and electron-builder are the active application/build stack.
 - CI runs on `windows-latest` and uses Node.js 22.
+- The supported operational surface is Windows PowerShell through the documented npm aliases and PowerShell scripts.
 
 ## Runtime Component Map
 
@@ -170,6 +171,8 @@ The deterministic local path is:
 
 Detailed script ownership and side effects live in `scripts/script.md`.
 
+There is no checked-in lint or format command. Static-quality coverage beyond TypeScript and tests is tracked as residual work in `PROJECT_STATUS.json`.
+
 ## Diagnostics And Verification
 
 The internal doctor validates Node.js, platform, lockfile, dependency installation, local tooling, template config, provider requirements, configured languages, launcher presence, display/microphone availability through Electron probing, and touch-input readiness reminders.
@@ -208,6 +211,18 @@ The tagged release workflow:
 - publishes GitHub release assets from `artifacts/packages/` and retained release evidence.
 
 Release-side scripts produce `artifacts/logs/release-evidence.json`, `artifacts/logs/third-party-notices.json`, and `artifacts/logs/sbom.cdx.json`. Customer bundle assembly copies buyer-facing docs and existing package outputs; it includes retained internal evidence only when those files already exist.
+
+## Production Readiness Contract
+
+Production readiness requires both repository gates and target-workstation evidence:
+
+- `npm run gate -- -KeepOutputs -EnablePackagedAutomation` must pass on Windows.
+- Security hardening tasks in `PROJECT_STATUS.json` must be closed or explicitly accepted by the product owner.
+- The package used for deployment must be generated from the verified source and signed or otherwise approved for the deployment.
+- Target hardware validation must cover packaged activation, setup commissioning, display assignment, microphone assignment, live provider speech, TTS playback, autostart at logon, upgrade, and rollback.
+- Retained evidence must exist under `artifacts/logs/` for release metadata, notices, SBOM, activation validation, commissioning evidence, live provider speech proof, and packaged close-out validation.
+
+Until those conditions are met, the repository may be technically verifiable but the customer deployment remains blocked.
 
 ## Output Boundaries
 
