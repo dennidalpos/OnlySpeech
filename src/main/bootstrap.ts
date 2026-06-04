@@ -77,12 +77,33 @@ function getActivationStorageAdapter(): ActivationStorageEncryptionAdapter | und
   return safeStorage as ActivationStorageEncryptionAdapter;
 }
 
+type SetupWizardSection = "stations" | "provider" | "languages" | "diagnostics" | "license";
+
+function normalizeWizardSection(value: string | undefined): SetupWizardSection | null {
+  switch (value) {
+    case "stations":
+    case "provider":
+    case "languages":
+    case "diagnostics":
+    case "license":
+      return value;
+    case "monitors":
+    case "microphones":
+      return "stations";
+    case "tests":
+    case "technical":
+      return "diagnostics";
+    default:
+      return null;
+  }
+}
+
 function parseBootOptions(args = process.argv.slice(1)): {
   forceSetupWizard: boolean;
-  wizardSection: "monitors" | "microphones" | "provider";
+  wizardSection: SetupWizardSection;
 } {
   let forceSetupWizard = false;
-  let wizardSection: "monitors" | "microphones" | "provider" = "monitors";
+  let wizardSection: SetupWizardSection = "stations";
 
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index];
@@ -93,18 +114,18 @@ function parseBootOptions(args = process.argv.slice(1)): {
     }
 
     if (argument === "--wizard-section") {
-      const nextValue = args[index + 1];
-      if (nextValue === "monitors" || nextValue === "microphones" || nextValue === "provider") {
-        wizardSection = nextValue;
+      const nextSection = normalizeWizardSection(args[index + 1]);
+      if (nextSection) {
+        wizardSection = nextSection;
         index += 1;
       }
       continue;
     }
 
     if (argument.startsWith("--wizard-section=")) {
-      const nextValue = argument.slice("--wizard-section=".length);
-      if (nextValue === "monitors" || nextValue === "microphones" || nextValue === "provider") {
-        wizardSection = nextValue;
+      const nextSection = normalizeWizardSection(argument.slice("--wizard-section=".length));
+      if (nextSection) {
+        wizardSection = nextSection;
       }
     }
   }

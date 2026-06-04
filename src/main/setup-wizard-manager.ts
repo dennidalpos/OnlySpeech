@@ -150,7 +150,7 @@ function computeWizardLicenseInfo(state: PersistedActivationState, now = new Dat
 
 function validateWizardDefaultTargetLanguages(envValues: Record<EnvKey, string>): void {
   const provider = envValues.TRANSLATION_PROVIDER.trim();
-  if (provider !== "azure" && provider !== "chatgpt") {
+  if (provider !== "azure" && provider !== "chatgpt" && provider !== "ollama") {
     throw new Error(`TRANSLATION_PROVIDER='${provider}' is not supported by the setup wizard.`);
   }
   const defaults: Array<readonly ["DEFAULT_TARGET_LANG_A" | "DEFAULT_TARGET_LANG_B", string]> = [

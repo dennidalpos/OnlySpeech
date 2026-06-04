@@ -23,14 +23,15 @@ The product boundary is intentionally narrow: one Windows PC, guided in-person c
 - Windows NSIS installer, portable executable, and versioned unpacked archive outputs.
 - Repository verification for source startup, automated tests, packaging audit, packaged lifecycle checks, release evidence, notices, and SBOM generation.
 
-## Production Readiness
+## Windows Production Readiness
 
-A production Windows deployment is not cleared by source build/test results alone. Treat the app as production-ready only after all of these are true:
+OnlySpeech is production-oriented for Windows + PowerShell, but a customer deployment is not cleared by source build/test results alone. Treat a build as deployable only after all of these are true:
 
 - `npm run gate -- -KeepOutputs -EnablePackagedAutomation` passes on Windows.
+- `npm audit --audit-level=moderate` and `npm run audit:packaging` are clean or any remaining findings are explicitly accepted for the release.
 - A signed installer or approved portable package is produced from the same verified source.
 - Packaged activation, commissioning, autostart, upgrade, rollback, live provider speech, and audio/language validation are completed on the target workstation.
-- Open security hardening items in [PROJECT_STATUS.json](PROJECT_STATUS.json) are closed or explicitly accepted by the product owner.
+- Open blockers in [PROJECT_STATUS.json](PROJECT_STATUS.json) are closed or explicitly accepted by the product owner.
 - Retained evidence exists under `artifacts/logs/` for release, compliance, commissioning, activation, live speech, and packaged close-out checks.
 
 ## Requirements
@@ -48,9 +49,13 @@ A production Windows deployment is not cleared by source build/test results alon
 
 1. Install Node.js 22+ on Windows.
 2. Run `npm run bootstrap`.
-3. Use `npm run dev` for the watch workspace, or `npm run start` for a direct source launch.
-4. Complete configuration through the integrated setup wizard, or use the `.env` contract implemented in source and described in [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md).
-5. For packaged workstation reset support, use `npm run clean:workstation`.
+3. Run `npm run start -- -SetupWizard` and save the workstation configuration.
+4. Use `npm run dev` for the watch workspace, or `npm run start` for a direct source launch.
+5. Run `npm test` and `npm run test:e2e` before packaging work.
+6. Run `npm run gate -- -KeepOutputs -EnablePackagedAutomation` for the Windows verification gate.
+7. Run `npm run package` only after the gate is clean or the remaining blockers are formally accepted.
+
+Use `npm run clean:workstation` only for packaged workstation support or reinstall flows.
 
 ## Environment
 
@@ -79,6 +84,7 @@ The installer verifies required software before copying the app:
 | command | purpose |
 | --- | --- |
 | `npm run bootstrap` | Validate the Node/npm baseline and restore dependencies with the deterministic install path when needed. |
+| `npm run bootstrap -- -ForceRefresh` | Force a deterministic dependency reinstall with `npm ci --include=dev --omit=optional`. |
 | `npm run dev` | Start renderer, main-process compiler, and Electron in watch mode. |
 | `npm run start` | Build stale/missing source outputs and launch Electron locally. |
 | `npm run start -- -SetupWizard` | Launch the source app directly into the integrated setup wizard. |
@@ -88,6 +94,7 @@ The installer verifies required software before copying the app:
 | `npm test` | Run Vitest excluding the compiled Electron e2e test. |
 | `npm run test:e2e` | Compile, then run `tests/electron-e2e.test.ts`. |
 | `npm run gate -- -KeepOutputs -EnablePackagedAutomation` | Run the full Windows verification gate through the canonical repository verifier, retaining installer outputs when requested. |
+| `npm run gate -- -RefreshDependencies -KeepOutputs -EnablePackagedAutomation` | Same gate with forced dependency refresh through the public wrapper. |
 | `npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation` | Canonical local/CI verification path with packaged automation enabled and outputs retained. |
 | `npm run package` | Produce public Windows installer, portable executable, and versioned unpacked archive under `artifacts/packages/`. |
 | `npm run clean` | Remove repo-local generated outputs while preserving dependencies, `.env`, workstation data, and autostart state. |
@@ -103,13 +110,13 @@ The installer verifies required software before copying the app:
 | `npm run release:compliance` | Write third-party notices and SBOM artifacts. |
 | `npm run release:customer-bundle` | Assemble the customer-facing release bundle from existing package outputs and docs. |
 
-There is no checked-in lint or format command yet. That gap is tracked in [PROJECT_STATUS.json](PROJECT_STATUS.json).
+There is no checked-in lint or format command. Use TypeScript build, Vitest, Electron e2e, packaging audit, and the Windows gate as the current checked quality surface.
 
 The complete PowerShell script classification and side-effect map lives in [scripts/script.md](scripts/script.md).
 
 ## Project Status
 
-The repository has a Windows-first command surface and a canonical verification gate. It is not production-ready until the open security hardening and real-workstation validation tasks in [PROJECT_STATUS.json](PROJECT_STATUS.json) are closed or accepted.
+The repository has a Windows-first command surface and a canonical verification gate. It is not production-ready until the open blockers in [PROJECT_STATUS.json](PROJECT_STATUS.json) are closed or accepted.
 
 CI and tagged release workflows run `npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation`.
 
@@ -117,9 +124,12 @@ CI and tagged release workflows run `npm run verify:repo -- -KeepOutputs -Enable
 
 - Dependency tree inconsistent: run `npm run bootstrap -- -ForceRefresh`.
 - Source launch opens setup instead of kiosk: complete the setup wizard or verify the source `.env` runtime root.
+- Demo mode remains on language selection: rebuild source outputs with `npm run build`, then launch with `npm run start`; verify `APP_MODE=demo` and both display windows are receiving runtime state.
 - Packaged workstation state is stale: run `npm run clean:workstation`, then provision again.
 - Missing microphone or display blockers: reopen setup with `npm run start -- -SetupWizard -WizardSection stations`.
 - Provider checks fail: verify the selected `TRANSLATION_PROVIDER`, required provider credentials, network access, region/model values, and language support.
+- Gate fails at `test`: run `npm test` directly, fix the failing Vitest file, then rerun the gate.
+- Gate fails at `audit-packaging`: run `npm audit --audit-level=moderate` and `npm run audit:packaging`, then remediate or formally accept the findings.
 - Windows N live speech failure: install Microsoft Media Feature Pack and reboot before rerunning validation.
 
 ## Technical Documentation

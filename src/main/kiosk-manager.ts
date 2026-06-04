@@ -239,9 +239,6 @@ export class KioskManager {
       case "activity":
         return;
       case "select-target-language":
-        if (this.demoController) {
-          return;
-        }
         if (!action.targetLanguage) {
           return;
         }

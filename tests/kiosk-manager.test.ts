@@ -268,6 +268,25 @@ describe("KioskManager microphone probes", () => {
     expect(state.health.blockingIssues).toEqual([]);
   });
 
+  it("keeps manual language selection responsive in demo mode", () => {
+    const manager = new KioskManager(
+      createConfig({
+        appMode: "demo",
+        chatGptApiKey: "",
+        chatGptModel: "",
+        chatGptTranscribeModel: ""
+      })
+    );
+
+    manager.handleOperatorAction({ type: "select-target-language", side: "B", targetLanguage: "fr" });
+
+    const state = (manager as unknown as { getState: () => AppState }).getState();
+
+    expect(state.appMode).toBe("demo");
+    expect(state.sides.B.selectedTargetLanguage).toBe("fr");
+    expect(state.sides.B.hasCommittedLanguageSelection).toBe(true);
+  });
+
   it("uses the configured demo slide interval for cycle restarts", () => {
     vi.useFakeTimers();
 

@@ -334,6 +334,58 @@ describe("SetupWizardManager control window", () => {
     ).toBe(false);
   });
 
+  it("saves demo-mode Ollama configuration without requiring live speech credentials", async () => {
+    const runtimeRoot = mkdtempSync(join(tmpdir(), "onlyspeech-wizard-ollama-demo-save-"));
+    tempDirectories.push(runtimeRoot);
+
+    const manager = new SetupWizardManager({
+      runtimeRoot,
+      getAutostartState: () => ({
+        mechanism: "current-user-run-key" as const,
+        scope: "current-user" as const,
+        supported: false,
+        canModify: false,
+        currentEnabled: false,
+        selectedEnabled: false
+      })
+    });
+
+    const state = createInitialWizardState(
+      [
+        { displayId: 1, label: "A", bounds: { x: 0, y: 0, width: 1920, height: 1080 }, scaleFactor: 1 },
+        { displayId: 2, label: "B", bounds: { x: 1920, y: 0, width: 1920, height: 1080 }, scaleFactor: 1 }
+      ],
+      {
+        APP_MODE: "demo",
+        SETUP_UI_LANGUAGE: "en",
+        TRANSLATION_PROVIDER: "ollama",
+        OLLAMA_BASE_URL: "",
+        OLLAMA_MODEL: "",
+        DEFAULT_TARGET_LANG_A: "en",
+        DEFAULT_TARGET_LANG_B: "fr"
+      }
+    );
+    (manager as unknown as { state: unknown }).state = state;
+    (manager as unknown as { registerIpcHandlers: () => void }).registerIpcHandlers();
+
+    const saveHandler = electronMocks.ipcMain.handle.mock.calls.find(
+      ([channel]: string[]) => channel === "wizard:save-env"
+    )?.[1] as (() => Promise<{
+      preview: string;
+    }>) | undefined;
+
+    if (!saveHandler) {
+      throw new Error("wizard:save-env handler not registered.");
+    }
+
+    const result = await saveHandler();
+
+    expect(result.preview).toContain("APP_MODE=demo");
+    expect(result.preview).toContain("TRANSLATION_PROVIDER=ollama");
+    expect(result.preview).toContain("REQUIRED_MICROPHONES=0");
+    expect(readFileSync(join(runtimeRoot, ".env"), "utf8")).toContain("TRANSLATION_PROVIDER=ollama");
+  });
+
   it("wizard:update-autostart applies the selected packaged startup state immediately", async () => {
     const runtimeRoot = mkdtempSync(join(tmpdir(), "onlyspeech-wizard-autostart-"));
     tempDirectories.push(runtimeRoot);

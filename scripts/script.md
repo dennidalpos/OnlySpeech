@@ -40,6 +40,7 @@ Ignored local outputs such as `.local/`, `dist/`, `artifacts/`, `node_modules/`,
 | `npm test` | Vitest without Electron e2e. |
 | `npm run test:e2e` | Compile and run Electron e2e. |
 | `npm run gate -- -KeepOutputs -EnablePackagedAutomation` | Public local production-readiness gate. |
+| `npm run gate -- -RefreshDependencies -KeepOutputs -EnablePackagedAutomation` | Public local gate with forced deterministic dependency refresh. |
 | `npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation` | Canonical local/CI/release verification. |
 | `npm run package` | Public package build. |
 | `npm run docs:screenshots` | Optional product screenshot regeneration. |
@@ -55,7 +56,7 @@ Ignored local outputs such as `.local/`, `dist/`, `artifacts/`, `node_modules/`,
 | `npm run release:tag-check` | Release tag validation. |
 | `npm run release:signing-check` | Windows signing input validation. |
 
-There is no checked-in lint or format command.
+There is no checked-in lint or format command. The current checked quality surface is TypeScript build, Vitest, Electron e2e, packaging audit, PowerShell script tests, and the Windows gate.
 
 ## Support Scripts
 
@@ -114,6 +115,8 @@ There is no checked-in lint or format command.
 14. Clean generated outputs unless `-KeepOutputs` is set.
 
 The gate fails at the first failing step through `Invoke-OnlySpeechStep` and prints the command label before execution.
+
+For a deployable Windows candidate, run `npm run package`, `npm run release:evidence`, `npm run release:compliance`, and `npm run release:customer-bundle` only after the gate is clean or remaining findings are formally accepted. Target-workstation activation, commissioning, live speech, autostart, upgrade, and rollback validation still happen outside the repository gate.
 
 ## Verification Modifiers
 

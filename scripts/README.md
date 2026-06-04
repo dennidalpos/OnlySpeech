@@ -1,6 +1,6 @@
 # Scripts
 
-OnlySpeech scripts are Windows + PowerShell entrypoints. Use npm aliases for normal operation; support scripts under `scripts/support/` are implementation details unless a runbook names them directly.
+OnlySpeech scripts are Windows + PowerShell entrypoints. Run commands from the repository root. Use npm aliases for normal operation; support scripts under `scripts/support/` are implementation details unless a runbook names them directly.
 
 ## Official Commands
 
@@ -16,6 +16,7 @@ OnlySpeech scripts are Windows + PowerShell entrypoints. Use npm aliases for nor
 | test | `npm run test:e2e` | Compile and run Electron e2e coverage. |
 | build | `npm run build` | Compile renderer and main process output. |
 | check | `npm run gate -- -KeepOutputs -EnablePackagedAutomation` | Local production-readiness gate with retained outputs and packaged automation. |
+| check | `npm run gate -- -RefreshDependencies -KeepOutputs -EnablePackagedAutomation` | Same gate with a forced deterministic dependency refresh. |
 | check | `npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation` | Canonical CI/release verification command. |
 | package | `npm run package` | Build public Windows installer, portable executable, and unpacked archive. |
 | cleanup | `npm run clean` | Remove repo-local generated outputs while preserving dependencies, `.env`, workstation data, and autostart. |
@@ -24,7 +25,7 @@ OnlySpeech scripts are Windows + PowerShell entrypoints. Use npm aliases for nor
 | release | `npm run release:compliance` | Write third-party notices and SBOM artifacts. |
 | release | `npm run release:customer-bundle` | Assemble the buyer-facing bundle from existing package outputs and docs. |
 
-There is no checked-in lint or format command.
+There is no checked-in lint or format command. The checked quality surface is TypeScript build, Vitest, Electron e2e, packaging audit, PowerShell script tests, and the Windows gate.
 
 ## Production Gate
 
@@ -35,7 +36,10 @@ Use this sequence before a Windows deployment candidate:
 3. `npm run test:e2e`
 4. `npm run gate -- -KeepOutputs -EnablePackagedAutomation`
 5. `npm run package`
-6. Target-workstation activation, commissioning, live speech, autostart, upgrade, and rollback validation.
+6. `npm run release:evidence`
+7. `npm run release:compliance`
+8. `npm run release:customer-bundle`
+9. Target-workstation activation, commissioning, live speech, autostart, upgrade, and rollback validation.
 
 The repository gate is necessary but not sufficient for production. Real hardware, live credentials, retained installer comparison, and logon evidence are still required.
 
@@ -45,8 +49,11 @@ The repository gate is necessary but not sufficient for production. Real hardwar
 | --- | --- |
 | Dependency install is stale or broken. | Run `npm run bootstrap -- -ForceRefresh`. |
 | Source app opens setup instead of kiosk. | Finish setup or verify the source `.env` runtime configuration. |
+| Demo mode stays on language selection. | Run `npm run build`, then `npm run start`; verify `APP_MODE=demo` and that both display windows receive runtime state. |
 | Display or microphone blockers remain. | Run `npm run start -- -SetupWizard -WizardSection stations`. |
 | Provider validation fails. | Check `TRANSLATION_PROVIDER`, provider credentials, region/model values, network access, and selected languages. |
+| Gate fails at test. | Run `npm test` directly and fix the failing Vitest file before rerunning the gate. |
+| Gate fails at packaging audit. | Run `npm audit --audit-level=moderate` and `npm run audit:packaging`, then remediate or formally accept findings. |
 | Packaged workstation has stale local state. | Run `npm run clean:workstation`, then provision again. |
 | Windows N cannot capture speech. | Install Microsoft Media Feature Pack and reboot. |
 

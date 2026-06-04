@@ -301,11 +301,17 @@ describeWindows("verify-repo.ps1", () => {
 
   it("keeps PROJECT_STATUS.json limited to open or blocked residual follow-up", () => {
     const projectStatus = JSON.parse(readFileSync(projectStatusPath, "utf8")) as {
-      tasks: Array<{ id: string; status: string }>;
+      todos: Array<{ id: string; status: string }>;
+      commands_to_confirm: string[];
+      blockers: string[];
+      risks: string[];
     };
 
-    expect(projectStatus.tasks.length).toBeGreaterThan(0);
-    expect(projectStatus.tasks.every((task) => ["open", "blocked"].includes(task.status))).toBe(true);
+    expect(projectStatus.todos.length).toBeGreaterThan(0);
+    expect(projectStatus.todos.every((task) => ["open", "blocked"].includes(task.status))).toBe(true);
+    expect(projectStatus.commands_to_confirm.length).toBeGreaterThan(0);
+    expect(projectStatus.blockers.length).toBeGreaterThan(0);
+    expect(projectStatus.risks.length).toBeGreaterThan(0);
   });
 
   it("keeps the public bootstrap wrapper pointed at the deterministic npm ci flow", () => {

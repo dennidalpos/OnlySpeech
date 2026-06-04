@@ -1,67 +1,81 @@
 {
   "project_name": "OnlySpeech",
-  "status": "active",
+  "status": "blocked",
   "current_phase": "windows-production-readiness",
-  "last_updated": "2026-06-02T10:50:00+02:00",
-  "production_target": true,
-  "active_objective": "Keep Windows + PowerShell documentation and script guidance aligned with verified production-readiness commands.",
-  "blockers": [
-    "Production close-out still requires real Windows target hardware, live provider credentials, retained comparison installers, and real Windows logon access."
-  ],
-  "risks": [
-    "Full gate, packaging, e2e, and release-bundle commands are documented but still need to be rerun after documentation cleanup if they are required for this handoff.",
-    "There is no checked-in lint or format command."
-  ],
-  "commands_to_confirm": [
-    "npm run test:e2e",
-    "npm run gate -- -KeepOutputs -EnablePackagedAutomation",
-    "npm run package",
-    "npm run release:customer-bundle"
-  ],
-  "quality_gates": {
-    "format": "not_available",
-    "lint": "not_available",
-    "typecheck": "not_run",
-    "tests": "passed",
-    "build": "not_run",
-    "security_review": "failed"
-  },
-  "tasks": [
+  "active_objective": "Prepare a Windows + PowerShell production deployment path without claiming readiness before security, gate, packaging, and target-workstation evidence are closed.",
+  "todos": [
     {
-      "id": "confirm-doc-script-command-surface",
-      "title": "Confirm documented Windows command surface against the full gate",
-      "status": "open",
-      "priority": 1,
-      "execution_order": 1,
-      "area": "documentation",
-      "summary": "Run or schedule the e2e, gate, package, and release-bundle commands listed in commands_to_confirm."
-    },
-    {
-      "id": "add-lint-format-command",
-      "title": "Add an explicit lint or format command if required for production gate policy",
-      "status": "open",
-      "priority": 2,
-      "execution_order": 2,
-      "area": "scripts",
-      "summary": "Choose and implement a Windows-compatible static-quality command, or formally keep lint/format unavailable."
-    },
-    {
-      "id": "close-security-hardening",
-      "title": "Close or accept remaining Electron security hardening items",
-      "status": "open",
-      "priority": 2,
-      "execution_order": 3,
+      "id": "resolve-dependency-audit",
       "area": "security",
-      "summary": "Resolve renderer-visible provider secrets, global media permission, sandbox disabled, privileged wizard IPC validation, and audio IPC limits before claiming production readiness."
+      "status": "open",
+      "summary": "Remediate or formally accept current npm audit and packaging audit findings."
+    },
+    {
+      "id": "confirm-production-command-path",
+      "area": "scripts",
+      "status": "open",
+      "summary": "Confirm the documented Windows command path after dependency audit remediation: bootstrap, tests, e2e, gate, package, release evidence, compliance, and customer bundle."
     },
     {
       "id": "complete-target-workstation-validation",
-      "title": "Complete real target-workstation validation",
+      "area": "operations",
       "status": "blocked",
-      "priority": 3,
-      "execution_order": 4,
-      "area": "external-validation",
-      "summary": "Retain evidence for activation, commissioning, live provider speech, autostart, upgrade, and rollback on real Windows hardware."
+      "summary": "Validate packaged activation, commissioning, live provider speech, TTS playback, autostart, upgrade, rollback, display assignment, microphone assignment, and retained evidence on the real Windows target workstation."
+    },
+    {
+      "id": "decide-lint-format-policy",
+      "area": "quality",
+      "status": "open",
+      "summary": "Either add Windows-compatible lint/format commands or formally keep TypeScript, tests, packaging audit, and gate as the checked quality surface."
+    },
+    {
+      "id": "review-script-doc-alignment-after-gate",
+      "area": "documentation",
+      "status": "open",
+      "summary": "Recheck README, docs/PROJECT_SPEC.md, scripts/README.md, and scripts/script.md after the full retained gate and release commands pass."
     }
-  ]
+  ],
+  "commands_to_confirm": [
+    "npm run bootstrap",
+    "npm test",
+    "npm run test:e2e",
+    "npm audit --audit-level=moderate",
+    "npm run audit:packaging",
+    "npm run gate -- -KeepOutputs -EnablePackagedAutomation",
+    "npm run package",
+    "npm run release:evidence",
+    "npm run release:compliance",
+    "npm run release:customer-bundle",
+    "npm run activation:template",
+    "npm run commission:template",
+    "npm run commission:automation",
+    "npm run commission:handover",
+    "npm run speech:matrix-template",
+    "npm run commission:closeout-template"
+  ],
+  "blockers": [
+    "Dependency security audit and packaging audit are not confirmed clean for release.",
+    "Full retained Windows gate with packaged automation still needs to pass after security remediation or formal acceptance.",
+    "Production close-out requires real Windows target hardware, live provider credentials, activation inputs, signing inputs or approved unsigned-package exception, retained installer comparison outputs, and real logon/autostart validation."
+  ],
+  "risks": [
+    "There is no checked-in lint or format command.",
+    "Electron renderer windows and setup wizard still use sandbox:false and require explicit acceptance or remediation before claiming security readiness.",
+    "Local workstation .env display and microphone assignments can drift from current hardware and must be refreshed through setup before handoff validation.",
+    "Large source and script files increase maintenance risk and should be reviewed outside the documentation/script alignment pass.",
+    "Documentation now reflects the intended Windows + PowerShell command path, but package, release bundle, and target-workstation commands remain to be reconfirmed after blockers are closed."
+  ],
+  "official_commands": {
+    "install": "npm run bootstrap",
+    "dev": "npm run dev",
+    "start": "npm run start",
+    "setup_wizard": "npm run start -- -SetupWizard",
+    "test": "npm test",
+    "e2e": "npm run test:e2e",
+    "build": "npm run build",
+    "check": "npm run gate -- -KeepOutputs -EnablePackagedAutomation",
+    "package": "npm run package",
+    "clean": "npm run clean",
+    "clean_workstation": "npm run clean:workstation"
+  }
 }

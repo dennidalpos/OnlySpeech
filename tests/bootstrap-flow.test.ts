@@ -3,6 +3,8 @@ import type { PersistedActivationState } from "../src/main/activation-storage.js
 import type { ActivationStateEvaluationResult } from "../src/main/activation-state.js";
 import type { ActivationValidationResult } from "../src/main/activation-validator.js";
 
+const originalArgv = [...process.argv];
+
 const bootstrapMocks = vi.hoisted(() => {
   let readyResolver: (() => void) | null = null;
 
@@ -385,13 +387,33 @@ describe("bootstrap integrated setup wizard flow", () => {
     vi.useFakeTimers();
     vi.resetModules();
     bootstrapMocks.reset();
+    process.argv = [...originalArgv];
+    delete process.env.ONLYSPEECH_SETUP_WIZARD_SECTION;
     delete process.env.ONLYSPEECH_TEST_TRIAL_EXHAUSTED_AT;
   });
 
   afterEach(() => {
+    process.argv = [...originalArgv];
     vi.clearAllTimers();
     vi.useRealTimers();
+    delete process.env.ONLYSPEECH_SETUP_WIZARD_SECTION;
     delete process.env.ONLYSPEECH_TEST_TRIAL_EXHAUSTED_AT;
+  });
+
+  it("preserves documented setup wizard section arguments during bootstrap", async () => {
+    process.argv = ["electron", ".", "--setup-wizard", "--wizard-section", "diagnostics"];
+
+    await importBootstrap();
+
+    expect(process.env.ONLYSPEECH_SETUP_WIZARD_SECTION).toBe("diagnostics");
+  });
+
+  it("maps legacy setup wizard monitor arguments to the stations section", async () => {
+    process.argv = ["electron", ".", "--setup-wizard", "--wizard-section=monitors"];
+
+    await importBootstrap();
+
+    expect(process.env.ONLYSPEECH_SETUP_WIZARD_SECTION).toBe("stations");
   });
 
   it("opens the setup wizard automatically when .env is missing", async () => {

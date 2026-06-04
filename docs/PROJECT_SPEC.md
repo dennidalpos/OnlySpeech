@@ -12,7 +12,7 @@ This document is the long-form technical contract for the repository. It does no
 - `docs/PROJECT_SPEC.md` is the primary technical contract; the rest of `docs/` contains the supporting runbooks, product notes, and buyer-facing collateral referenced from that contract.
 - `scripts/script.md` is the canonical script index, invocation map, and PowerShell side-effect map.
 - `.github/workflows/*.yml` are the canonical CI and tagged-release workflow definitions.
-- `PROJECT_STATUS.json` tracks only explicit residual follow-up that is intentionally left open after repository changes; it is not a changelog.
+- `PROJECT_STATUS.json` tracks current blockers, risks, commands to confirm, and open documentation/script follow-up; it is not a changelog.
 
 ## Product Boundary
 
@@ -152,7 +152,7 @@ Provider/model overrides must be validated on the target workstation before depl
 
 ## Script And Command Contract
 
-The stable user-facing npm entrypoints are intentionally small: `bootstrap`, `dev`, `start`, `build`, `gate`, `package`, `clean`, `clean:workstation`, `test`, `test:e2e`, `verify:repo`, `docs:screenshots`, and `license:keygen`.
+The stable user-facing npm entrypoints are `bootstrap`, `dev`, `start`, `build`, `gate`, `package`, `clean`, `clean:workstation`, `test`, `test:e2e`, `verify:repo`, `docs:screenshots`, and `license:keygen`. Release, commissioning, activation, and speech-proof aliases are supported operational commands and are documented in `scripts/script.md`.
 
 `npm run bootstrap` is the dependency restore entrypoint. It validates the Node.js baseline, requires `package-lock.json`, and runs `npm ci --include=dev --omit=optional` only when the dependency tree is missing, inconsistent, or force-refreshed.
 
@@ -171,7 +171,7 @@ The deterministic local path is:
 
 Detailed script ownership and side effects live in `scripts/script.md`.
 
-There is no checked-in lint or format command. Static-quality coverage beyond TypeScript and tests is tracked as residual work in `PROJECT_STATUS.json`.
+There is no checked-in lint or format command. Static-quality coverage is currently TypeScript build, Vitest, Electron e2e, packaging audit, PowerShell script tests, and the Windows gate.
 
 ## Diagnostics And Verification
 
@@ -185,7 +185,7 @@ The test surface includes:
 - PowerShell planning and repo-helper tests;
 - packaged runtime automation tests.
 
-`npm run gate` and `npm run verify:repo` cover cleanup, bootstrap, doctor, tests, source smoke, build, Electron e2e, packaging audit, packaging, packaged lifecycle validation, optional packaged automation, release evidence generation, release compliance generation, and final cleanup unless outputs are preserved. The gate default preserves `.env`, `.local/activation-generator`, dependencies, local vendored `tools/`, workstation data, and autostart state; `-CleanWorkstationData` explicitly removes packaged workstation data through `clean:workstation`, and `-RefreshDependencies` force-refreshes the deterministic bootstrap.
+`npm run gate` and `npm run verify:repo` cover cleanup, bootstrap, doctor, tests, source smoke, build, Electron e2e, packaging audit, packaging, packaged lifecycle validation, optional packaged automation, release evidence generation, release compliance generation, and final cleanup unless outputs are preserved. The gate default preserves `.env`, `.local/activation-generator`, dependencies, local vendored `tools/`, workstation data, and autostart state. `-CleanWorkstationData` explicitly removes packaged workstation data through `clean:workstation`. The public `gate` wrapper uses `-RefreshDependencies`; the canonical `verify:repo` implementation uses `-ForceRefreshDependencies`.
 
 Supported verification modifiers include `-SkipInstall`, `-SkipPack`, `-SkipPackagedLifecycle`, `-EnablePackagedAutomation`, `-SkipSmokeStart`, `-KeepOutputs`, `-CleanWorkstationData`, `-ForceRefreshDependencies`, and `-DryRun`. The public `gate` wrapper exposes dependency refresh as `-RefreshDependencies`.
 
@@ -217,6 +217,7 @@ Release-side scripts produce `artifacts/logs/release-evidence.json`, `artifacts/
 Production readiness requires both repository gates and target-workstation evidence:
 
 - `npm run gate -- -KeepOutputs -EnablePackagedAutomation` must pass on Windows.
+- `npm audit --audit-level=moderate` and `npm run audit:packaging` must pass, or remaining findings must be explicitly accepted for the release.
 - Security hardening tasks in `PROJECT_STATUS.json` must be closed or explicitly accepted by the product owner.
 - The package used for deployment must be generated from the verified source and signed or otherwise approved for the deployment.
 - Target hardware validation must cover packaged activation, setup commissioning, display assignment, microphone assignment, live provider speech, TTS playback, autostart at logon, upgrade, and rollback.
