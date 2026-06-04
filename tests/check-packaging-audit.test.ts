@@ -41,17 +41,34 @@ function validateReport(report: unknown) {
 }
 
 describe("Validate-PackagingAuditReport", () => {
-  it("accepts the current expected clean audit shape", { timeout: 15000 }, () => {
+  it("accepts the current explicitly accepted audit shape", { timeout: 15000 }, () => {
     const expected = getExpectedState();
 
     expect(
       validateReport({
-        vulnerabilities: {},
+        vulnerabilities: {
+          "microsoft-cognitiveservices-speech-sdk": {
+            name: "microsoft-cognitiveservices-speech-sdk",
+            severity: "moderate",
+            fixAvailable: {
+              name: "microsoft-cognitiveservices-speech-sdk",
+              isSemVerMajor: true
+            }
+          },
+          uuid: {
+            name: "uuid",
+            severity: "moderate",
+            fixAvailable: {
+              name: "microsoft-cognitiveservices-speech-sdk",
+              isSemVerMajor: true
+            }
+          }
+        },
         metadata: { vulnerabilities: { ...expected.expectedCounts } }
       })
     ).toEqual({
       ok: true,
-      message: "Packaging audit matches the current expected dependency state (0 findings)."
+      message: "Packaging audit matches the current expected dependency state (2 findings)."
     });
   });
 
@@ -64,7 +81,7 @@ describe("Validate-PackagingAuditReport", () => {
       })
     ).toEqual({
       ok: false,
-      message: "Unexpected total count: expected 0, found 21."
+      message: "Unexpected total count: expected 2, found 21."
     });
   });
 
@@ -88,7 +105,7 @@ describe("Validate-PackagingAuditReport", () => {
       })
     ).toEqual({
       ok: false,
-      message: "Unexpected moderate count: expected 0, found 2."
+      message: "Unexpected vulnerability list. Expected microsoft-cognitiveservices-speech-sdk, uuid. Found electronBuilder, uuid."
     });
   });
 
@@ -108,7 +125,7 @@ describe("Validate-PackagingAuditReport", () => {
       })
     ).toEqual({
       ok: false,
-      message: "Unexpected vulnerability list length: expected 0, found 1."
+      message: "Unexpected moderate count: expected 2, found 0."
     });
   });
 });

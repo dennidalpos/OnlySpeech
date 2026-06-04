@@ -64,7 +64,7 @@ describe("TextToSpeechClient", () => {
 
   it("starts provider-owned OpenAI playback for the ChatGPT provider", async () => {
     installAudioMocks();
-    const fetchMock = vi.fn(async () => createAudioResponse());
+    const fetchMock = vi.fn(async (_url: string, _init?: RequestInit) => createAudioResponse());
     vi.stubGlobal("fetch", fetchMock);
 
     const client = new TextToSpeechClient();
@@ -96,7 +96,7 @@ describe("TextToSpeechClient", () => {
 
   it("can disable OpenAI TTS language instructions per command", async () => {
     installAudioMocks();
-    const fetchMock = vi.fn(async () => createAudioResponse());
+    const fetchMock = vi.fn(async (_url: string, _init?: RequestInit) => createAudioResponse());
     vi.stubGlobal("fetch", fetchMock);
 
     const client = new TextToSpeechClient();

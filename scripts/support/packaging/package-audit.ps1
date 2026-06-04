@@ -46,15 +46,19 @@ function New-PackagingAuditMismatch {
 
 function Get-ExpectedPackagingAuditState {
   return [ordered]@{
-    expectedFix = $null
-    expectedVulnerabilities = @()
+    # npm can currently resolve this only through a semver-major Azure Speech SDK downgrade.
+    expectedFix = [ordered]@{
+      name = "microsoft-cognitiveservices-speech-sdk"
+      isSemVerMajor = $true
+    }
+    expectedVulnerabilities = @("microsoft-cognitiveservices-speech-sdk", "uuid")
     expectedCounts = [ordered]@{
       info = 0
       low = 0
-      moderate = 0
+      moderate = 2
       high = 0
       critical = 0
-      total = 0
+      total = 2
     }
   }
 }
