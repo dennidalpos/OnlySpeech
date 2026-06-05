@@ -1,5 +1,9 @@
 {
   "todos": [
-    "Complete target-workstation activation, commissioning, live provider speech, autostart, upgrade, rollback, display, microphone, and evidence validation."
+    "Complete all packaged activation scenarios in artifacts/logs/activation-validation.json with retained real activation evidence.",
+    "Complete target-station commissioning checks in artifacts/logs/target-station-validation.json, then capture artifacts/logs/commissioning-evidence.json with no remaining pending checks.",
+    "Complete all live provider speech scenarios in artifacts/logs/live-provider-speech-proof.json for microphone input, STT, translation, and TTS playback on real hardware with real credentials.",
+    "Run packaged upgrade and rollback validation with retained previous and rollback installers, then close the upgrade_rollback scenarios in artifacts/logs/packaged-closeout-validation.json.",
+    "Complete packaged autostart validation after real Windows logon, then close the autostart scenarios in artifacts/logs/packaged-closeout-validation.json."
   ]
 }

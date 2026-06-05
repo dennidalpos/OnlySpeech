@@ -12,7 +12,7 @@ This document is the long-form technical contract for the repository. It does no
 - `docs/PROJECT_SPEC.md` is the primary technical contract; the rest of `docs/` contains the supporting runbooks, product notes, and buyer-facing collateral referenced from that contract.
 - `scripts/script.md` is the canonical script index, invocation map, and PowerShell side-effect map.
 - `.github/workflows/*.yml` are the canonical CI and tagged-release workflow definitions.
-- `PROJECT_STATUS.json` tracks current blockers, risks, commands to confirm, and open documentation/script follow-up; it is not a changelog.
+- `PROJECT_STATUS.json` tracks only current incomplete todo tasks; it is not a changelog, report, risk register, or check log.
 
 ## Product Boundary
 

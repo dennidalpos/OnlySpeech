@@ -36,6 +36,7 @@
 # Package manager and runtime logs
 *.log
 npm-debug.log*
+*.drawio.bkp
 
 # Editor and OS files
 .vscode/
