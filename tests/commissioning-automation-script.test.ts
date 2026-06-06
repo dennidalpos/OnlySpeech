@@ -48,4 +48,13 @@ describeWindows("run-target-station-automation.ps1", () => {
     expect(script).toContain("Runtime env file not found.");
     expect(script).not.toContain("WS-DP01");
   });
+
+  it("forces a temporary kiosk profile for automation phases", () => {
+    const script = readFileSync(scriptPath, "utf8");
+
+    expect(script).toContain("function New-OnlySpeechKioskAutomationEnvMap");
+    expect(script).toContain('$automationEnvValues["APP_MODE"] = "kiosk"');
+    expect(script).toContain('$automationEnvValues["REQUIRED_MONITORS"] = "2"');
+    expect(script).toContain("New-OnlySpeechKioskAutomationEnvMap -BaseEnvValues $BaseEnvValues");
+  });
 });

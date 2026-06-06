@@ -72,6 +72,30 @@ function ConvertTo-OnlySpeechEnvText {
   return ($lines -join [Environment]::NewLine) + [Environment]::NewLine
 }
 
+function New-OnlySpeechKioskAutomationEnvMap {
+  param(
+    [System.Collections.IDictionary]$BaseEnvValues
+  )
+
+  $automationEnvValues = [ordered]@{}
+  foreach ($entry in $BaseEnvValues.GetEnumerator()) {
+    $automationEnvValues[$entry.Key] = [string]$entry.Value
+  }
+
+  $automationEnvValues["APP_MODE"] = "kiosk"
+  $automationEnvValues["REQUIRED_MONITORS"] = "2"
+
+  if ([string]::IsNullOrWhiteSpace([string]$automationEnvValues["DEFAULT_TARGET_LANG_A"])) {
+    $automationEnvValues["DEFAULT_TARGET_LANG_A"] = "it"
+  }
+
+  if ([string]::IsNullOrWhiteSpace([string]$automationEnvValues["DEFAULT_TARGET_LANG_B"])) {
+    $automationEnvValues["DEFAULT_TARGET_LANG_B"] = "en"
+  }
+
+  return $automationEnvValues
+}
+
 function Invoke-OnlySpeechAutomationRequest {
   param(
     [int]$Port,
@@ -279,7 +303,8 @@ function Invoke-FullscreenAndHardResetCheck {
   New-Item -ItemType Directory -Path $appDataRoot -Force | Out-Null
   New-Item -ItemType Directory -Path $localAppDataRoot -Force | Out-Null
 
-  Write-OnlySpeechUtf8File -Path (Join-Path $runtimeRoot ".env") -Content (ConvertTo-OnlySpeechEnvText -Values $BaseEnvValues)
+  $automationEnvValues = New-OnlySpeechKioskAutomationEnvMap -BaseEnvValues $BaseEnvValues
+  Write-OnlySpeechUtf8File -Path (Join-Path $runtimeRoot ".env") -Content (ConvertTo-OnlySpeechEnvText -Values $automationEnvValues)
   $process = $null
 
   try {
@@ -373,10 +398,7 @@ function Invoke-IdleClearCheck {
   New-Item -ItemType Directory -Path $appDataRoot -Force | Out-Null
   New-Item -ItemType Directory -Path $localAppDataRoot -Force | Out-Null
 
-  $idleEnvValues = [ordered]@{}
-  foreach ($entry in $BaseEnvValues.GetEnumerator()) {
-    $idleEnvValues[$entry.Key] = [string]$entry.Value
-  }
+  $idleEnvValues = New-OnlySpeechKioskAutomationEnvMap -BaseEnvValues $BaseEnvValues
   $idleEnvValues["IDLE_CLEAR_SECONDS"] = "2"
   $idleEnvValues["IDLE_HARD_RESET_SECONDS"] = "30"
 
@@ -446,10 +468,7 @@ function Invoke-VisitorLanguageCatalogCheck {
   New-Item -ItemType Directory -Path $appDataRoot -Force | Out-Null
   New-Item -ItemType Directory -Path $localAppDataRoot -Force | Out-Null
 
-  $visitorEnvValues = [ordered]@{}
-  foreach ($entry in $BaseEnvValues.GetEnumerator()) {
-    $visitorEnvValues[$entry.Key] = [string]$entry.Value
-  }
+  $visitorEnvValues = New-OnlySpeechKioskAutomationEnvMap -BaseEnvValues $BaseEnvValues
 
   if ([string]::IsNullOrWhiteSpace([string]$visitorEnvValues["SETUP_UI_LANGUAGE"])) {
     $visitorEnvValues["SETUP_UI_LANGUAGE"] = "en"
