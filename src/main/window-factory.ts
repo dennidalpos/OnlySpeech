@@ -1,6 +1,7 @@
 import { BrowserWindow, screen } from "electron";
 import { fileURLToPath } from "node:url";
 import type { Bounds, DisplayAssignment, Side } from "../shared/types.js";
+import { installWindowNavigationGuards } from "./window-security.js";
 
 interface CreateOperatorWindowOptions {
   side: Side;
@@ -8,7 +9,7 @@ interface CreateOperatorWindowOptions {
   devServerUrl?: string;
 }
 
-const preloadPath = fileURLToPath(new URL("./preload.js", import.meta.url));
+const preloadPath = fileURLToPath(new URL("./preload.cjs", import.meta.url));
 const rendererHtmlPath = fileURLToPath(new URL("../renderer/index.html", import.meta.url));
 
 function clampNumber(value: number, minimum: number, maximum: number): number {
@@ -84,9 +85,10 @@ export function createOperatorWindow(options: CreateOperatorWindowOptions): Brow
       preload: preloadPath,
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false
+      sandbox: true
     }
   });
+  installWindowNavigationGuards(window);
 
   if (devServerUrl) {
     void window.loadURL(`${devServerUrl}?side=${side}`);

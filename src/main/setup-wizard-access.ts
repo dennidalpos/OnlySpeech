@@ -9,7 +9,9 @@ import type {
   SetupWizardAccessState
 } from "../shared/types.js";
 
-const SETUP_WIZARD_ACCESS_SCHEMA_VERSION = 2;
+const SETUP_WIZARD_ACCESS_SCHEMA_VERSION = 3;
+const MAX_FAILED_AUTHORIZATION_ATTEMPTS = 5;
+const AUTHORIZATION_LOCKOUT_MS = 5 * 60 * 1_000;
 
 const DEFAULT_PASSWORD_DERIVATION = Object.freeze({
   algorithm: "scrypt" as const,
@@ -19,16 +21,17 @@ const DEFAULT_PASSWORD_DERIVATION = Object.freeze({
   keyLength: 64
 });
 
-interface PersistedSetupWizardAccessRecordV2 {
-  schemaVersion: 2;
+interface PersistedSetupWizardAccessRecordV3 {
+  schemaVersion: 3;
   passwordSalt: string;
   passwordHash: string;
   passwordDerivation: typeof DEFAULT_PASSWORD_DERIVATION;
   mustChangePassword: boolean;
-  temporaryPassword: string | null;
+  failedAuthorizationAttempts: number;
+  lockedUntilEpochMs: number | null;
 }
 
-type PersistedSetupWizardAccessRecord = PersistedSetupWizardAccessRecordV2;
+type PersistedSetupWizardAccessRecord = PersistedSetupWizardAccessRecordV3;
 
 function derivePasswordHash(
   password: string,
@@ -63,10 +66,9 @@ function createPasswordRecord(
   password: string,
   options: {
     mustChangePassword: boolean;
-    temporaryPassword: string | null;
     randomBytesProvider: (size: number) => Buffer;
   }
-): PersistedSetupWizardAccessRecordV2 {
+): PersistedSetupWizardAccessRecordV3 {
   const passwordSalt = options.randomBytesProvider(16).toString("hex");
 
   return {
@@ -75,7 +77,8 @@ function createPasswordRecord(
     passwordHash: derivePasswordHash(password, passwordSalt, DEFAULT_PASSWORD_DERIVATION),
     passwordDerivation: DEFAULT_PASSWORD_DERIVATION,
     mustChangePassword: options.mustChangePassword,
-    temporaryPassword: options.temporaryPassword
+    failedAuthorizationAttempts: 0,
+    lockedUntilEpochMs: null
   };
 }
 
@@ -88,9 +91,12 @@ function createTemporaryPassword(randomBytesProvider: (size: number) => Buffer):
 }
 
 export class SetupWizardAccessManager {
+  private provisioningTemporaryPassword: string | null = null;
+
   constructor(
     private readonly accessFilePath: string,
-    private readonly randomBytesProvider: (size: number) => Buffer = randomBytes
+    private readonly randomBytesProvider: (size: number) => Buffer = randomBytes,
+    private readonly nowProvider: () => number = Date.now
   ) {}
 
   ensureInitialized(): void {
@@ -99,9 +105,9 @@ export class SetupWizardAccessManager {
     }
 
     const temporaryPassword = createTemporaryPassword(this.randomBytesProvider);
+    this.provisioningTemporaryPassword = temporaryPassword;
     this.writeRecord(createPasswordRecord(temporaryPassword, {
       mustChangePassword: true,
-      temporaryPassword,
       randomBytesProvider: this.randomBytesProvider
     }));
   }
@@ -112,7 +118,7 @@ export class SetupWizardAccessManager {
     return {
       requiresPassword: options.runtimeEnvPresent,
       mustChangePassword: options.runtimeEnvPresent ? record.mustChangePassword : false,
-      temporaryPassword: options.runtimeEnvPresent ? record.temporaryPassword : null
+      temporaryPassword: options.runtimeEnvPresent ? this.provisioningTemporaryPassword : null
     };
   }
 
@@ -123,7 +129,7 @@ export class SetupWizardAccessManager {
     this.ensureInitialized();
     const record = this.readRecord();
     return {
-      temporaryPassword: record.temporaryPassword,
+      temporaryPassword: this.provisioningTemporaryPassword,
       mustChangePassword: record.mustChangePassword
     };
   }
@@ -134,9 +140,35 @@ export class SetupWizardAccessManager {
     const password = request.password.trim();
     const nextPassword = request.nextPassword?.trim() ?? "";
     const record = this.readRecord();
+    const now = this.nowProvider();
+
+    if (record.lockedUntilEpochMs !== null && record.lockedUntilEpochMs > now) {
+      return this.failure("temporarily-locked");
+    }
 
     if (!password || !verifyPassword(password, record)) {
+      const failedAuthorizationAttempts = record.failedAuthorizationAttempts + 1;
+      this.writeRecord({
+        ...record,
+        failedAuthorizationAttempts: failedAuthorizationAttempts >= MAX_FAILED_AUTHORIZATION_ATTEMPTS
+          ? 0
+          : failedAuthorizationAttempts,
+        lockedUntilEpochMs: failedAuthorizationAttempts >= MAX_FAILED_AUTHORIZATION_ATTEMPTS
+          ? now + AUTHORIZATION_LOCKOUT_MS
+          : null
+      });
+      if (failedAuthorizationAttempts >= MAX_FAILED_AUTHORIZATION_ATTEMPTS) {
+        return this.failure("temporarily-locked");
+      }
       return this.failure("invalid-password");
+    }
+
+    if (record.failedAuthorizationAttempts !== 0 || record.lockedUntilEpochMs !== null) {
+      this.writeRecord({
+        ...record,
+        failedAuthorizationAttempts: 0,
+        lockedUntilEpochMs: null
+      });
     }
 
     if (!record.mustChangePassword) {
@@ -153,15 +185,34 @@ export class SetupWizardAccessManager {
 
     this.writeRecord(createPasswordRecord(nextPassword, {
       mustChangePassword: false,
-      temporaryPassword: null,
       randomBytesProvider: this.randomBytesProvider
     }));
+    this.provisioningTemporaryPassword = null;
 
     return { ok: true };
   }
 
   private readRecord(): PersistedSetupWizardAccessRecord {
-    const parsed = JSON.parse(readFileSync(this.accessFilePath, "utf8")) as PersistedSetupWizardAccessRecord;
+    const parsed = JSON.parse(readFileSync(this.accessFilePath, "utf8")) as {
+      schemaVersion?: number;
+      temporaryPassword?: string | null;
+    };
+
+    if (parsed.schemaVersion === 2) {
+      const legacy = parsed as typeof parsed & Omit<PersistedSetupWizardAccessRecord, "schemaVersion" | "failedAuthorizationAttempts" | "lockedUntilEpochMs">;
+      this.provisioningTemporaryPassword ??= parsed.temporaryPassword ?? null;
+      const migrated: PersistedSetupWizardAccessRecord = {
+        schemaVersion: SETUP_WIZARD_ACCESS_SCHEMA_VERSION,
+        passwordSalt: legacy.passwordSalt,
+        passwordHash: legacy.passwordHash,
+        passwordDerivation: legacy.passwordDerivation,
+        mustChangePassword: legacy.mustChangePassword,
+        failedAuthorizationAttempts: 0,
+        lockedUntilEpochMs: null
+      };
+      this.writeRecord(migrated);
+      return migrated;
+    }
 
     if (parsed.schemaVersion !== SETUP_WIZARD_ACCESS_SCHEMA_VERSION) {
       throw new Error(
@@ -169,7 +220,7 @@ export class SetupWizardAccessManager {
       );
     }
 
-    return parsed;
+    return parsed as PersistedSetupWizardAccessRecord;
   }
 
   private writeRecord(record: PersistedSetupWizardAccessRecord): void {
@@ -184,6 +235,12 @@ export class SetupWizardAccessManager {
           ok: false,
           code,
           message: "Setup wizard password is invalid."
+        };
+      case "temporarily-locked":
+        return {
+          ok: false,
+          code,
+          message: "Setup wizard access is temporarily locked after repeated failed attempts. Try again in five minutes."
         };
       case "new-password-required":
         return {

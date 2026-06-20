@@ -1,13 +1,14 @@
 import { BrowserWindow, screen } from "electron";
 import { fileURLToPath } from "node:url";
 import { clampBoundsToVisibleArea } from "./window-factory.js";
+import { installWindowNavigationGuards } from "./window-security.js";
 
 interface CreateActivationWindowOptions {
   devServerUrl?: string;
   onClosed?: () => void;
 }
 
-const preloadPath = fileURLToPath(new URL("./preload.js", import.meta.url));
+const preloadPath = fileURLToPath(new URL("./preload.cjs", import.meta.url));
 const activationHtmlPath = fileURLToPath(new URL("../renderer/activation.html", import.meta.url));
 
 export function createActivationWindow(options: CreateActivationWindowOptions = {}): BrowserWindow {
@@ -42,9 +43,10 @@ export function createActivationWindow(options: CreateActivationWindowOptions = 
       preload: preloadPath,
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false
+      sandbox: true
     }
   });
+  installWindowNavigationGuards(window);
 
   if (options.devServerUrl) {
     const normalizedUrl = options.devServerUrl.endsWith("/")

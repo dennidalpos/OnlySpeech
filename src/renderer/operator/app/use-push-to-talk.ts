@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import type { OnlySpeechRendererApi } from "../../../shared/onlyspeech-api.js";
 import type { Side } from "../../../shared/types.js";
 
@@ -17,7 +17,7 @@ export function usePushToTalk(options: UsePushToTalkOptions) {
     isPttPressedRef.current = isPttPressed;
   }, [isPttPressed]);
 
-  const endPtt = () => {
+  const endPtt = useCallback(() => {
     if (!isPttPressedRef.current) {
       return;
     }
@@ -25,9 +25,9 @@ export function usePushToTalk(options: UsePushToTalkOptions) {
     isPttPressedRef.current = false;
     setIsPttPressed(false);
     sendOperatorAction({ type: "request-ptt-up", side });
-  };
+  }, [sendOperatorAction, side]);
 
-  const startPtt = () => {
+  const startPtt = useCallback(() => {
     if (!canTalk || isPttPressedRef.current) {
       return;
     }
@@ -35,7 +35,7 @@ export function usePushToTalk(options: UsePushToTalkOptions) {
     isPttPressedRef.current = true;
     setIsPttPressed(true);
     sendOperatorAction({ type: "request-ptt-down", side });
-  };
+  }, [canTalk, sendOperatorAction, side]);
 
   const onPointerDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
     if (!canTalk) {
@@ -75,7 +75,7 @@ export function usePushToTalk(options: UsePushToTalkOptions) {
       window.removeEventListener("touchcancel", release);
       window.removeEventListener("blur", release);
     };
-  }, [isPttPressed]);
+  }, [endPtt, isPttPressed]);
 
   useEffect(() => {
     const isKeyboardPttKey = (event: KeyboardEvent) =>
@@ -120,7 +120,7 @@ export function usePushToTalk(options: UsePushToTalkOptions) {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, [canTalk]);
+  }, [endPtt, startPtt]);
 
   return {
     isPttPressed,

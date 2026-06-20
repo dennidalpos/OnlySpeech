@@ -14,7 +14,9 @@ const envExamplePath = resolve(testsDir, "..", ".env.example");
 
 describe("runtime env contract", () => {
   it("keeps the checked-in .env.example aligned with the canonical runtime env surface", () => {
-    expect(readFileSync(envExamplePath, "utf8")).toBe(renderDotEnvExample());
+    const normalizeLineEndings = (value: string) => value.replace(/\r\n/g, "\n");
+
+    expect(normalizeLineEndings(readFileSync(envExamplePath, "utf8"))).toBe(renderDotEnvExample());
   });
 
   it("renders every declared runtime env key in canonical order", () => {

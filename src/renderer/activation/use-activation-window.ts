@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getOnlySpeechRendererApi } from "../../shared/onlyspeech-api.js";
 import {
   ACTIVATION_COPY,
@@ -36,18 +36,18 @@ export function useActivationWindow() {
   const api = getOnlySpeechRendererApi();
   const text = ACTIVATION_COPY[language];
 
-  function applyStatus(
+  const applyStatus = useCallback((
     nextStatus: typeof status,
     nextTone: ActivationStatusTone = nextStatus.status,
     nextDetail: string | null = null
-  ) {
+  ) => {
     setStatus(nextStatus);
     setStatusTone(nextTone);
     setStatusDetail(nextDetail);
     setStatusDetailVisible(false);
-  }
+  }, []);
 
-  async function readGateState() {
+  const readGateState = useCallback(async () => {
     if (!api?.getActivationGateState) {
       return {
         detail: null,
@@ -66,7 +66,7 @@ export function useActivationWindow() {
         state: createFallbackActivationState(language)
       };
     }
-  }
+  }, [api, language]);
 
   async function refreshStatus() {
     setIsStatusRefreshing(true);
@@ -96,7 +96,7 @@ export function useActivationWindow() {
     return () => {
       cancelled = true;
     };
-  }, [api, language]);
+  }, [applyStatus, readGateState]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

@@ -37,6 +37,7 @@ Ignored local outputs such as `.local/`, `dist/`, `artifacts/`, `node_modules/`,
 | `npm run start` | Direct source launch. |
 | `npm run start -- -SetupWizard` | Direct source setup wizard launch. |
 | `npm run build` | Renderer and main compile. |
+| `npm run lint` | ESLint checks for source, tests, and JavaScript tooling. |
 | `npm test` | Vitest without Electron e2e. |
 | `npm run test:e2e` | Compile and run Electron e2e. |
 | `npm run gate -- -KeepOutputs -EnablePackagedAutomation` | Public local production-readiness gate. |

@@ -87,6 +87,29 @@ describe("setup-wizard preload", () => {
     expect(api.getTextToSpeechCoverageSnapshot).toBeUndefined();
   });
 
+  it("exposes only display-assignment capabilities to overlay windows", async () => {
+    process.argv.push("--onlyspeech-wizard-role=overlay");
+    try {
+      await import("../src/tools/setup-wizard/preload.js");
+    } finally {
+      process.argv.pop();
+    }
+
+    const api = preloadMocks.exposeInMainWorld.mock.calls[0]?.[1] as Record<string, unknown>;
+    expect(Object.keys(api).sort()).toEqual([
+      "assignDisplay",
+      "assignMicrophone",
+      "closeCurrentOverlay",
+      "closeMonitorSetup",
+      "getState",
+      "onState",
+      "updateMicrophones",
+      "updateSignalLevel"
+    ]);
+    expect(api.saveEnv).toBeUndefined();
+    expect(api.terminateApplication).toBeUndefined();
+  });
+
   it("routes chatgpt speech tests through ipc and keeps azure speech lazy", async () => {
     preloadMocks.invoke.mockResolvedValue({ transcript: "ciao", translation: "hello" });
 

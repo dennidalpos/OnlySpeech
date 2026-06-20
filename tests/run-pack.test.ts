@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 const repoRoot = process.cwd();
 const scriptPath = join(repoRoot, "scripts", "support", "packaging", "package-core.ps1");
-const exampleRepoRoot = String.raw`D:\Repo`;
+const exampleRepoRoot = join(repoRoot, ".test-fixtures", "package-root");
 
 function runPowerShellJson(script: string): unknown {
   const result = spawnSync(
@@ -203,6 +203,6 @@ describe("package.json Windows packaging metadata", () => {
     expect(packageJson.scripts.bootstrap).toBe(
       "powershell -ExecutionPolicy Bypass -File ./scripts/bootstrap.ps1"
     );
-    expect(packageJson.devDependencies["@rollup/rollup-win32-x64-msvc"]).toBe("4.60.1");
+    expect(packageJson.devDependencies["@rollup/rollup-win32-x64-msvc"]).toBe("4.62.2");
   });
 });

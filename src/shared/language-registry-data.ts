@@ -32,8 +32,7 @@ export interface CanonicalInteractionLanguageDefinition {
   providers: Record<SeedProvider, SeedProviderDefinition>;
 }
 
-interface CanonicalInteractionLanguageSeed
-  extends Omit<CanonicalInteractionLanguageDefinition, "tier"> {}
+type CanonicalInteractionLanguageSeed = Omit<CanonicalInteractionLanguageDefinition, "tier">;
 
 export interface ProviderTargetOnlyLanguageDefinition {
   code: string;

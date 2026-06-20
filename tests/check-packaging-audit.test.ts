@@ -41,34 +41,17 @@ function validateReport(report: unknown) {
 }
 
 describe("Validate-PackagingAuditReport", () => {
-  it("accepts the current explicitly accepted audit shape", { timeout: 15000 }, () => {
+  it("accepts a clean audit report", { timeout: 15000 }, () => {
     const expected = getExpectedState();
 
     expect(
       validateReport({
-        vulnerabilities: {
-          "microsoft-cognitiveservices-speech-sdk": {
-            name: "microsoft-cognitiveservices-speech-sdk",
-            severity: "moderate",
-            fixAvailable: {
-              name: "microsoft-cognitiveservices-speech-sdk",
-              isSemVerMajor: true
-            }
-          },
-          uuid: {
-            name: "uuid",
-            severity: "moderate",
-            fixAvailable: {
-              name: "microsoft-cognitiveservices-speech-sdk",
-              isSemVerMajor: true
-            }
-          }
-        },
+        vulnerabilities: {},
         metadata: { vulnerabilities: { ...expected.expectedCounts } }
       })
     ).toEqual({
       ok: true,
-      message: "Packaging audit matches the current expected dependency state (2 findings)."
+      message: "Packaging audit matches the current expected dependency state (0 findings)."
     });
   });
 
@@ -81,7 +64,7 @@ describe("Validate-PackagingAuditReport", () => {
       })
     ).toEqual({
       ok: false,
-      message: "Unexpected total count: expected 2, found 21."
+      message: "Unexpected total count: expected 0, found 21."
     });
   });
 
@@ -105,7 +88,7 @@ describe("Validate-PackagingAuditReport", () => {
       })
     ).toEqual({
       ok: false,
-      message: "Unexpected vulnerability list. Expected microsoft-cognitiveservices-speech-sdk, uuid. Found electronBuilder, uuid."
+      message: "Unexpected moderate count: expected 0, found 2."
     });
   });
 
@@ -125,7 +108,7 @@ describe("Validate-PackagingAuditReport", () => {
       })
     ).toEqual({
       ok: false,
-      message: "Unexpected moderate count: expected 2, found 0."
+      message: "Unexpected vulnerability list length: expected 0, found 1."
     });
   });
 });

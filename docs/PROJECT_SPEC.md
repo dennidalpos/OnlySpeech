@@ -171,7 +171,7 @@ The deterministic local path is:
 
 Detailed script ownership and side effects live in `scripts/script.md`.
 
-There is no checked-in lint or format command. Static-quality coverage is currently TypeScript build, Vitest, Electron e2e, packaging audit, PowerShell script tests, and the Windows gate.
+Static-quality coverage includes ESLint, TypeScript build, thresholded Vitest coverage, Electron e2e, packaging audit, PowerShell script tests, and the Windows gate.
 
 ## Diagnostics And Verification
 

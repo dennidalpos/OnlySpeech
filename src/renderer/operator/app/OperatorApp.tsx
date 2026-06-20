@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { findSourceLanguageOption } from "../../../shared/language-options.js";
 import type { OnlySpeechRendererApi } from "../../../shared/onlyspeech-api.js";
 import { buildInteractionLanguageChoices } from "../../../shared/language-flow.js";
@@ -85,7 +85,7 @@ function resolveDocumentDirection(language: string): "ltr" | "rtl" {
 }
 
 export function OperatorApp() {
-  const side = useMemo(resolveSide, []);
+  const side = resolveSide();
   const fallbackUiLanguage = "en";
   const onlySpeechApi: OnlySpeechRendererApi | null = window.onlySpeech ?? null;
   const appState = useOnlySpeechRuntime(side, onlySpeechApi);
@@ -202,7 +202,6 @@ export function OperatorApp() {
     let cancelled = false;
 
     if (!onlySpeechApi?.getShutdownCapability) {
-      setCanShutdownComputer(false);
       return () => {
         cancelled = true;
       };

@@ -13,6 +13,8 @@ OnlySpeech scripts are Windows + PowerShell entrypoints. Run commands from the r
 | start | `npm run start -- -SetupWizard` | Open the integrated setup wizard from source. |
 | start | `npm run start -- -SetupWizard -WizardSection provider` | Open a supported wizard section: `stations`, `provider`, `languages`, `diagnostics`, or `license`. |
 | test | `npm test` | Run Vitest excluding compiled Electron e2e. |
+| test | `npm run test:coverage` | Enforce coverage thresholds for activation, IPC, runtime configuration, providers, and setup persistence. |
+| check | `npm run lint` | Run ESLint across TypeScript, React, and JavaScript sources and tests. |
 | test | `npm run test:e2e` | Compile and run Electron e2e coverage. |
 | build | `npm run build` | Compile renderer and main process output. |
 | check | `npm run gate -- -KeepOutputs -EnablePackagedAutomation` | Local production-readiness gate with retained outputs and packaged automation. |
@@ -25,7 +27,7 @@ OnlySpeech scripts are Windows + PowerShell entrypoints. Run commands from the r
 | release | `npm run release:compliance` | Write third-party notices and SBOM artifacts. |
 | release | `npm run release:customer-bundle` | Assemble the buyer-facing bundle from existing package outputs and docs. |
 
-There is no checked-in lint or format command. The checked quality surface is TypeScript build, Vitest, Electron e2e, packaging audit, PowerShell script tests, and the Windows gate.
+The checked quality surface is ESLint, TypeScript build, Vitest, Electron e2e, packaging audit, PowerShell script tests, and the Windows gate.
 
 ## Production Gate
 

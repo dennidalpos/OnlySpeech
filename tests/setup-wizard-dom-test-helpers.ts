@@ -8,7 +8,6 @@ import type {
   TrialAvailabilityState
 } from "../src/shared/types.js";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyMock = Mock<(...args: any[]) => any>;
 
 export interface WizardApiMock {

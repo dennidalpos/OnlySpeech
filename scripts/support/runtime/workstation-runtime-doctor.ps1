@@ -537,9 +537,11 @@ async function probeAudioInputs() {
     webPreferences: {
       contextIsolation: false,
       nodeIntegration: false,
-      sandbox: false
+      sandbox: true
     }
   });
+  hiddenWindow.webContents.on("will-navigate", (event) => event.preventDefault());
+  hiddenWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
 
   try {
     await withTimeout(

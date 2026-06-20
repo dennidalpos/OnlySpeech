@@ -69,6 +69,8 @@ export function normalizeActivationEmail(email: string): string {
   if (
     normalizedEmail.length === 0 ||
     /\s/.test(normalizedEmail) ||
+    // Control characters are explicitly rejected by the activation contract.
+    // eslint-disable-next-line no-control-regex
     /[\u0000-\u001F\u007F]/.test(normalizedEmail) ||
     !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(normalizedEmail)
   ) {

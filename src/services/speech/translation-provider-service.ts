@@ -13,24 +13,24 @@ import {
   resolveSpeechTurnSourceLanguage
 } from "../../shared/speech-flow.js";
 import { getProviderAdapter } from "./provider-adapters.js";
-
-interface TranslationResponseShape {
-  choices?: Array<{
-    message?: {
-      content?: string;
-    };
-  }>;
-}
-
-interface OpenAiTranscriptionShape {
-  text?: string;
-  language?: string;
-}
-
-interface ChatGptSpeechTurnTranslationShape {
-  translation: string;
-  detectedLanguage?: string;
-}
+import { buildPlaybackNormalizationPrompt, buildSpeechTurnTranslationPrompt, buildTranslationPrompt } from "./translation-prompts.js";
+import {
+  buildProviderTransportFailureMessage,
+  decodeBase64Audio,
+  inferAudioExtension,
+  isRecoverableChatGptPartialTranscriptionFailure,
+  normalizeDetectedLanguageCode,
+  parseJsonObject,
+  parseProviderError as parseError,
+  readChatCompletionContent,
+  type AzureTranslatorResponseShape,
+  type ChatGptSpeechTurnTranslationShape,
+  type OllamaChatResponseShape,
+  type OllamaTagsResponseShape,
+  type OllamaVersionResponseShape,
+  type OpenAiTranscriptionShape,
+  type TranslationResponseShape
+} from "./provider-response-utils.js";
 
 interface ProviderSmokeTestResult {
   mode: "translation" | "validation";
@@ -43,48 +43,11 @@ interface PlaybackNormalizationResult {
   mode: "translated" | "passthrough";
 }
 
-interface AzureTranslatorResponseShape {
-  detectedLanguage?: {
-    language?: string;
-  };
-  translations?: Array<{
-    text?: string;
-    to?: string;
-  }>;
-}
-
-interface RemoteErrorShape {
-  error?: {
-    code?: string;
-    type?: string;
-  };
-  code?: string;
-  type?: string;
-}
-
 const CHATGPT_TRANSLATION_ENDPOINT = "https://api.openai.com/v1/chat/completions";
 const CHATGPT_TRANSCRIPTION_ENDPOINT = "https://api.openai.com/v1/audio/transcriptions";
 const DEFAULT_AZURE_TRANSLATOR_ENDPOINT = "https://api.cognitive.microsofttranslator.com";
 const CHATGPT_PARTIAL_AUDIO_FALLBACK_MESSAGE =
   "ChatGPT partial transcription is unavailable for this incremental capture; OnlySpeech will continue with the final turn only.";
-
-interface OllamaChatResponseShape {
-  message?: {
-    content?: string;
-  };
-  done?: boolean;
-}
-
-interface OllamaTagsResponseShape {
-  models?: Array<{
-    name?: string;
-    model?: string;
-  }>;
-}
-
-interface OllamaVersionResponseShape {
-  version?: string;
-}
 
 interface SpeechTranslationProvider extends ProviderAdapter {
   translate: (request: TranslationRequest, isPartial: boolean) => Promise<string>;
@@ -95,190 +58,6 @@ interface SpeechTranslationProvider extends ProviderAdapter {
     text: string;
   }) => Promise<PlaybackNormalizationResult>;
   processSpeechTurn: (request: SpeechTurnRequest) => Promise<SpeechTurnResult>;
-}
-
-function buildTranslationPrompt(request: TranslationRequest, isPartial: boolean): string {
-  const providerTargetLanguage =
-    resolveProviderTargetLanguageCode(request.targetLanguage, request.provider, {
-      includeProviderExpansions: true
-    }) ?? request.targetLanguage;
-
-  return [
-    `Source language: ${request.sourceLanguage}`,
-    `Target language: ${providerTargetLanguage}`,
-    "Translate the spoken text naturally for a live conversation.",
-    isPartial ? "The utterance may be incomplete because it comes from a live partial capture." : null,
-    "Return only the translated text, with no notes, labels, or quotation marks.",
-    "",
-    request.text
-  ]
-    .filter((line): line is string => Boolean(line))
-    .join("\n");
-}
-
-function buildSpeechTurnTranslationPrompt(
-  request: TranslationRequest,
-  isPartial: boolean,
-  detectedLanguageMode: RuntimeConfig["chatGptTranslationDetectedLanguageMode"]
-): string {
-  const providerTargetLanguage =
-    resolveProviderTargetLanguageCode(request.targetLanguage, request.provider, {
-      includeProviderExpansions: true
-    }) ?? request.targetLanguage;
-  const detectedLanguageInstruction =
-    detectedLanguageMode === "off"
-      ? 'Return strict JSON with key "translation" only.'
-      : 'Return strict JSON with keys "translation" and "detected_language". Use null for "detected_language" when unclear. The detected language is diagnostic metadata only unless runtime configuration explicitly enables adaptive source language mode.';
-
-  return [
-    `Configured source locale hint: ${request.sourceLanguage}`,
-    `Target language: ${providerTargetLanguage}`,
-    "Translate the spoken text naturally for a live conversation.",
-    detectedLanguageMode === "off"
-      ? null
-      : "Infer the dominant spoken language from the transcript and return only its ISO 639-1 or ISO 639-3 code when clear.",
-    isPartial ? "The utterance may be incomplete because it comes from a live partial capture." : null,
-    detectedLanguageInstruction,
-    "",
-    request.text
-  ]
-    .filter((line): line is string => Boolean(line))
-    .join("\n");
-}
-
-function buildPlaybackNormalizationPrompt(targetLanguage: string, text: string): string {
-  return [
-    `Target language: ${targetLanguage}`,
-    "Detect the input language automatically.",
-    "Rewrite the text so it can be spoken naturally in the target language by a kiosk text-to-speech system.",
-    "If the text is already in the target language, keep the meaning and return a natural equivalent in that same language.",
-    "Return only the final target-language text, with no notes, labels, or quotation marks.",
-    "",
-    text
-  ].join("\n");
-}
-
-async function parseError(response: Response): Promise<string> {
-  let code: string | null = null;
-  try {
-    const text = await response.text();
-    code = extractRemoteErrorCode(text);
-  } catch {
-    code = null;
-  }
-
-  const statusLabel = `${response.status} ${response.statusText}`.trim();
-  return code ? `${statusLabel} (${code})` : statusLabel;
-}
-
-function extractRemoteErrorCode(text: string): string | null {
-  const trimmed = text.trim();
-  if (!trimmed) {
-    return null;
-  }
-
-  try {
-    const parsed = JSON.parse(trimmed) as RemoteErrorShape;
-    const candidate =
-      parsed.error?.code ??
-      parsed.error?.type ??
-      parsed.code ??
-      parsed.type ??
-      null;
-
-    if (typeof candidate === "string" && /^[A-Za-z0-9_.:-]{1,80}$/.test(candidate)) {
-      return candidate;
-    }
-  } catch {
-    if (/could not be decoded|unsupported|invalid file format/i.test(trimmed)) {
-      return "unsupported-audio";
-    }
-
-    return null;
-  }
-
-  return null;
-}
-
-function decodeBase64Audio(base64: string): ArrayBuffer {
-  const binary = atob(base64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  return bytes.buffer;
-}
-
-function inferAudioExtension(audioMimeType: string): string {
-  if (audioMimeType.includes("webm")) {
-    return "webm";
-  }
-
-  if (audioMimeType.includes("ogg")) {
-    return "ogg";
-  }
-
-  if (audioMimeType.includes("mp4") || audioMimeType.includes("mpeg") || audioMimeType.includes("aac")) {
-    return "m4a";
-  }
-
-  return "wav";
-}
-
-function isRecoverableChatGptPartialTranscriptionFailure(error: unknown): boolean {
-  const message = error instanceof Error ? error.message : String(error);
-  return /corrupt|corrupted|unsupported|unsupported-audio|could not be decoded|invalid file format/i.test(message);
-}
-
-function buildProviderTransportFailureMessage(error: unknown): string {
-  if (error instanceof Error) {
-    const message = error.message.trim();
-    return message
-      ? `Provider request failed before receiving a response: ${message}`
-      : "Provider request failed before receiving a response.";
-  }
-
-  return "Provider request failed before receiving a response.";
-}
-
-function readChatCompletionContent(payload: TranslationResponseShape): string {
-  return payload.choices?.[0]?.message?.content?.trim() ?? "";
-}
-
-function parseJsonObject(text: string): Record<string, unknown> | null {
-  const trimmed = text.trim();
-  if (!trimmed) {
-    return null;
-  }
-
-  const fencedMatch = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
-  const candidates = fencedMatch ? [fencedMatch[1] ?? "", trimmed] : [trimmed];
-
-  for (const candidate of candidates) {
-    try {
-      const parsed = JSON.parse(candidate);
-      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-        return parsed as Record<string, unknown>;
-      }
-    } catch {
-      // Ignore malformed model output and fall back to plain-text handling.
-    }
-  }
-
-  return null;
-}
-
-function normalizeDetectedLanguageCode(value: unknown): string | undefined {
-  if (typeof value !== "string") {
-    return undefined;
-  }
-
-  const trimmed = value.trim();
-  if (!trimmed) {
-    return undefined;
-  }
-
-  return /^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/.test(trimmed) ? trimmed : undefined;
 }
 
 export class TranslationProviderService {
@@ -770,10 +549,10 @@ export class TranslationProviderService {
       });
     } catch (error) {
       if (error instanceof Error && error.name === "AbortError") {
-        throw new Error(`Provider request timed out after ${effectiveTimeoutMs}ms.`);
+        throw new Error(`Provider request timed out after ${effectiveTimeoutMs}ms.`, { cause: error });
       }
 
-      throw new Error(buildProviderTransportFailureMessage(error));
+      throw new Error(buildProviderTransportFailureMessage(error), { cause: error });
     } finally {
       clearTimeout(timeoutHandle);
     }

@@ -12,16 +12,17 @@ interface ConfirmDialogProps {
 export function ConfirmDialog(props: ConfirmDialogProps) {
   const titleId = "confirm-dialog-title";
   const descriptionId = "confirm-dialog-description";
+  const { onCancel } = props;
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        props.onCancel();
+        onCancel();
       }
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [props.onCancel]);
+  }, [onCancel]);
 
   return (
     <div className="dialog-backdrop" role="presentation">

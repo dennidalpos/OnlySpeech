@@ -180,7 +180,7 @@ describeWindows("windows script helpers", () => {
         "    -RequestedPath '' `",
         "    -ExportDirectory '' `",
         "    -OlderThanDays 14 `",
-        "    -RepoRoot 'D:\\Repo' `",
+        `    -RepoRoot ${toPowerShellString(repoRoot)} \``,
         "    -LocalAppData 'C:\\Users\\Installer\\AppData\\Local' `",
         "    -Files $files `",
         "    -ExistingPaths @('C:\\Users\\Installer\\AppData\\Local\\OnlySpeech\\logs') `",
@@ -195,7 +195,7 @@ describeWindows("windows script helpers", () => {
     };
 
     expect(plan.SourcePath).toBe("C:\\Users\\Installer\\AppData\\Local\\OnlySpeech\\logs");
-    expect(plan.ExportDirectory).toBe("D:\\Repo\\artifacts\\logs\\runtime-logs");
+    expect(plan.ExportDirectory).toBe(join(repoRoot, "artifacts", "logs", "runtime-logs"));
     expect(plan.Operations).toEqual([
       {
         Action: "remove",

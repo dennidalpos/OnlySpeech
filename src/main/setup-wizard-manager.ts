@@ -1,7 +1,7 @@
 import { createServer, type Server } from "node:http";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { app, BrowserWindow, ipcMain, screen, shell } from "electron";
+import { app, BrowserWindow, ipcMain, screen, shell, type IpcMainEvent, type IpcMainInvokeEvent } from "electron";
 import { parse as parseEnv } from "dotenv";
 import {
   findMatchingPersistedMicrophone,
@@ -70,6 +70,8 @@ import {
   applyWizardAutostartSelection,
   getWizardAutostartState
 } from "./setup-wizard-autostart.js";
+import { installWindowNavigationGuards } from "./window-security.js";
+import { overlayWizardChannels, parseWizardPayload } from "./setup-wizard-ipc.js";
 
 export { hasRuntimeEnvFile } from "./setup-wizard-runtime.js";
 
@@ -178,7 +180,7 @@ function resolveSetupWizardUiLanguage(
 }
 
 export class SetupWizardManager {
-  private readonly preloadPath = fileURLToPath(new URL("../tools/setup-wizard/preload.js", import.meta.url));
+  private readonly preloadPath = fileURLToPath(new URL("../tools/setup-wizard/preload.cjs", import.meta.url));
 
   private readonly overlayWindows = new Map<number, BrowserWindow>();
 
@@ -566,9 +568,11 @@ export class SetupWizardManager {
           preload: this.preloadPath,
           contextIsolation: true,
           nodeIntegration: false,
-          sandbox: false
+          sandbox: true,
+          additionalArguments: ["--onlyspeech-wizard-role=overlay"]
         }
       });
+      installWindowNavigationGuards(window);
 
       window.once("ready-to-show", () => {
         window.show();
@@ -619,9 +623,11 @@ export class SetupWizardManager {
         preload: this.preloadPath,
         contextIsolation: true,
         nodeIntegration: false,
-        sandbox: false
+        sandbox: true,
+        additionalArguments: ["--onlyspeech-wizard-role=control"]
       }
     });
+    installWindowNavigationGuards(window);
 
     window.once("ready-to-show", () => {
       this.syncControlWindowToPrimaryDisplay();
@@ -726,15 +732,48 @@ export class SetupWizardManager {
 
     this.ipcRegistered = true;
 
-    ipcMain.handle("wizard:get-state", async () => this.getStateOrThrow());
-    ipcMain.handle("wizard:get-azure-text-to-speech-catalog", async () => {
+    const authorizeSender = (channel: string, event: IpcMainEvent | IpcMainInvokeEvent): void => {
+      const controlAuthorized = this.controlWindow?.webContents === event.sender;
+      const overlayAuthorized = overlayWizardChannels.has(channel) &&
+        [...this.overlayWindows.values()].some((window) => window.webContents === event.sender);
+      if (!controlAuthorized && !overlayAuthorized) {
+        throw new Error(`Unauthorized setup wizard IPC sender for ${channel}.`);
+      }
+    };
+    const registerHandle = (
+      channel: string,
+      listener: (event: IpcMainInvokeEvent, payload?: any) => unknown
+    ): void => {
+      ipcMain.handle(channel, (event, payload?: unknown, ...extra: unknown[]) => {
+        authorizeSender(channel, event);
+        if (extra.length > 0) {
+          throw new Error(`Invalid ${channel} payload.`);
+        }
+        return listener(event, parseWizardPayload(channel, payload));
+      });
+    };
+    const registerOn = (
+      channel: string,
+      listener: (event: IpcMainEvent, payload?: any) => void
+    ): void => {
+      ipcMain.on(channel, (event, payload?: unknown, ...extra: unknown[]) => {
+        authorizeSender(channel, event);
+        if (extra.length > 0) {
+          throw new Error(`Invalid ${channel} payload.`);
+        }
+        listener(event, parseWizardPayload(channel, payload));
+      });
+    };
+
+    registerHandle("wizard:get-state", async () => this.getStateOrThrow());
+    registerHandle("wizard:get-azure-text-to-speech-catalog", async () => {
       return await getAzureTextToSpeechCatalogSnapshotFromEnvironment(this.getStateOrThrow().envValues);
     });
-    ipcMain.handle("wizard:open-monitor-setup", async () => {
+    registerHandle("wizard:open-monitor-setup", async () => {
       await this.openMonitorSetup();
       return this.getSnapshot();
     });
-    ipcMain.handle("wizard:assign-display", (_event, payload: { side: "A" | "B" | null; displayId: number }) => {
+    registerHandle("wizard:assign-display", (_event, payload: { side: "A" | "B" | null; displayId: number }) => {
       const state = this.getStateOrThrow();
 
       if (!payload.side) {
@@ -755,7 +794,7 @@ export class SetupWizardManager {
       return this.getStateOrThrow();
     });
 
-    ipcMain.handle("wizard:assign-microphone", (_event, payload: { side: "A" | "B"; deviceId: string | null }) => {
+    registerHandle("wizard:assign-microphone", (_event, payload: { side: "A" | "B"; deviceId: string | null }) => {
       const state = this.getStateOrThrow();
       this.state = {
         ...state,
@@ -767,7 +806,7 @@ export class SetupWizardManager {
       return this.getStateOrThrow();
     });
 
-    ipcMain.handle(
+    registerHandle(
       "wizard:update-microphones",
       (
         _event,
@@ -796,7 +835,7 @@ export class SetupWizardManager {
       }
     );
 
-    ipcMain.handle("wizard:update-signal-level", (_event, payload: { side: "A" | "B"; level: number }) => {
+    registerHandle("wizard:update-signal-level", (_event, payload: { side: "A" | "B"; level: number }) => {
       const state = this.getStateOrThrow();
       this.state = {
         ...state,
@@ -809,7 +848,7 @@ export class SetupWizardManager {
       return this.getStateOrThrow();
     });
 
-    ipcMain.handle("wizard:update-env-values", (_event, values: Partial<Record<EnvKey, string>>) => {
+    registerHandle("wizard:update-env-values", (_event, values: Partial<Record<EnvKey, string>>) => {
       const state = this.getStateOrThrow();
       const nextEnvValues = createDefaultEnvValues({
         ...state.envValues,
@@ -848,7 +887,7 @@ export class SetupWizardManager {
       return this.getStateOrThrow();
     });
 
-    ipcMain.handle("wizard:update-autostart", (_event, payload: { selectedEnabled: boolean }) => {
+    registerHandle("wizard:update-autostart", (_event, payload: { selectedEnabled: boolean }) => {
       const state = this.getStateOrThrow();
       if (!state.autostart.supported || !state.autostart.canModify) {
         return state;
@@ -869,12 +908,12 @@ export class SetupWizardManager {
       return this.getStateOrThrow();
     });
 
-    ipcMain.handle("wizard:preview-env", () =>
+    registerHandle("wizard:preview-env", () =>
       buildWizardEnv(this.getStateOrThrow(), {
         secureSecretStorage: usesSecureRuntimeSecretStorage()
       })
     );
-    ipcMain.handle("wizard:open-logs-folder", async () => {
+    registerHandle("wizard:open-logs-folder", async () => {
       const logsPath = getRuntimeLogsDirectory();
       mkdirSync(logsPath, { recursive: true });
       const openError = await shell.openPath(logsPath);
@@ -884,7 +923,7 @@ export class SetupWizardManager {
 
       return { path: logsPath };
     });
-    ipcMain.handle(
+    registerHandle(
       "wizard:test-provider-translation",
       async (
         _event,
@@ -915,7 +954,7 @@ export class SetupWizardManager {
         };
       }
     );
-    ipcMain.handle(
+    registerHandle(
       "wizard:normalize-provider-playback-text",
       async (
         _event,
@@ -938,7 +977,7 @@ export class SetupWizardManager {
         });
       }
     );
-    ipcMain.handle(
+    registerHandle(
       "wizard:test-provider-speech",
       async (
         _event,
@@ -965,7 +1004,7 @@ export class SetupWizardManager {
         });
       }
     );
-    ipcMain.handle("wizard:save-env", async () => {
+    registerHandle("wizard:save-env", async () => {
       const state = this.getStateOrThrow();
       validateWizardDefaultTargetLanguages(state.envValues);
       const envPath = getRuntimeEnvFilePath(this.options.runtimeRoot);
@@ -1010,7 +1049,7 @@ export class SetupWizardManager {
       };
     });
 
-    ipcMain.handle("wizard:get-license-state", (): WizardLicenseInfo | null => {
+    registerHandle("wizard:get-license-state", (): WizardLicenseInfo | null => {
       const persistedState = this.options.getLicenseState?.();
       if (!persistedState) {
         return null;
@@ -1019,7 +1058,7 @@ export class SetupWizardManager {
       return computeWizardLicenseInfo(persistedState);
     });
 
-    ipcMain.handle(
+    registerHandle(
       "wizard:submit-new-license",
       (_event, payload: { email: string; activationCode: string }): { ok: true } | { ok: false; message: string } => {
         const submission = prepareActivationSubmission({
@@ -1039,19 +1078,19 @@ export class SetupWizardManager {
       }
     );
 
-    ipcMain.handle("wizard:clear-license", (): { ok: true } => {
+    registerHandle("wizard:clear-license", (): { ok: true } => {
       this.options.clearLicense?.();
       return { ok: true };
     });
 
-    ipcMain.handle("wizard:get-trial-availability", (): TrialAvailabilityState => {
+    registerHandle("wizard:get-trial-availability", (): TrialAvailabilityState => {
       return this.options.getTrialAvailability?.() ?? {
         eligible: true,
         exhaustedAt: null
       };
     });
 
-    ipcMain.handle("wizard:submit-trial", async (): Promise<{ ok: true } | { ok: false; message: string }> => {
+    registerHandle("wizard:submit-trial", async (): Promise<{ ok: true } | { ok: false; message: string }> => {
       if (!this.options.submitTrial) {
         return { ok: false, message: "Trial activation is unavailable." };
       }
@@ -1064,20 +1103,20 @@ export class SetupWizardManager {
       return { ok: false, message: result.message };
     });
 
-    ipcMain.handle("wizard:terminate-application", async (): Promise<{ ok: true }> => {
+    registerHandle("wizard:terminate-application", async (): Promise<{ ok: true }> => {
       await this.options.terminateApplication?.();
       return { ok: true };
     });
 
-    ipcMain.on("wizard:close", () => {
+    registerOn("wizard:close", () => {
       this.close();
     });
 
-    ipcMain.on("wizard:close-monitor-setup", () => {
+    registerOn("wizard:close-monitor-setup", () => {
       this.closeMonitorSetup();
     });
 
-    ipcMain.on("wizard:close-current-overlay", (event) => {
+    registerOn("wizard:close-current-overlay", (event) => {
       const currentWindow = BrowserWindow.fromWebContents(event.sender);
       this.closeCurrentOverlay(currentWindow);
     });

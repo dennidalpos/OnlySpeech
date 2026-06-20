@@ -90,8 +90,10 @@ The installer verifies required software before copying the app:
 | `npm run start -- -SetupWizard` | Launch the source app directly into the integrated setup wizard. |
 | `npm run start -- -SetupWizard -WizardSection provider` | Launch the setup wizard at a supported section: `stations`, `provider`, `languages`, `diagnostics`, or `license`. |
 | `npm run build` | Compile renderer and main outputs. |
+| `npm run lint` | Run ESLint across source, tests, and JavaScript tooling. |
 | `npm run compile` | Run `build:renderer` and `build:main` directly. |
 | `npm test` | Run Vitest excluding the compiled Electron e2e test. |
+| `npm run test:coverage` | Run the security/runtime coverage suite and enforce minimum thresholds. |
 | `npm run test:e2e` | Compile, then run `tests/electron-e2e.test.ts`. |
 | `npm run gate -- -KeepOutputs -EnablePackagedAutomation` | Run the full Windows verification gate through the canonical repository verifier, retaining installer outputs when requested. |
 | `npm run gate -- -RefreshDependencies -KeepOutputs -EnablePackagedAutomation` | Same gate with forced dependency refresh through the public wrapper. |
@@ -110,7 +112,7 @@ The installer verifies required software before copying the app:
 | `npm run release:compliance` | Write third-party notices and SBOM artifacts. |
 | `npm run release:customer-bundle` | Assemble the customer-facing release bundle from existing package outputs and docs. |
 
-There is no checked-in lint or format command. Use TypeScript build, Vitest, Electron e2e, packaging audit, and the Windows gate as the current checked quality surface.
+Use ESLint, TypeScript build, Vitest, Electron e2e, packaging audit, and the Windows gate as the checked quality surface.
 
 The complete PowerShell script classification and side-effect map lives in [scripts/script.md](scripts/script.md).
 

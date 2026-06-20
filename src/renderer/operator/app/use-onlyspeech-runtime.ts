@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { OnlySpeechRendererApi } from "../../../shared/onlyspeech-api.js";
 import type { AppState, RendererCommand, Side, TextToSpeechContent } from "../../../shared/types.js";
 import { probeAudioInputDevices } from "../../../services/audio/media-device-probe.js";
@@ -30,15 +30,15 @@ export function useOnlySpeechRuntime(side: Side, onlySpeechApi: OnlySpeechRender
     language: string | null;
   } | null>(null);
 
-  const getSpeechClient = async (): Promise<LiveSpeechClient> => {
+  const getSpeechClient = useCallback(async (): Promise<LiveSpeechClient> => {
     if (!speechClientRef.current) {
       speechClientRef.current = new LiveSpeechClient();
     }
 
     return speechClientRef.current;
-  };
+  }, []);
 
-  const getTextToSpeechClient = async (): Promise<TextToSpeechClient> => {
+  const getTextToSpeechClient = useCallback(async (): Promise<TextToSpeechClient> => {
     if (!textToSpeechClientRef.current) {
       textToSpeechClientRef.current = new TextToSpeechClient({
         synthesizeTextToSpeech: onlySpeechApi?.synthesizeTextToSpeech?.bind(onlySpeechApi)
@@ -46,7 +46,7 @@ export function useOnlySpeechRuntime(side: Side, onlySpeechApi: OnlySpeechRender
     }
 
     return textToSpeechClientRef.current;
-  };
+  }, [onlySpeechApi]);
 
   useEffect(() => {
     if (!onlySpeechApi) {
@@ -197,7 +197,7 @@ export function useOnlySpeechRuntime(side: Side, onlySpeechApi: OnlySpeechRender
       textToSpeechClientRef.current?.shutdown();
       activeTextToSpeechRef.current = null;
     };
-  }, [onlySpeechApi, side]);
+  }, [getSpeechClient, getTextToSpeechClient, onlySpeechApi, side]);
 
   useEffect(() => {
     if (!onlySpeechApi || !appState || !activeTextToSpeechRef.current) {

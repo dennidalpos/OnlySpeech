@@ -1,10 +1,5 @@
 import {
-  findTargetLanguageOption,
-  resolveDetectedSourceLanguageOption
-} from "./language-options.js";
-import {
   buildInteractionLanguageChoices as buildRegistryInteractionLanguageChoices,
-  getInteractionLanguageCurrentLabel,
   resolveInteractionLanguageSourceLocale as resolveRegistryInteractionLanguageSourceLocale
 } from "./language-registry.js";
 import {
@@ -17,6 +12,8 @@ import {
   EXTENDED_VISITOR_UI_TEXT
 } from "./visitor-localization-extended.js";
 import type { OperatorStatus } from "./types.js";
+
+export { getVisitorCurrentLanguageLabel, getVisitorLocalizedLanguageLabel } from "./visitor-language-labels.js";
 
 export interface VisitorLanguageChoice {
   value: string;
@@ -1061,68 +1058,4 @@ export function getVisitorStatusLabels(
   languageCode: string | null | undefined
 ): Record<OperatorStatus, string> {
   return VISITOR_STATUS_LABELS[normalizeLanguageKey(languageCode)] ?? VISITOR_STATUS_LABELS.en;
-}
-
-export function getVisitorCurrentLanguageLabel(languageCode: string | null | undefined): string {
-  if (!languageCode || !findTargetLanguageOption(languageCode)) {
-    return "-";
-  }
-
-  return getInteractionLanguageCurrentLabel(languageCode);
-}
-
-function normalizeLanguageDisplayCode(languageCode: string): string {
-  const normalized = languageCode.trim();
-  const lower = normalized.toLowerCase();
-
-  if (lower === "en-us") {
-    return "en-US";
-  }
-
-  if (lower === "pt-pt") {
-    return "pt-PT";
-  }
-
-  if (lower === "fr-ca") {
-    return "fr-CA";
-  }
-
-  if (lower === "zh-hans") {
-    return "zh-Hans";
-  }
-
-  if (lower === "zh-hant") {
-    return "zh-Hant";
-  }
-
-  return normalized;
-}
-
-export function getVisitorLocalizedLanguageLabel(
-  languageCode: string | null | undefined,
-  viewerLanguageCode: string | null | undefined
-): string {
-  if (!languageCode) {
-    return "-";
-  }
-
-  const viewerLocale = normalizeLanguageKey(viewerLanguageCode);
-  const displayCode = normalizeLanguageDisplayCode(languageCode);
-
-  try {
-    const displayNames = new Intl.DisplayNames([viewerLocale], { type: "language" });
-    const localized = displayNames.of(displayCode);
-    if (localized) {
-      return localized;
-    }
-  } catch {
-    // Ignore Intl display-name failures and continue to deterministic fallbacks.
-  }
-
-  const detectedSourceLanguage = resolveDetectedSourceLanguageOption(languageCode);
-  if (detectedSourceLanguage) {
-    return getInteractionLanguageCurrentLabel(detectedSourceLanguage.value);
-  }
-
-  return getInteractionLanguageCurrentLabel(languageCode);
 }

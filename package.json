@@ -20,7 +20,8 @@
     "dev:electron": "wait-on tcp:5173 file:dist/main/bootstrap.js && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5173 electron .",
     "build": "powershell -ExecutionPolicy Bypass -File ./scripts/build.ps1",
     "build:renderer": "vite build",
-    "build:main": "tsc -p tsconfig.main.json",
+    "build:main": "tsc -p tsconfig.main.json && npm run build:preloads",
+    "build:preloads": "node ./scripts/support/build-preloads.mjs",
     "gate": "powershell -ExecutionPolicy Bypass -File ./scripts/gate.ps1",
     "package": "powershell -ExecutionPolicy Bypass -File ./scripts/package.ps1",
     "package:internal": "powershell -ExecutionPolicy Bypass -File ./scripts/support/packaging/package-core.ps1 -Profile Internal",
@@ -39,11 +40,13 @@
     "release:tag-check": "powershell -ExecutionPolicy Bypass -File ./scripts/support/packaging/assert-release-tag.ps1",
     "release:signing-check": "powershell -ExecutionPolicy Bypass -File ./scripts/support/packaging/check-windows-signing.ps1",
     "license:keygen": "powershell -ExecutionPolicy Bypass -File ./scripts/license-keygen.ps1",
+    "lint": "eslint . --max-warnings=0",
     "start": "powershell -ExecutionPolicy Bypass -File ./scripts/start.ps1",
     "test:e2e": "npm run compile && vitest run tests/electron-e2e.test.ts",
     "test:packaged-lifecycle": "powershell -ExecutionPolicy Bypass -File ./scripts/support/commissioning/test-packaged-install-lifecycle.ps1",
     "test:packaged-automation": "powershell -ExecutionPolicy Bypass -File ./scripts/support/commissioning/test-packaged-runtime-automation.ps1",
-    "test": "vitest run --exclude tests/electron-e2e.test.ts"
+    "test": "vitest run --exclude tests/electron-e2e.test.ts",
+    "test:coverage": "vitest run --coverage tests/activation-flow.test.ts tests/activation-state.test.ts tests/activation-storage.test.ts tests/activation-validator.test.ts tests/ipc.test.ts tests/config.test.ts tests/runtime-env-contract.test.ts tests/translation-provider-service.test.ts tests/live-speech-client.test.ts tests/runtime-secrets.test.ts tests/setup-wizard-access.test.ts"
   },
   "keywords": [
     "electron",
@@ -58,35 +61,45 @@
     "npm": ">=10"
   },
   "dependencies": {
-    "dotenv": "^17.3.1",
-    "microsoft-cognitiveservices-speech-sdk": "^1.48.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "uuid": "^14.0.0",
-    "zod": "^4.3.6"
+    "dotenv": "^17.4.2",
+    "microsoft-cognitiveservices-speech-sdk": "^1.50.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "uuid": "^14.0.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@rolldown/binding-win32-x64-msvc": "1.0.0-rc.17",
-    "@rollup/rollup-win32-x64-msvc": "4.60.1",
-    "@types/jsdom": "^28.0.1",
-    "@types/node": "^25.5.0",
-    "@types/react": "^19.2.2",
-    "@types/react-dom": "^19.2.2",
-    "@vitejs/plugin-react": "^6.0.1",
-    "concurrently": "^9.2.1",
+    "@eslint/js": "^10.0.1",
+    "@rolldown/binding-win32-x64-msvc": "1.0.3",
+    "@rollup/rollup-win32-x64-msvc": "4.62.2",
+    "@types/jsdom": "^28.0.3",
+    "@types/node": "^25.9.4",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "@vitest/coverage-v8": "^4.1.9",
+    "concurrently": "^10.0.3",
     "cross-env": "^10.1.0",
-    "electron": "41.1.0",
-    "electron-builder": "26.8.2",
-    "jsdom": "^29.0.1",
+    "electron": "42.4.1",
+    "electron-builder": "26.15.3",
+    "eslint": "^10.5.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.6.0",
+    "jsdom": "^29.1.1",
     "lightningcss-win32-x64-msvc": "1.32.0",
-    "typescript": "^6.0.2",
-    "vite": "^8.0.5",
-    "vitest": "^4.1.2",
-    "wait-on": "^9.0.1"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.9",
+    "wait-on": "^9.0.10"
   },
   "overrides": {
     "axios": "^1.15.0",
-    "follow-redirects": "^1.16.0"
+    "follow-redirects": "^1.16.0",
+    "microsoft-cognitiveservices-speech-sdk": {
+      "uuid": "11.1.1"
+    }
   },
   "build": {
     "appId": "com.onlyspeech.kiosk",

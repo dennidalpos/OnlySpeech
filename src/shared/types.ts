@@ -135,6 +135,7 @@ export type ShutdownComputerResult =
 
 export type SetupWizardAccessFailureCode =
   | "invalid-password"
+  | "temporarily-locked"
   | "new-password-required"
   | "new-password-too-short";
 

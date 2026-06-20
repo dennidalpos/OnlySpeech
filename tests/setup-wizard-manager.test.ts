@@ -15,6 +15,12 @@ const electronMocks = vi.hoisted(() => {
 
     readonly options: Record<string, unknown>;
 
+    readonly webContents = {
+      on: vi.fn(),
+      setWindowOpenHandler: vi.fn(),
+      send: vi.fn()
+    };
+
     private destroyed = false;
 
     private readonly onceListeners = new Map<string, () => void>();
@@ -54,7 +60,7 @@ const electronMocks = vi.hoisted(() => {
     BrowserWindow: MockBrowserWindow,
     app: {
       isPackaged: false,
-      getPath: vi.fn((name: string) => {
+      getPath: vi.fn((name: string): string => {
         if (name === "userData") {
           return "D:\\OnlySpeech\\userData";
         }
@@ -250,7 +256,10 @@ describe("SetupWizardManager control window", () => {
       throw new Error("wizard:save-env handler not registered.");
     }
 
-    const result = await saveHandler();
+    (manager as unknown as { controlWindow: unknown }).controlWindow = electronMocks.createdWindows[0] ?? new electronMocks.BrowserWindow({});
+    const result = await (saveHandler as unknown as (event: unknown) => ReturnType<typeof saveHandler>)({
+      sender: electronMocks.createdWindows[0].webContents
+    });
 
     expect(onEnvSaved).toHaveBeenCalledTimes(1);
     expect(result.autostartEnabled).toBe(true);
@@ -318,7 +327,19 @@ describe("SetupWizardManager control window", () => {
       throw new Error("wizard:save-env handler not registered.");
     }
 
-    const result = await saveHandler();
+    let result: Awaited<ReturnType<typeof saveHandler>> | undefined;
+    await electronMocks.app.getPath.withImplementation(
+      () => runtimeRoot,
+      async () => {
+      (manager as unknown as { controlWindow: unknown }).controlWindow = electronMocks.createdWindows[0] ?? new electronMocks.BrowserWindow({});
+      result = await (saveHandler as unknown as (event: unknown) => ReturnType<typeof saveHandler>)({
+        sender: electronMocks.createdWindows[0].webContents
+      });
+      }
+    );
+    if (!result) {
+      throw new Error("wizard:save-env returned no result.");
+    }
     const snapshot = manager.getSnapshot().state;
 
     expect(result.secretStorageMode).toBe("windows-secure-store");
@@ -378,7 +399,10 @@ describe("SetupWizardManager control window", () => {
       throw new Error("wizard:save-env handler not registered.");
     }
 
-    const result = await saveHandler();
+    (manager as unknown as { controlWindow: unknown }).controlWindow = electronMocks.createdWindows[0] ?? new electronMocks.BrowserWindow({});
+    const result = await (saveHandler as unknown as (event: unknown) => ReturnType<typeof saveHandler>)({
+      sender: electronMocks.createdWindows[0].webContents
+    });
 
     expect(result.preview).toContain("APP_MODE=demo");
     expect(result.preview).toContain("TRANSLATION_PROVIDER=ollama");
@@ -447,7 +471,8 @@ describe("SetupWizardManager control window", () => {
       throw new Error("wizard:update-autostart handler not registered.");
     }
 
-    await updateAutostartHandler({}, { selectedEnabled: false });
+    (manager as unknown as { controlWindow: unknown }).controlWindow = electronMocks.createdWindows[0] ?? new electronMocks.BrowserWindow({});
+    await updateAutostartHandler({ sender: electronMocks.createdWindows[0].webContents }, { selectedEnabled: false });
 
     expect(applyAutostartSelection).toHaveBeenCalledWith(false);
     expect(manager.getSnapshot().state?.autostart).toMatchObject({

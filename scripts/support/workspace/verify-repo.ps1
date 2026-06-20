@@ -22,6 +22,32 @@ $packageCoreScript = Join-Path $repoRoot "scripts\support\packaging\package-core
 $packagedLifecycleScript = Join-Path $repoRoot "scripts\support\commissioning\test-packaged-install-lifecycle.ps1"
 $packagedAutomationScript = Join-Path $repoRoot "scripts\support\commissioning\test-packaged-runtime-automation.ps1"
 $cleanWorkstationScript = Join-Path $repoRoot "scripts\clean-workstation.ps1"
+$intentionalDuplicatePairs = @(
+  @("build\assert-installer-prerequisites.ps1", "scripts\support\packaging\assert-installer-prerequisites.ps1"),
+  @("build\configure-power-settings.ps1", "scripts\support\packaging\configure-power-settings.ps1"),
+  @("build\brand\onlyspeech-logo-dark.svg", "public\brand\onlyspeech-logo-dark.svg"),
+  @("build\brand\onlyspeech-mark.svg", "public\brand\onlyspeech-mark.svg")
+)
+
+function Assert-IntentionalDuplicateParity {
+  if ($DryRun) {
+    Write-Host "[duplicate-parity] skipped in dry run"
+    return
+  }
+  foreach ($pair in $intentionalDuplicatePairs) {
+    $leftPath = Join-Path $repoRoot $pair[0]
+    $rightPath = Join-Path $repoRoot $pair[1]
+    if (-not (Test-Path -LiteralPath $leftPath) -or -not (Test-Path -LiteralPath $rightPath)) {
+      throw "Intentional duplicate is missing: $($pair -join ' <-> ')"
+    }
+    $leftHash = (Get-FileHash -LiteralPath $leftPath -Algorithm SHA256).Hash
+    $rightHash = (Get-FileHash -LiteralPath $rightPath -Algorithm SHA256).Hash
+    if ($leftHash -ne $rightHash) {
+      throw "Intentional duplicate parity failed: $($pair -join ' <-> ')"
+    }
+  }
+  Write-Host "[duplicate-parity] OK ($($intentionalDuplicatePairs.Count) pairs)"
+}
 
 function Get-PackagedAppProcesses {
   if (-not (Test-Path -LiteralPath $packagedExe)) {
@@ -152,7 +178,9 @@ try {
     "-File",
     $doctorScript
   ) -WorkingDirectory $repoRoot -DryRun:$DryRun
+  Invoke-OnlySpeechStep -Label "lint" -FilePath "npm" -Arguments @("run", "lint") -WorkingDirectory $repoRoot -DryRun:$DryRun
   Invoke-OnlySpeechStep -Label "test" -FilePath "npm" -Arguments @("test") -WorkingDirectory $repoRoot -DryRun:$DryRun
+  Invoke-OnlySpeechStep -Label "coverage" -FilePath "npm" -Arguments @("run", "test:coverage") -WorkingDirectory $repoRoot -DryRun:$DryRun
   if (-not $SkipSmokeStart) {
     Invoke-OnlySpeechStep -Label "smoke-start-source" -FilePath "powershell.exe" -Arguments @(
       "-ExecutionPolicy",
@@ -177,6 +205,7 @@ try {
       "-Profile",
       "Internal"
     ) -WorkingDirectory $repoRoot -DryRun:$DryRun
+    Assert-IntentionalDuplicateParity
 
     if (-not $SkipPackagedLifecycle) {
       $packagedLifecycleArguments = @(

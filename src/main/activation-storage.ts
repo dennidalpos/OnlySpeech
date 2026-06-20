@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node
 import { dirname } from "node:path";
 import type { ActivationClaims, ActivationPlan } from "./activation-types.js";
 
-export interface PersistedActivationClaims extends ActivationClaims {}
+export type PersistedActivationClaims = ActivationClaims;
 
 export interface PersistedActivationState {
   schemaVersion: 1;

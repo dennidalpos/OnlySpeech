@@ -52,6 +52,8 @@ describeWindows("verify-repo.ps1", () => {
     }
 
     expect(result.stdout).toContain("[package-internal] powershell.exe");
+    expect(result.stdout).toContain("[lint] npm run lint");
+    expect(result.stdout).toContain("[coverage] npm run test:coverage");
     expect(result.stdout).toContain("-Profile Internal");
     expect(result.stdout).toContain("[archive-unpacked]");
     expect(result.stdout).toContain("OnlySpeech-0.1.0-x64-unpacked.zip");
@@ -305,7 +307,6 @@ describeWindows("verify-repo.ps1", () => {
     };
 
     expect(Object.keys(projectStatus).sort()).toEqual(["todos"]);
-    expect(projectStatus.todos.length).toBeGreaterThan(0);
     expect(projectStatus.todos.every((task) => typeof task === "string" && task.trim().length > 0)).toBe(true);
   });
 

@@ -48,10 +48,12 @@ async function main() {
     backgroundColor: "#07111f",
     autoHideMenuBar: true,
     webPreferences: {
-      sandbox: false,
+      sandbox: true,
       contextIsolation: true
     }
   });
+  window.webContents.on("will-navigate", (event) => event.preventDefault());
+  window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
 
   try {
     await window.loadURL(pageUrl);

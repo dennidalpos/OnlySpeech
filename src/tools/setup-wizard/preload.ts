@@ -310,4 +310,17 @@ const api = {
   }
 };
 
-contextBridge.exposeInMainWorld("onlySpeechWizard", api);
+const wizardRole = process.argv.find((argument) => argument.startsWith("--onlyspeech-wizard-role="))
+  ?.slice("--onlyspeech-wizard-role=".length);
+const overlayApi = {
+  getState: api.getState,
+  assignDisplay: api.assignDisplay,
+  assignMicrophone: api.assignMicrophone,
+  updateMicrophones: api.updateMicrophones,
+  updateSignalLevel: api.updateSignalLevel,
+  closeMonitorSetup: api.closeMonitorSetup,
+  closeCurrentOverlay: api.closeCurrentOverlay,
+  onState: api.onState
+};
+
+contextBridge.exposeInMainWorld("onlySpeechWizard", wizardRole === "overlay" ? overlayApi : api);
