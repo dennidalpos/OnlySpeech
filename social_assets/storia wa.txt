@@ -1,0 +1,16 @@
+Schermata 1
+Due lingue.
+Una sola conversazione.
+
+Schermata 2
+Scegli la lingua, parla e guarda il dialogo prendere forma su due schermi coordinati.
+
+Schermata 3
+Trascrizione, traduzione e storico sempre chiari.
+
+Schermata 4
+Una vera scena di check-in: prenotazione OS-24817, accoglienza e checkout alle 11:00.
+
+Schermata 5
+OnlySpeech rende l’accoglienza più fluida.
+Un passaggio alla volta.
