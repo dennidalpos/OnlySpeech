@@ -113,7 +113,7 @@ describe("speech-flow", () => {
   it("uses detected language only when ChatGPT translation detection is adaptive", () => {
     expect(resolveSpeechTurnSourceLanguage("it-IT", "en-US", "diagnostic")).toBe("it-IT");
     expect(resolveSpeechTurnSourceLanguage("it-IT", "en-US", "off")).toBe("it-IT");
-    expect(resolveSpeechTurnSourceLanguage("it-IT", "en-US", "adaptive")).toBe("en-GB");
+    expect(resolveSpeechTurnSourceLanguage("it-IT", "en-US", "adaptive")).toBe("en-US");
   });
 
   it("resolves one provider language contract for representative language pairs", () => {

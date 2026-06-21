@@ -198,22 +198,6 @@ export class SetupWizardAccessManager {
       temporaryPassword?: string | null;
     };
 
-    if (parsed.schemaVersion === 2) {
-      const legacy = parsed as typeof parsed & Omit<PersistedSetupWizardAccessRecord, "schemaVersion" | "failedAuthorizationAttempts" | "lockedUntilEpochMs">;
-      this.provisioningTemporaryPassword ??= parsed.temporaryPassword ?? null;
-      const migrated: PersistedSetupWizardAccessRecord = {
-        schemaVersion: SETUP_WIZARD_ACCESS_SCHEMA_VERSION,
-        passwordSalt: legacy.passwordSalt,
-        passwordHash: legacy.passwordHash,
-        passwordDerivation: legacy.passwordDerivation,
-        mustChangePassword: legacy.mustChangePassword,
-        failedAuthorizationAttempts: 0,
-        lockedUntilEpochMs: null
-      };
-      this.writeRecord(migrated);
-      return migrated;
-    }
-
     if (parsed.schemaVersion !== SETUP_WIZARD_ACCESS_SCHEMA_VERSION) {
       throw new Error(
         `Unsupported setup wizard access record schema. Delete and reprovision '${this.accessFilePath}' before reopening the setup wizard.`

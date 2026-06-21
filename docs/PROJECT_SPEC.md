@@ -103,7 +103,7 @@ The setup wizard persists workstation configuration, validates provider settings
 
 Provider language behavior is governed by the shared language registry and the provider capability matrix. Runtime code must use the existing `sourceLocale`, provider `targetCode`, canonical BCP-47 locale, and capability metadata instead of inventing fallback languages. Unsupported STT, translation, or TTS capability must be blocked or degraded according to the configured policy.
 
-The runtime interaction catalog exposes one selectable entry for regional English, French, and Portuguese families. Legacy regional aliases such as `en-us`, `en-gb`, `fr-ca`, and `pt-pt` are accepted only as input aliases and normalize into canonical runtime choices; English uses `en-GB` as its canonical runtime locale. The expected catalog counts are: baseline interaction 53, Azure interaction 79, and ChatGPT interaction 66.
+The runtime interaction catalog exposes one canonical selectable entry for each English, French, and Portuguese family. Non-canonical regional inputs such as `en-US`, `fr-CA`, and `pt-PT` are not rewritten into a different product language; English uses `en-GB` as its canonical runtime locale. The expected catalog counts are: baseline interaction 53, Azure interaction 79, and ChatGPT interaction 66.
 
 Language and audio quality controls are configured globally through the setup wizard or `.env`:
 
@@ -196,7 +196,6 @@ Supported verification modifiers include `-SkipInstall`, `-SkipPack`, `-SkipPack
 - Internal verification and tagged-release flows also validate `win-unpacked` before retaining the versioned unpacked zip.
 - The app is packaged with `asar`.
 - Artifact names are deterministic from product name, version, architecture, and target.
-- Packaging compatibility helpers live under `scripts/support/packaging/`.
 - Packaged autostart is wizard-managed through the current user's Windows Run entry and can be enabled or disabled from the setup wizard without admin rights.
 
 ## Release Contract
@@ -220,7 +219,7 @@ Production readiness requires both repository gates and target-workstation evide
 - `npm audit --audit-level=moderate` and `npm run audit:packaging` must pass, or remaining findings must be explicitly accepted for the release.
 - Security hardening tasks in `PROJECT_STATUS.json` must be closed or explicitly accepted by the product owner.
 - The package used for deployment must be generated from the verified source and signed or otherwise approved for the deployment.
-- Target hardware validation must cover packaged activation, setup commissioning, display assignment, microphone assignment, live provider speech, TTS playback, autostart at logon, upgrade, and rollback.
+- Target hardware validation must cover packaged activation, setup commissioning, display assignment, microphone assignment, live provider speech, TTS playback, autostart at logon, and fresh install/uninstall.
 - Retained evidence must exist under `artifacts/logs/` for release metadata, notices, SBOM, activation validation, commissioning evidence, live provider speech proof, and packaged close-out validation.
 
 Until those conditions are met, the repository may be technically verifiable but the customer deployment remains blocked.
@@ -252,6 +251,5 @@ The repository can be locally aligned and technically verified without claiming 
 - Windows code-signing credentials;
 - packaged activation validation on the real target workstation with customer activation inputs;
 - a physical target workstation with actual displays, microphones, speakers, and touch hardware;
-- previous signed installers for upgrade and rollback validation;
 - for `TRANSLATION_PROVIDER=ollama`, a reachable Ollama host and installed model matching `OLLAMA_BASE_URL` and `OLLAMA_MODEL`;
 - deployment-specific legal and privacy review outside the repository.

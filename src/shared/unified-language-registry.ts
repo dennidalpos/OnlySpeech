@@ -232,17 +232,17 @@ function buildProviderCapability(
     };
   }
 
-  const legacyCapability = PROVIDER_LANGUAGE_CAPABILITIES_BY_CODE[provider][normalizeLanguageId(languageId)];
+  const providerCapability = PROVIDER_LANGUAGE_CAPABILITIES_BY_CODE[provider][normalizeLanguageId(languageId)];
   const sourceLocale =
-    legacyCapability?.preferredSourceLocale ??
+    providerCapability?.preferredSourceLocale ??
     resolveInteractionLanguageSourceLocale(languageId, provider, {
       includeProviderExpansions: true
     }) ??
     null;
   const chatGptPolicy =
     provider === "chatgpt" ? resolveChatGptTranscriptionLanguagePolicy(sourceLocale ?? languageId) : null;
-  const stt = legacyCapability?.speechToText ?? false;
-  const translation = legacyCapability?.translationTarget ?? false;
+  const stt = providerCapability?.speechToText ?? false;
+  const translation = providerCapability?.translationTarget ?? false;
   const tts =
     provider === "azure"
       ? Boolean(sourceLocale)
@@ -254,7 +254,7 @@ function buildProviderCapability(
     translation,
     tts,
     sourceLocale,
-    targetCode: legacyCapability?.targetCode ?? null,
+    targetCode: providerCapability?.targetCode ?? null,
     defaultVoice: provider === "azure" ? "runtime-catalog" : tts ? "alloy" : null,
     notes: [
       ...(provider === "chatgpt" && chatGptPolicy?.usesPromptFallback

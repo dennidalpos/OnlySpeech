@@ -59,7 +59,7 @@ describe("ConversationHistory", () => {
     expect(html).toContain("Station B");
     expect(html).toContain("Auto");
     expect(html).toContain("Inglese");
-    expect(html).not.toContain("Stati Uniti");
+    expect(html).toContain("Stati Uniti");
     expect(html).toContain("Italiano");
     expect(html).toContain("Buongiorno");
     expect(html).not.toContain("Good morning");
@@ -117,7 +117,7 @@ describe("ConversationHistory", () => {
     expect(html).not.toContain("-&gt; Portoghese (Brasile)");
   });
 
-  it("renders regional english source aliases as the canonical british english runtime language", () => {
+  it("renders the detected regional English source locale", () => {
     const html = renderToStaticMarkup(
       <ConversationHistory
         title="Conversation history"
@@ -141,7 +141,7 @@ describe("ConversationHistory", () => {
 
     expect(html).toContain("Inglese");
     expect(html).not.toContain("American English");
-    expect(html).not.toContain("Stati Uniti");
+    expect(html).toContain("Stati Uniti");
   });
 
   it("avoids italian fallback labels in visitor history metadata when a localized display locale is provided", () => {

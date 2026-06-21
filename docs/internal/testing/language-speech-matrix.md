@@ -17,7 +17,7 @@ This matrix applies only to the live speech-ready providers, `azure` and `chatgp
 - when Azure playback-text normalization diagnostics are part of the session, `AZURE_TRANSLATOR_KEY` and `AZURE_TRANSLATOR_REGION` are configured too;
 - the setup wizard has saved languages that remain inside the shared kiosk interaction catalog for the active provider.
 - the release language catalog counts match the runtime contract: baseline interaction 53, Azure interaction 79, and ChatGPT interaction 66.
-- legacy regional inputs such as `en-us`, `en-gb`, `fr-ca`, and `pt-pt` are treated as accepted aliases only; the runtime selector exposes the canonical language entry, with English resolved to `en-GB`.
+- product-language inputs use canonical catalog codes; non-canonical regional inputs are not rewritten to a different product language, and English speech uses `en-GB`.
 - on a packaged workstation, readiness is derived from `%LOCALAPPDATA%\OnlySpeech\.env`; source-workspace dry runs fall back to the repo-root `.env`.
 - refresh the retained proof template before the real workstation pass:
 

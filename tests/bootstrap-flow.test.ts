@@ -408,7 +408,7 @@ describe("bootstrap integrated setup wizard flow", () => {
     expect(process.env.ONLYSPEECH_SETUP_WIZARD_SECTION).toBe("diagnostics");
   });
 
-  it("maps legacy setup wizard monitor arguments to the stations section", async () => {
+  it("ignores unsupported setup wizard sections", async () => {
     process.argv = ["electron", ".", "--setup-wizard", "--wizard-section=monitors"];
 
     await importBootstrap();

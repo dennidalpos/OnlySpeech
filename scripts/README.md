@@ -42,9 +42,9 @@ Use this sequence before a Windows deployment candidate:
 6. `npm run release:evidence`
 7. `npm run release:compliance`
 8. `npm run release:customer-bundle`
-9. Target-workstation activation, commissioning, live speech, autostart, upgrade, and rollback validation.
+9. Target-workstation activation, commissioning, live speech, autostart, and fresh install/uninstall validation.
 
-The repository gate is necessary but not sufficient for production. Real hardware, live credentials, retained installer comparison, and logon evidence are still required.
+The repository gate is necessary but not sufficient for production. Real hardware, live credentials, packaged install/uninstall, and logon evidence are still required.
 
 ## Troubleshooting
 

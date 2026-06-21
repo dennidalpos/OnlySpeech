@@ -283,7 +283,7 @@ describe("SessionStore", () => {
     ]);
   });
 
-  it("stores canonical british english in history when providers report a regional english alias", () => {
+  it("preserves the detected regional English locale in conversation history", () => {
     const store = new SessionStore(createConfig());
     store.setHealth(createHealthyState());
     store.setTargetLanguage("A", "en");
@@ -293,10 +293,10 @@ describe("SessionStore", () => {
 
     const state = store.getState();
     expect(state.sides.A.sourceLanguage).toBe("en-GB");
-    expect(state.sides.A.detectedSourceLanguage).toBe("en-GB");
+    expect(state.sides.A.detectedSourceLanguage).toBe("en-US");
     expect(state.conversationHistory).toEqual([
       expect.objectContaining({
-        sourceLanguage: "en-GB",
+        sourceLanguage: "en-US",
         transcript: "hello",
         translation: "ciao"
       })

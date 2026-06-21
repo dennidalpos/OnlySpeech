@@ -87,12 +87,6 @@ function normalizeWizardSection(value: string | undefined): SetupWizardSection |
     case "diagnostics":
     case "license":
       return value;
-    case "monitors":
-    case "microphones":
-      return "stations";
-    case "tests":
-    case "technical":
-      return "diagnostics";
     default:
       return null;
   }

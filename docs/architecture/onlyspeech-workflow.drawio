@@ -291,7 +291,7 @@
         <mxCell id="v20" value="GitHub release assets&lt;br&gt;packages, evidence and diagnostics" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="820" y="690" width="210" height="70" as="geometry" />
         </mxCell>
-        <mxCell id="v21" value="External completion dependencies&lt;br&gt;real hardware, live credentials,&lt;br&gt;activation, autostart, upgrade/rollback" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;" vertex="1" parent="1">
+        <mxCell id="v21" value="External completion dependencies&lt;br&gt;real hardware, live credentials,&lt;br&gt;activation, autostart, packaged install" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="1090" y="680" width="260" height="90" as="geometry" />
         </mxCell>
         <mxCell id="e-v1-v2" value="" style="endArrow=block;html=1;rounded=0;strokeColor=#666666;" edge="1" parent="1" source="v1" target="v2">

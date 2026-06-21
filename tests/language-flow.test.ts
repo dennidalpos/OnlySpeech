@@ -286,18 +286,18 @@ describe("language-flow", () => {
   it("normalizes provider-detected base languages to the preferred canonical speech locale", () => {
     expect(resolveDetectedSourceLanguageOption("it")?.value).toBe("it-IT");
     expect(resolveDetectedSourceLanguageOption("en")?.value).toBe("en-GB");
-    expect(resolveDetectedSourceLanguageOption("en-US")?.value).toBe("en-GB");
+    expect(resolveDetectedSourceLanguageOption("en-US")?.value).toBe("en-US");
     expect(resolveDetectedSourceLanguageOption("bn")?.value).toBe("bn-IN");
     expect(resolveDetectedSourceLanguageOption("ur")?.value).toBe("ur-IN");
   });
 
-  it("normalizes provider and locale aliases to the canonical product-language codes", () => {
+  it("normalizes current provider locales and rejects retired regional aliases", () => {
     expect(normalizeInteractionLanguage("zh-CN", "chatgpt", "en")).toBe("zh-Hans");
     expect(normalizeInteractionLanguage("zh-TW", "chatgpt", "en")).toBe("zh-Hant");
-    expect(normalizeInteractionLanguage("en-US", "chatgpt", "it")).toBe("en");
+    expect(normalizeInteractionLanguage("en-US", "chatgpt", "it")).toBe("it");
     expect(normalizeInteractionLanguage("en-GB", "chatgpt", "it")).toBe("en");
-    expect(normalizeInteractionLanguage("fr-CA", "chatgpt", "en", { includeProviderExpansions: true })).toBe("fr");
-    expect(normalizeInteractionLanguage("pt-PT", "chatgpt", "en")).toBe("pt");
+    expect(normalizeInteractionLanguage("fr-CA", "chatgpt", "en", { includeProviderExpansions: true })).toBe("en");
+    expect(normalizeInteractionLanguage("pt-PT", "chatgpt", "en")).toBe("en");
   });
 
   it("keeps every provider-expanded interaction language selectable without falling back to the wizard defaults", () => {

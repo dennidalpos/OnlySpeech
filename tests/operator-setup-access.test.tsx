@@ -349,7 +349,7 @@ describe("operator setup access gate", () => {
     ]);
   });
 
-  it("shows the temporary setup password automatically on Station A when an upgraded workstation still requires the first password change", async () => {
+  it("shows the temporary setup password automatically on Station A while the first password change is required", async () => {
     const harness = createHarness({
       accessState: {
         requiresPassword: true,

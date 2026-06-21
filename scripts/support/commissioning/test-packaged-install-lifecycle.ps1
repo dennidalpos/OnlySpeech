@@ -1,8 +1,6 @@
 param(
   [string]$PackageRoot = "",
   [string]$InstallRoot = "",
-  [string]$PreviousInstallerPath = "",
-  [string]$RollbackInstallerPath = "",
   [string]$LiveValidationAppDataPath = "",
   [switch]$SkipLaunches,
   [switch]$DryRun
@@ -293,18 +291,14 @@ function Invoke-InstallerLifecycle {
   param(
     [string]$LabelPrefix,
     [string]$InstallerPath,
-    [string]$InstallDirectory,
-    [switch]$SkipDirectoryReset,
-    [switch]$SkipUninstall
+    [string]$InstallDirectory
   )
 
   if (-not $DryRun) {
     Assert-PathExists -LiteralPath $InstallerPath -Label "$LabelPrefix installer"
   }
   Assert-InstallDirectoryScope -InstallDirectory $InstallDirectory
-  if (-not $SkipDirectoryReset) {
-    Reset-InstallDirectory -LabelPrefix $LabelPrefix -InstallDirectory $InstallDirectory
-  }
+  Reset-InstallDirectory -LabelPrefix $LabelPrefix -InstallDirectory $InstallDirectory
 
   Invoke-InstallerStep -LabelPrefix $LabelPrefix -InstallerPath $InstallerPath -InstallDirectory $InstallDirectory
 
@@ -314,10 +308,6 @@ function Invoke-InstallerLifecycle {
   }
 
   Invoke-LaunchValidation -Label "$LabelPrefix-launch" -ExecutablePath $installedExe -WorkingDirectory $InstallDirectory
-
-  if ($SkipUninstall) {
-    return
-  }
 
   $uninstallerPath = if ($DryRun) { Join-Path $InstallDirectory "Uninstall OnlySpeech.exe" } else { Resolve-UninstallerPath -InstallDirectory $InstallDirectory }
   if (-not $DryRun) {
@@ -373,18 +363,3 @@ if ($DryRun) {
 Write-Step -Label "layout" -Message "installer=$($currentInstaller.FullName) portable=$($portableExe.FullName) unpacked=$unpackedExe"
 Invoke-LaunchValidation -Label "unpacked-launch" -ExecutablePath $unpackedExe -WorkingDirectory (Split-Path -Parent $unpackedExe)
 Invoke-InstallerLifecycle -LabelPrefix "current" -InstallerPath $currentInstaller.FullName -InstallDirectory (Join-Path $resolvedInstallRoot "current")
-
-if (-not [string]::IsNullOrWhiteSpace($PreviousInstallerPath)) {
-  $resolvedRollbackInstallerPath = if ([string]::IsNullOrWhiteSpace($RollbackInstallerPath)) {
-    $PreviousInstallerPath
-  } else {
-    $RollbackInstallerPath
-  }
-  $upgradeInstallDirectory = Join-Path $resolvedInstallRoot "upgrade"
-
-  Write-Step -Label "upgrade-plan" -Message "previous=$PreviousInstallerPath rollback=$resolvedRollbackInstallerPath"
-  Invoke-InstallerLifecycle -LabelPrefix "previous" -InstallerPath $PreviousInstallerPath -InstallDirectory $upgradeInstallDirectory -SkipUninstall
-  Invoke-InstallerLifecycle -LabelPrefix "upgrade" -InstallerPath $currentInstaller.FullName -InstallDirectory $upgradeInstallDirectory -SkipDirectoryReset -SkipUninstall
-  Invoke-InstallerLifecycle -LabelPrefix "rollback" -InstallerPath $resolvedRollbackInstallerPath -InstallDirectory $upgradeInstallDirectory -SkipDirectoryReset
-}
-

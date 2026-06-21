@@ -91,51 +91,6 @@ describeWindows("test-packaged-install-lifecycle.ps1", () => {
     expect(result.stdout).toContain("[current-uninstall]");
   });
 
-  it("prints upgrade and rollback steps when comparison installers are supplied", () => {
-    const packageRoot = createTempDirectory("onlyspeech-packages-upgrade");
-    const unpackedRoot = join(packageRoot, "win-unpacked");
-    const comparisonRoot = createTempDirectory("onlyspeech-packages-comparison");
-    mkdirSync(unpackedRoot, { recursive: true });
-    writeFileSync(join(unpackedRoot, "OnlySpeech.exe"), "", "utf8");
-    writeFileSync(join(packageRoot, "OnlySpeech-0.2.0-portable.exe"), "", "utf8");
-    writeFileSync(join(packageRoot, "OnlySpeech-0.2.0-installer.exe"), "", "utf8");
-    const previousInstallerPath = join(comparisonRoot, "OnlySpeech-0.1.0-installer.exe");
-    const rollbackInstallerPath = join(comparisonRoot, "OnlySpeech-0.0.9-installer.exe");
-    writeFileSync(previousInstallerPath, "", "utf8");
-    writeFileSync(rollbackInstallerPath, "", "utf8");
-
-    const result = spawnSync(
-      "powershell.exe",
-      [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        lifecycleScriptPath,
-        "-PackageRoot",
-        packageRoot,
-        "-PreviousInstallerPath",
-        previousInstallerPath,
-        "-RollbackInstallerPath",
-        rollbackInstallerPath,
-        "-DryRun"
-      ],
-      {
-        cwd: repoRoot,
-        encoding: "utf8"
-      }
-    );
-
-    if (result.status !== 0) {
-      throw new Error([result.stdout.trim(), result.stderr.trim()].filter(Boolean).join("\n"));
-    }
-
-    expect(result.stdout).toContain("[upgrade-plan]");
-    expect(result.stdout).toContain("[previous-reset]");
-    expect(result.stdout).toContain("[previous-install]");
-    expect(result.stdout).toContain("[rollback-install]");
-  });
-
   it("accepts a relaunched packaged process after the bootstrap pid exits cleanly", () => {
     const script = readFileSync(lifecycleScriptPath, "utf8");
 

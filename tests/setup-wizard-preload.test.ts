@@ -77,7 +77,7 @@ describe("setup-wizard preload", () => {
     vi.unstubAllGlobals();
   });
 
-  it("exposes the wizard bridge without the legacy managed-TTS helpers", async () => {
+  it("exposes the wizard bridge without removed managed-TTS helpers", async () => {
     await import("../src/tools/setup-wizard/preload.js");
 
     expect(preloadMocks.exposeInMainWorld).toHaveBeenCalledTimes(1);

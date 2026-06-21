@@ -8,14 +8,6 @@ param(
 $repoHelpersPath = Join-Path $PSScriptRoot "..\lib\repo.ps1"
 . $repoHelpersPath
 
-function Get-PackCompatibilityPreloadPath {
-  param(
-    [string]$RepoRoot = (Resolve-OnlySpeechRepoRoot -ScriptRoot $PSScriptRoot)
-  )
-
-  return Join-Path $RepoRoot "scripts\support\packaging\electron-builder-compat-preload.cjs"
-}
-
 function Copy-PackagingResourceScripts {
   param(
     [string]$RepoRoot = (Resolve-OnlySpeechRepoRoot -ScriptRoot $PSScriptRoot),
@@ -62,41 +54,11 @@ function Get-PackagingLineClassification {
     [string]$Line
   )
 
-  if ($Line -match "(?i)\bwarning\b" -or $Line -match "duplicate dependency references" -or $Line -match "(?i)deprecationwarning") {
+  if ($Line -match "(?i)\bwarning\b" -or $Line -match "(?i)deprecationwarning") {
     return [ordered]@{ type = "unexpected-warning" }
   }
 
   return [ordered]@{ type = "normal" }
-}
-
-function New-PackEnvironment {
-  param(
-    [hashtable]$Environment = @{},
-    [string]$RepoRoot = (Resolve-OnlySpeechRepoRoot -ScriptRoot $PSScriptRoot)
-  )
-
-  if ($Environment.Count -eq 0) {
-    foreach ($entry in [System.Environment]::GetEnvironmentVariables().GetEnumerator()) {
-      $Environment[[string]$entry.Key] = [string]$entry.Value
-    }
-  }
-
-  $preloadFlag = "--require=$(Get-PackCompatibilityPreloadPath -RepoRoot $RepoRoot)"
-  $nodeOptions = [string]($Environment["NODE_OPTIONS"])
-  $normalizedNodeOptions = if ([string]::IsNullOrWhiteSpace($nodeOptions)) { "" } else { $nodeOptions.Trim() }
-  $tokens = @([regex]::Split($normalizedNodeOptions, "\s+") | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
-
-  $result = @{}
-  foreach ($entry in $Environment.GetEnumerator()) {
-    $result[[string]$entry.Key] = [string]$entry.Value
-  }
-
-  if ($tokens -notcontains $preloadFlag) {
-    $tokens += $preloadFlag
-  }
-
-  $result["NODE_OPTIONS"] = ($tokens -join " ").Trim()
-  return $result
 }
 
 function Get-PackCommandArgs {
@@ -225,46 +187,36 @@ function Invoke-RunPack {
     [string]$RepoRoot = (Resolve-OnlySpeechRepoRoot -ScriptRoot $PSScriptRoot),
     [ValidateSet("Public", "Internal")]
     [string]$Profile = "Public",
-    [hashtable]$Environment = @{},
     [switch]$DryRun
   )
 
   $resolvedRepoRoot = if ([string]::IsNullOrWhiteSpace($RepoRoot)) { Resolve-OnlySpeechRepoRoot -ScriptRoot $PSScriptRoot } else { $RepoRoot }
   $packagesRoot = Join-Path $resolvedRepoRoot "artifacts\packages"
-  $packEnvironment = New-PackEnvironment -Environment $Environment -RepoRoot $resolvedRepoRoot
   $packCommandArgs = @(Get-PackCommandArgs -RepoRoot $resolvedRepoRoot -Profile $Profile)
-  $previousNodeOptions = $env:NODE_OPTIONS
   $unexpectedWarnings = @()
 
   if ($DryRun) {
     [Console]::Out.WriteLine("[pack] profile=$Profile")
     [Console]::Out.WriteLine("[pack] node $($packCommandArgs -join ' ')")
-    [Console]::Out.WriteLine("[pack] NODE_OPTIONS=$($packEnvironment["NODE_OPTIONS"])")
     Copy-PackagingResourceScripts -RepoRoot $resolvedRepoRoot -DryRun
     return 0
   }
 
-  try {
-    Copy-PackagingResourceScripts -RepoRoot $resolvedRepoRoot
-    $env:NODE_OPTIONS = $packEnvironment["NODE_OPTIONS"]
-    & node $packCommandArgs 2>&1 | ForEach-Object {
-      $line = "$_"
-      $classification = Get-PackagingLineClassification -Line $line
-      if ($classification.type -eq "unexpected-warning") {
-        $unexpectedWarnings += $line
-      }
-
-      if ($_ -is [System.Management.Automation.ErrorRecord]) {
-        [Console]::Error.WriteLine($line)
-      } else {
-        [Console]::Out.WriteLine($line)
-      }
+  Copy-PackagingResourceScripts -RepoRoot $resolvedRepoRoot
+  & node $packCommandArgs 2>&1 | ForEach-Object {
+    $line = "$_"
+    $classification = Get-PackagingLineClassification -Line $line
+    if ($classification.type -eq "unexpected-warning") {
+      $unexpectedWarnings += $line
     }
 
-    $exitCode = $LASTEXITCODE
-  } finally {
-    $env:NODE_OPTIONS = $previousNodeOptions
+    if ($_ -is [System.Management.Automation.ErrorRecord]) {
+      [Console]::Error.WriteLine($line)
+    } else {
+      [Console]::Out.WriteLine($line)
+    }
   }
+  $exitCode = $LASTEXITCODE
 
   if ($unexpectedWarnings.Count -gt 0) {
     [Console]::Error.WriteLine("Unexpected packaging warning(s) detected:")

@@ -6,8 +6,7 @@ This runbook covers:
 
 - final packaged activation validation with real purchased activation material;
 - final target-station commissioning evidence, including explicit `touch-input` closure when applicable to the target hardware;
-- packaged autostart validation at real user logon through the supported HKCU Run-key path;
-- retained-installer upgrade and rollback validation on a dedicated Windows workstation.
+- packaged autostart validation at real user logon through the supported HKCU Run-key path.
 
 ## Preconditions
 
@@ -85,32 +84,6 @@ Retain at minimum:
 
 Record the retained notes directly in `artifacts/logs/packaged-closeout-validation.json` under `autostart.scenarios` by changing each scenario from `pending` to `passed`, `failed`, or `not_applicable`, and filling `checked_at`, `evidence`, and `notes`.
 
-## Upgrade And Rollback Validation
-
-Validate this only when retained comparison installers are available. The repository covers the script path and dry-run behavior, but not the real installer transitions by itself.
-Refresh the packaged close-out checklist first if the file is missing or stale:
-
-```powershell
-npm run commission:closeout-template
-```
-
-Use a dedicated Windows workstation or disposable VM and keep all install roots inside the script-owned lifecycle area.
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\support\commissioning\test-packaged-install-lifecycle.ps1 `
-  -PreviousInstallerPath <path-to-supported-older-installer.exe> `
-  -RollbackInstallerPath <path-to-rollback-baseline-installer.exe>
-```
-
-Expected manual closure:
-
-- the previous retained installer installs and launches successfully;
-- upgrade to the current retained installer succeeds without breaking startup;
-- rollback to the retained rollback baseline succeeds without breaking startup;
-- notes and any retained paths are recorded with the release or commissioning evidence used for the delivery.
-
-Record the retained notes directly in `artifacts/logs/packaged-closeout-validation.json` under `upgrade_rollback.scenarios` by changing each scenario from `pending` to `passed`, `failed`, or `not_applicable`, and filling `checked_at`, `evidence`, and `notes`.
-
 ## Commissioning Close-Out
 
 The following target-station checks can be automated on the active workstation before the remaining manual close-out:
@@ -150,7 +123,7 @@ npm run commission:handover
 
 ## Tracking Notes
 
-If this manual pass is being tracked in `PROJECT_STATUS.json`, close or update the relevant open task only after the retained evidence for that area actually exists. For activation and commissioning this usually means `artifacts/logs/activation-validation.json` and `artifacts/logs/commissioning-evidence.json`; for autostart and retained-installer lifecycle validation this means `artifacts/logs/packaged-closeout-validation.json` with the relevant scenario groups closed.
+If this manual pass is being tracked in `PROJECT_STATUS.json`, close or update the relevant open task only after the retained evidence for that area actually exists. For activation and commissioning this usually means `artifacts/logs/activation-validation.json` and `artifacts/logs/commissioning-evidence.json`; for autostart this means `artifacts/logs/packaged-closeout-validation.json` with the relevant scenarios closed.
 
 Do not claim signed-release, GitHub-hosted CI, or commercial-review completion unless those external bundles are retained too.
 

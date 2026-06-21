@@ -490,7 +490,7 @@ describe("registerIpcHandlers", () => {
     expect(kioskManager.handleTextToSpeechEvent).toHaveBeenCalledWith(event);
   });
 
-  it("does not register the legacy managed text-to-speech ipc handlers", async () => {
+  it("does not register removed managed text-to-speech ipc handlers", async () => {
     registerIpcHandlers({
       getKioskManager: () => null,
       getTranslationProviderService: () => null,

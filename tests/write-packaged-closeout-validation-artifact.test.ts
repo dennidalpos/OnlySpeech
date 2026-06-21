@@ -35,12 +35,10 @@ afterEach(() => {
 });
 
 describe("New-PackagedCloseoutValidationArtifact", () => {
-  it("writes a packaged close-out template covering autostart and upgrade rollback evidence", () => {
+  it("writes a packaged close-out template covering the current package and autostart evidence", () => {
     const tempRepo = createTempDirectory("onlyspeech-packaged-closeout");
     const packageRoot = join(tempRepo, "artifacts", "packages");
-    const comparisonRoot = join(tempRepo, "comparison");
     mkdirSync(join(packageRoot, "win-unpacked"), { recursive: true });
-    mkdirSync(comparisonRoot, { recursive: true });
     writeFileSync(
       join(tempRepo, "package.json"),
       JSON.stringify({ name: "onlyspeech", version: "0.1.0" }, null, 2),
@@ -49,18 +47,12 @@ describe("New-PackagedCloseoutValidationArtifact", () => {
     writeFileSync(join(packageRoot, "win-unpacked", "OnlySpeech.exe"), "", "utf8");
     writeFileSync(join(packageRoot, "OnlySpeech-0.1.0-x64-setup.exe"), "", "utf8");
     writeFileSync(join(packageRoot, "OnlySpeech-0.1.0-x64-portable.exe"), "", "utf8");
-    const previousInstallerPath = join(comparisonRoot, "OnlySpeech-0.0.9-x64-setup.exe");
-    const rollbackInstallerPath = join(comparisonRoot, "OnlySpeech-0.0.8-x64-setup.exe");
-    writeFileSync(previousInstallerPath, "", "utf8");
-    writeFileSync(rollbackInstallerPath, "", "utf8");
 
     const repoLiteral = tempRepo.replace(/'/g, "''");
-    const previousLiteral = previousInstallerPath.replace(/'/g, "''");
-    const rollbackLiteral = rollbackInstallerPath.replace(/'/g, "''");
     const result = runPowerShellJson(
       [
         `& { . '${scriptPath}'`,
-        `  New-PackagedCloseoutValidationArtifact -RepoRoot '${repoLiteral}' -PreviousInstallerPath '${previousLiteral}' -RollbackInstallerPath '${rollbackLiteral}' | ConvertTo-Json -Depth 12 -Compress`,
+        `  New-PackagedCloseoutValidationArtifact -RepoRoot '${repoLiteral}' | ConvertTo-Json -Depth 12 -Compress`,
         "}"
       ].join("\n")
     ) as {
@@ -71,13 +63,8 @@ describe("New-PackagedCloseoutValidationArtifact", () => {
           portable_executable: string | null;
           unpacked_executable: string | null;
         };
-        comparison_installers: {
-          previous_installer: string | null;
-          rollback_installer: string | null;
-        };
         project_status_task_coverage: Array<{ task_id: string; evidence_paths: string[] }>;
         autostart: { registry_path: string; value_name: string; scenarios: Array<{ id: string; status: string }> };
-        upgrade_rollback: { command: string; scenarios: Array<{ id: string; status: string }> };
       };
     };
 
@@ -90,23 +77,16 @@ describe("New-PackagedCloseoutValidationArtifact", () => {
       portable_executable: "artifacts/packages/OnlySpeech-0.1.0-x64-portable.exe",
       unpacked_executable: "artifacts/packages/win-unpacked/OnlySpeech.exe"
     });
-    expect(result.artifact.comparison_installers).toEqual({
-      previous_installer: "comparison/OnlySpeech-0.0.9-x64-setup.exe",
-      rollback_installer: "comparison/OnlySpeech-0.0.8-x64-setup.exe"
-    });
     expect(result.artifact.project_status_task_coverage.map((entry) => entry.task_id)).toEqual([
       "residual-packaged-activation-commissioning-validation",
       "residual-live-provider-speech-proof",
-      "residual-upgrade-rollback-validation",
       "residual-packaged-autostart-live-validation"
     ]);
     expect(result.artifact.autostart.registry_path).toBe("HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run");
     expect(result.artifact.autostart.value_name).toBe("OnlySpeech");
     expect(result.artifact.autostart.scenarios).toHaveLength(5);
     expect(result.artifact.autostart.scenarios.every((scenario) => scenario.status === "pending")).toBe(true);
-    expect(result.artifact.upgrade_rollback.command).toContain("test-packaged-install-lifecycle.ps1");
-    expect(result.artifact.upgrade_rollback.scenarios).toHaveLength(5);
-    expect(result.artifact.upgrade_rollback.scenarios.map((scenario) => scenario.id)).toContain("current-installer-upgrade-launch");
+    expect(result.artifact.autostart.scenarios.map((scenario) => scenario.id)).toContain("autostart-single-run-key-mechanism");
     expect(writtenArtifact).toEqual(result.artifact);
   });
 
@@ -130,11 +110,9 @@ describe("New-PackagedCloseoutValidationArtifact", () => {
     const artifact = JSON.parse(readFileSync(outputPath, "utf8")) as {
       schema_version: number;
       autostart: { scenarios: Array<{ id: string }> };
-      upgrade_rollback: { scenarios: Array<{ id: string }> };
     };
 
     expect(artifact.schema_version).toBe(1);
     expect(artifact.autostart.scenarios).toHaveLength(5);
-    expect(artifact.upgrade_rollback.scenarios).toHaveLength(5);
   });
 });

@@ -29,6 +29,14 @@ const projectStatusPath = join(repoRoot, "PROJECT_STATUS.json");
 const readmePath = join(repoRoot, "README.md");
 
 describeWindows("verify-repo.ps1", () => {
+  it("hashes intentional duplicates without relying on optional PowerShell cmdlets", () => {
+    const script = readFileSync(scriptPath, "utf8");
+
+    expect(script).toContain("[System.Security.Cryptography.SHA256]::Create()");
+    expect(script).toContain("Get-OnlySpeechFileSha256 -LiteralPath $leftPath");
+    expect(script).not.toContain("Get-FileHash");
+  });
+
   it("uses the internal packaging profile in the dry-run acceptance sequence", () => {
     const result = spawnSync(
       "powershell.exe",
@@ -231,7 +239,6 @@ describeWindows("verify-repo.ps1", () => {
 
     expect(scriptsIndex).toContain("## Script Classification");
     expect(scriptsIndex).toContain("| agents | none |");
-    expect(scriptsIndex).toContain("| legacy | none |");
     expect(scriptsIndex).toContain("| removable | none currently tracked |");
     expect(scriptsIndex).toContain("scripts/bootstrap.ps1");
     expect(scriptsIndex).toContain("scripts/dev.ps1");

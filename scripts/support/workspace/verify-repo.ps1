@@ -29,6 +29,25 @@ $intentionalDuplicatePairs = @(
   @("build\brand\onlyspeech-mark.svg", "public\brand\onlyspeech-mark.svg")
 )
 
+function Get-OnlySpeechFileSha256 {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$LiteralPath
+  )
+
+  $stream = [System.IO.File]::OpenRead($LiteralPath)
+  try {
+    $sha256 = [System.Security.Cryptography.SHA256]::Create()
+    try {
+      return ([System.BitConverter]::ToString($sha256.ComputeHash($stream))).Replace("-", "")
+    } finally {
+      $sha256.Dispose()
+    }
+  } finally {
+    $stream.Dispose()
+  }
+}
+
 function Assert-IntentionalDuplicateParity {
   if ($DryRun) {
     Write-Host "[duplicate-parity] skipped in dry run"
@@ -40,8 +59,8 @@ function Assert-IntentionalDuplicateParity {
     if (-not (Test-Path -LiteralPath $leftPath) -or -not (Test-Path -LiteralPath $rightPath)) {
       throw "Intentional duplicate is missing: $($pair -join ' <-> ')"
     }
-    $leftHash = (Get-FileHash -LiteralPath $leftPath -Algorithm SHA256).Hash
-    $rightHash = (Get-FileHash -LiteralPath $rightPath -Algorithm SHA256).Hash
+    $leftHash = Get-OnlySpeechFileSha256 -LiteralPath $leftPath
+    $rightHash = Get-OnlySpeechFileSha256 -LiteralPath $rightPath
     if ($leftHash -ne $rightHash) {
       throw "Intentional duplicate parity failed: $($pair -join ' <-> ')"
     }

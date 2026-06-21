@@ -123,7 +123,7 @@ describe("SetupWizardAccessManager", () => {
     ).toEqual({ ok: true });
   });
 
-  it("rejects unsupported legacy persisted access records with a reprovision instruction", () => {
+  it.each([1, 2])("rejects unsupported persisted access schema %s with a reprovision instruction", (schemaVersion) => {
     const directory = createTempDirectory();
     const accessFilePath = join(directory, "setup-wizard-access.json");
 
@@ -131,9 +131,9 @@ describe("SetupWizardAccessManager", () => {
       accessFilePath,
       JSON.stringify(
         {
-          schemaVersion: 1,
-          passwordSalt: "legacy-salt",
-          passwordHash: "legacy-hash",
+          schemaVersion,
+          passwordSalt: "unsupported-salt",
+          passwordHash: "unsupported-hash",
           mustChangePassword: false,
           temporaryPassword: null
         },

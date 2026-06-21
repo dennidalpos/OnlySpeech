@@ -43,7 +43,7 @@ describe("main preload", () => {
     preloadMocks.reset();
   });
 
-  it("exposes the renderer bridge without the legacy managed-TTS helpers", async () => {
+  it("exposes the renderer bridge without removed managed-TTS helpers", async () => {
     await import("../src/main/preload.js");
     const api = preloadMocks.exposeInMainWorld.mock.calls[0]?.[1] as Record<string, unknown>;
 

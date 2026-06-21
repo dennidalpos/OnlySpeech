@@ -132,10 +132,6 @@ const INTERACTION_LANGUAGE_CODE_ALIASES = new Map<string, string>(
   })
 );
 
-INTERACTION_LANGUAGE_CODE_ALIASES.set("en-us", "en");
-INTERACTION_LANGUAGE_CODE_ALIASES.set("en-gb", "en");
-INTERACTION_LANGUAGE_CODE_ALIASES.set("fr-ca", "fr");
-INTERACTION_LANGUAGE_CODE_ALIASES.set("pt-pt", "pt");
 INTERACTION_LANGUAGE_CODE_ALIASES.set("zh-cn", "zh-Hans");
 INTERACTION_LANGUAGE_CODE_ALIASES.set("zh-hk", "yue");
 INTERACTION_LANGUAGE_CODE_ALIASES.set("zh-sg", "zh-Hans");
@@ -148,8 +144,6 @@ INTERACTION_LANGUAGE_CODE_ALIASES.set("yue-hk", "yue");
 const PRECOMPUTED_NATIVE_LANGUAGE_LABELS: Readonly<Record<string, string>> = Object.freeze({
   it: "italiano",
   en: "English",
-  "en-us": "American English",
-  "en-gb": "British English",
   fr: "français",
   de: "Deutsch",
   es: "español",
@@ -198,14 +192,12 @@ const PRECOMPUTED_NATIVE_LANGUAGE_LABELS: Readonly<Record<string, string>> = Obj
   lt: "lietuvių",
   mt: "Malti",
   nb: "norsk bokmål",
-  "pt-pt": "português europeu",
   "sr-Cyrl": "српски (ћирилица)",
   "sr-Latn": "српски (латиница)",
   sk: "slovenčina",
   sl: "slovenščina",
   sv: "svenska",
   hu: "magyar",
-  "fr-ca": "français canadien",
   hy: "հայերեն",
   as: "অসমীয়া",
   az: "azərbaycan",
@@ -341,22 +333,6 @@ function resolveRegistryEntry(languageCode: string | null | undefined): Registry
 }
 
 function toDisplayNameCode(languageCode: string): string {
-  if (languageCode === "en-us") {
-    return "en-US";
-  }
-
-  if (languageCode === "en-gb") {
-    return "en-GB";
-  }
-
-  if (languageCode === "pt-pt") {
-    return "pt-PT";
-  }
-
-  if (languageCode === "fr-ca") {
-    return "fr-CA";
-  }
-
   if (languageCode === "tlh-Latn" || languageCode === "tlh-Piqd") {
     return "tlh";
   }

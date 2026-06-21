@@ -205,7 +205,7 @@ describeWindows("windows script helpers", () => {
     ]);
   });
 
-  it("prefers LocalAppData runtime logs when both current and legacy locations exist", () => {
+  it("uses the canonical LocalAppData runtime logs when unrelated paths also exist", () => {
     const resolvedSourcePath = runPowerShell(
       [
         "-NoProfile",

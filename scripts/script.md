@@ -9,7 +9,6 @@ Use npm commands for normal operation. Direct PowerShell script paths are docume
 | primary | `scripts/*.ps1`, stable npm aliases in `package.json` | Supported developer, operator, CI, release, and support entrypoints. |
 | support | `scripts/support/**/*.ps1`, `scripts/support/**/*.mjs`, `scripts/support/**/*.cjs`, `scripts/support/**/*.html` | Internal implementation, shared helpers, packaging resources, and repo-owned utility tooling. |
 | agents | none | No agent-owned script path is supported. Scratch files must stay out of tracked source. |
-| legacy | none | No legacy script path is part of the maintained command surface. |
 | removable | none currently tracked | Remove a script only after checking `package.json`, docs, tests, CI, and installer config in the same change. |
 
 Ignored local outputs such as `.local/`, `dist/`, `artifacts/`, `node_modules/`, and package caches are not part of the tracked script surface.
@@ -48,7 +47,7 @@ Ignored local outputs such as `.local/`, `dist/`, `artifacts/`, `node_modules/`,
 | `npm run activation:template` | Packaged activation validation template. |
 | `npm run commission:template` | Target-station and commissioning templates. |
 | `npm run commission:automation` | Target-station automation against the packaged profile. |
-| `npm run commission:closeout-template` | Autostart, upgrade, and rollback validation template. |
+| `npm run commission:closeout-template` | Packaged autostart validation template. |
 | `npm run commission:handover` | Final commissioning evidence generation. |
 | `npm run speech:matrix-template` | Live provider speech proof template. |
 | `npm run release:evidence` | Release metadata for existing package outputs. |
@@ -87,7 +86,7 @@ There is no checked-in lint or format command. The current checked quality surfa
 | `scripts/support/commissioning/write-commissioning-artifact.ps1` | Write commissioning evidence and target-station templates. | `commission:template`, `commission:handover`. |
 | `scripts/support/commissioning/run-target-station-automation.ps1` | Run target-station automation and update validation state. | `npm run commission:automation`. |
 | `scripts/support/commissioning/write-live-provider-speech-proof-artifact.ps1` | Write live provider speech proof template. | `npm run speech:matrix-template`. |
-| `scripts/support/commissioning/write-packaged-closeout-validation-artifact.ps1` | Write autostart, upgrade, and rollback validation template. | `npm run commission:closeout-template`. |
+| `scripts/support/commissioning/write-packaged-closeout-validation-artifact.ps1` | Write packaged autostart validation template. | `npm run commission:closeout-template`. |
 | `scripts/support/commissioning/test-packaged-install-lifecycle.ps1` | Validate packaged install/startup lifecycle. | `npm run test:packaged-lifecycle`, `verify:repo`. |
 | `scripts/support/commissioning/test-packaged-runtime-automation.ps1` | Validate packaged runtime automation against `win-unpacked`. | `npm run test:packaged-automation`, `verify:repo -EnablePackagedAutomation`. |
 | `scripts/support/docs/write-product-screenshots.ps1` | Compile and regenerate optional product screenshots. | `npm run docs:screenshots`. |
@@ -117,7 +116,7 @@ There is no checked-in lint or format command. The current checked quality surfa
 
 The gate fails at the first failing step through `Invoke-OnlySpeechStep` and prints the command label before execution.
 
-For a deployable Windows candidate, run `npm run package`, `npm run release:evidence`, `npm run release:compliance`, and `npm run release:customer-bundle` only after the gate is clean or remaining findings are formally accepted. Target-workstation activation, commissioning, live speech, autostart, upgrade, and rollback validation still happen outside the repository gate.
+For a deployable Windows candidate, run `npm run package`, `npm run release:evidence`, `npm run release:compliance`, and `npm run release:customer-bundle` only after the gate is clean or remaining findings are formally accepted. Target-workstation activation, commissioning, live speech, autostart, and fresh install/uninstall validation still happen outside the repository gate.
 
 ## Verification Modifiers
 

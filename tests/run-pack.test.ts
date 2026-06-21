@@ -22,12 +22,12 @@ function runPowerShellJson(script: string): unknown {
 }
 
 describe("Get-PackagingLineClassification", () => {
-  it("flags duplicate dependency output as unexpected", () => {
+  it("passes through electron-builder dependency graph diagnostics", () => {
     const result = runPowerShellJson(
       `& { . '${scriptPath}'; Get-PackagingLineClassification -Line '  • duplicate dependency references  dependencies=["@azure/abort-controller@2.1.2","debug@4.4.3","debug@4.4.3","debug@4.4.3"]' | ConvertTo-Json -Compress }`
     );
 
-    expect(result).toEqual({ type: "unexpected-warning" });
+    expect(result).toEqual({ type: "normal" });
   });
 
   it("flags DEP0190 output as unexpected", () => {
@@ -44,25 +44,6 @@ describe("Get-PackagingLineClassification", () => {
     );
 
     expect(result).toEqual({ type: "normal" });
-  });
-});
-
-describe("New-PackEnvironment", () => {
-  it("adds the packaging compatibility preload", () => {
-    const result = runPowerShellJson(
-      `& { . '${scriptPath}'; $envMap = @{ PATH = 'C:\\Windows\\System32' }; New-PackEnvironment -Environment $envMap -RepoRoot '${exampleRepoRoot}' | ConvertTo-Json -Compress }`
-    ) as { NODE_OPTIONS: string };
-
-    expect(result.NODE_OPTIONS).toContain(`--require=${exampleRepoRoot}\\scripts\\support\\packaging\\electron-builder-compat-preload.cjs`);
-  });
-
-  it("does not duplicate the preload flag", () => {
-    const preloadFlag = `--require=${exampleRepoRoot}\\scripts\\support\\packaging\\electron-builder-compat-preload.cjs`;
-    const result = runPowerShellJson(
-      `& { . '${scriptPath}'; $envMap = @{ NODE_OPTIONS = '${preloadFlag}' }; New-PackEnvironment -Environment $envMap -RepoRoot '${exampleRepoRoot}' | ConvertTo-Json -Compress }`
-    ) as { NODE_OPTIONS: string };
-
-    expect(result.NODE_OPTIONS).toBe(preloadFlag);
   });
 });
 

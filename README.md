@@ -30,7 +30,7 @@ OnlySpeech is production-oriented for Windows + PowerShell, but a customer deplo
 - `npm run gate -- -KeepOutputs -EnablePackagedAutomation` passes on Windows.
 - `npm audit --audit-level=moderate` and `npm run audit:packaging` are clean or any remaining findings are explicitly accepted for the release.
 - A signed installer or approved portable package is produced from the same verified source.
-- Packaged activation, commissioning, autostart, upgrade, rollback, live provider speech, and audio/language validation are completed on the target workstation.
+- Packaged activation, commissioning, autostart, fresh install/uninstall, live provider speech, and audio/language validation are completed on the target workstation.
 - Open blockers in [PROJECT_STATUS.json](PROJECT_STATUS.json) are closed or explicitly accepted by the product owner.
 - Retained evidence exists under `artifacts/logs/` for release, compliance, commissioning, activation, live speech, and packaged close-out checks.
 
@@ -105,7 +105,7 @@ The installer verifies required software before copying the app:
 | `npm run activation:template` | Write the packaged activation validation artifact template. |
 | `npm run commission:template` | Write the target-station validation template and commissioning template artifact. |
 | `npm run commission:automation` | Run target-station automation against the packaged profile when available. |
-| `npm run commission:closeout-template` | Write the packaged close-out validation template for autostart and retained-installer upgrade/rollback evidence. |
+| `npm run commission:closeout-template` | Write the packaged close-out validation template for autostart evidence. |
 | `npm run commission:handover` | Write final commissioning evidence from retained target-station validation. |
 | `npm run speech:matrix-template` | Write the live provider speech proof template. |
 | `npm run release:evidence` | Write release evidence metadata for existing packaged outputs. |
@@ -142,7 +142,7 @@ CI and tagged release workflows run `npm run verify:repo -- -KeepOutputs -Enable
 - [scripts/script.md](scripts/script.md): canonical npm/PowerShell script index, classification, and side-effect map.
 - [docs/product/provider-setup.md](docs/product/provider-setup.md): provider setup boundaries and official documentation links.
 - [docs/internal/testing/language-speech-matrix.md](docs/internal/testing/language-speech-matrix.md): manual live provider speech proof matrix.
-- [docs/internal/testing/packaged-activation-commissioning-runbook.md](docs/internal/testing/packaged-activation-commissioning-runbook.md): real-workstation activation, commissioning, autostart, upgrade, and rollback close-out.
+- [docs/internal/testing/packaged-activation-commissioning-runbook.md](docs/internal/testing/packaged-activation-commissioning-runbook.md): real-workstation activation, commissioning, and autostart close-out.
 - [docs/customer-bundle/Customer_Quick_Start.md](docs/customer-bundle/Customer_Quick_Start.md): buyer-facing packaged first-use guide.
 - [docs/internal/Privacy_and_Commercial_Distribution.md](docs/internal/Privacy_and_Commercial_Distribution.md): repository privacy and commercial-distribution boundary.
 - [docs/product/Marketplace_Sales_Package.md](docs/product/Marketplace_Sales_Package.md): seller-facing marketplace copy baseline, not buyer-bundle documentation.

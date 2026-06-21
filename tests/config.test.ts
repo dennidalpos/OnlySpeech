@@ -126,7 +126,7 @@ describe("loadRuntimeConfig", () => {
   it("normalizes locale-style env language values to the canonical product registry", () => {
     const config = loadRuntimeConfig({
       DEFAULT_TARGET_LANG_A: "zh-CN",
-      DEFAULT_TARGET_LANG_B: "pt-PT"
+      DEFAULT_TARGET_LANG_B: "pt-BR"
     });
 
     expect(config.defaultTargetLangA).toBe("zh-Hans");

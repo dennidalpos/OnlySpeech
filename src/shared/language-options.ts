@@ -35,11 +35,6 @@ for (const entry of CANONICAL_INTERACTION_LANGUAGES) {
   SOURCE_LANGUAGE_VALUE_ALIASES.set(entry.displayLocale.toLowerCase(), entry.preferredSourceLocale);
 }
 
-SOURCE_LANGUAGE_VALUE_ALIASES.set("en-us", "en-GB");
-SOURCE_LANGUAGE_VALUE_ALIASES.set("en-gb", "en-GB");
-SOURCE_LANGUAGE_VALUE_ALIASES.set("fr-ca", "fr-FR");
-SOURCE_LANGUAGE_VALUE_ALIASES.set("pt-pt", "pt-BR");
-
 export const DEFAULT_INTERACTION_LANGUAGE_CODES = CANONICAL_INTERACTION_LANGUAGES.map((entry) =>
   entry.tier === "baseline" ? entry.code : null
 ).filter((entry): entry is string => entry !== null);
