@@ -191,6 +191,37 @@ export class TestAutomationServer {
           return;
         }
 
+        if (method === "POST" && url.pathname === "/kiosk/demo-pause") {
+          const payload = (await readJsonBody(request)) as { paused?: boolean } | null;
+          if (typeof payload?.paused !== "boolean") {
+            sendJson(response, 400, { error: "Missing demo paused state." });
+            return;
+          }
+
+          this.bindings.getKioskManager()?.setDemoPaused(payload.paused);
+          sendJson(response, 200, this.createSnapshot());
+          return;
+        }
+
+        if (method === "POST" && url.pathname === "/kiosk/demo-restart-paused") {
+          this.bindings.getKioskManager()?.restartDemoPaused();
+          sendJson(response, 200, this.createSnapshot());
+          return;
+        }
+
+        if (method === "POST" && url.pathname === "/kiosk/demo-storyboard-step") {
+          const payload = (await readJsonBody(request)) as { step?: number } | null;
+          const step = payload?.step;
+          if (!Number.isInteger(step) || step === undefined || step < 1 || step > 5) {
+            sendJson(response, 400, { error: "Storyboard step must be an integer from 1 to 5." });
+            return;
+          }
+
+          this.bindings.getKioskManager()?.showDemoStoryboardStep(step);
+          sendJson(response, 200, this.createSnapshot());
+          return;
+        }
+
         if (method === "POST" && url.pathname === "/kiosk/inspect") {
           const payload = (await readJsonBody(request)) as { side?: Side } | null;
           if (!payload?.side) {

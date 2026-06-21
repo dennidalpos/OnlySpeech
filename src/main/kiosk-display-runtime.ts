@@ -88,6 +88,25 @@ export class KioskDisplayRuntime {
       });
     }
 
+    await window.webContents.executeJavaScript(`
+      (() => {
+        const styleId = "onlyspeech-social-capture-style";
+        if (!document.getElementById(styleId)) {
+          const style = document.createElement("style");
+          style.id = styleId;
+          style.textContent = [
+            "html, body { scrollbar-width: none !important; }",
+            "::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }",
+            ".cookie-banner, .debug-banner, .setup-password-notice, vite-error-overlay, #webpack-dev-server-client-overlay { display: none !important; }"
+          ].join("\\n");
+          document.head.appendChild(style);
+        }
+      })()
+    `);
+
+    window.moveTop();
+    window.focus();
+    window.webContents.invalidate();
     await new Promise((resolve) => setTimeout(resolve, 200));
     return window.capturePage().then((image) => image.toPNG());
   }

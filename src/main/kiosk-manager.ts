@@ -213,6 +213,15 @@ export class KioskManager {
     this.demoController.resume();
   }
 
+  restartDemoPaused(): void {
+    this.demoController?.restart();
+    this.demoController?.pause();
+  }
+
+  showDemoStoryboardStep(step: number): void {
+    this.demoController?.showStoryboardStep(step);
+  }
+
   getSnapshot(): { state: AppState; windows: Array<{ side: Side; destroyed: boolean }> } {
     return {
       state: structuredClone(this.getState()),

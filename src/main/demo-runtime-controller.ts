@@ -32,14 +32,14 @@ const DEMO_CYCLES: DemoCycle[] = [
     exchanges: [
       {
         side: "A",
-        transcript: "Good morning. I can help you with check-in today.",
-        translation: "早上好。我今天可以协助您办理登记。",
+        transcript: "Good morning, Ms. Chen. I found reservation OS-24817: three nights, from 21 to 24 June.",
+        translation: "早上好，陈女士。我找到了预订 OS-24817：6月21日至24日，共三晚。",
         detectedLanguage: "en-US"
       },
       {
         side: "B",
-        transcript: "谢谢。我需要我的预订编号。",
-        translation: "Thank you. I need my booking reference.",
+        transcript: "谢谢。请确认包含早餐，退房时间是上午十一点。",
+        translation: "Thank you. Please confirm breakfast is included and checkout is at 11:00 a.m.",
         detectedLanguage: "zh-CN"
       }
     ]
@@ -176,6 +176,72 @@ export class DemoRuntimeController {
     this.paused = false;
     this.runCycle(DEMO_CYCLES[this.cycleIndex % DEMO_CYCLES.length] ?? DEMO_CYCLES[0]!);
     this.cycleIndex += 1;
+  }
+
+  showStoryboardStep(step: number): void {
+    const cycle = DEMO_CYCLES[0]!;
+    this.clearScheduledActions();
+    this.disposed = false;
+    this.paused = true;
+    this.options.sessionStore.hardReset();
+    this.options.sessionStore.setVisitorConversationHistoryEnabled(true);
+
+    if (step >= 2) {
+      this.options.sessionStore.setTargetLanguage("A", cycle.sideLanguages.A);
+    }
+    if (step >= 3) {
+      this.options.sessionStore.setTargetLanguage("B", cycle.sideLanguages.B);
+    }
+
+    const operatorExchange = cycle.exchanges[0]!;
+    const visitorExchange = cycle.exchanges[1]!;
+    if (step === 3) {
+      this.options.sessionStore.setActiveSide(operatorExchange.side);
+      this.options.sessionStore.updateSpeech(
+        operatorExchange.side,
+        operatorExchange.transcript,
+        operatorExchange.translation,
+        operatorExchange.detectedLanguage
+      );
+    } else if (step === 4) {
+      this.options.sessionStore.updateSpeech(
+        operatorExchange.side,
+        operatorExchange.transcript,
+        operatorExchange.translation,
+        operatorExchange.detectedLanguage
+      );
+      this.options.sessionStore.appendConversationTurn(
+        operatorExchange.side,
+        operatorExchange.transcript,
+        operatorExchange.translation,
+        operatorExchange.detectedLanguage
+      );
+      this.options.sessionStore.setActiveSide(visitorExchange.side);
+      this.options.sessionStore.updateSpeech(
+        visitorExchange.side,
+        visitorExchange.transcript,
+        visitorExchange.translation,
+        visitorExchange.detectedLanguage
+      );
+    } else if (step >= 5) {
+      for (const exchange of cycle.exchanges) {
+        this.options.sessionStore.updateSpeech(
+          exchange.side,
+          exchange.transcript,
+          exchange.translation,
+          exchange.detectedLanguage
+        );
+        this.options.sessionStore.appendConversationTurn(
+          exchange.side,
+          exchange.transcript,
+          exchange.translation,
+          exchange.detectedLanguage
+        );
+      }
+      this.options.sessionStore.setActiveSide(null);
+    }
+
+    this.options.broadcastState();
   }
 
   private runCycle(cycle: DemoCycle): void {
