@@ -1,3 +1,7 @@
 {
-  "todos": []
+  "todos": [
+    "Sostituire i placeholder [INSERISCI LINK] in social_assets/CAMPAIGN_COPY.md con l'URL finale della campagna.",
+    "Rieseguire il test mirato npm test -- --run tests/write-social-assets-script.test.ts tests/test-automation.test.ts dopo le ultime modifiche agli script social asset.",
+    "Eseguire una revisione visuale finale dei 10 PNG in social_assets/vertical e social_assets/feed prima della pubblicazione."
+  ]
 }
