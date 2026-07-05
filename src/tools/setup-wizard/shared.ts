@@ -411,10 +411,11 @@ export function assignMicrophone(
   side: WizardSide,
   deviceId: string | null,
   options: {
+    appMode?: string | null | undefined;
     microphonePttMode?: string | null | undefined;
   } = {}
 ): WizardMicrophone[] {
-  const runtimeProfile = getWizardRuntimeProfile(DEFAULT_APP_MODE, options.microphonePttMode);
+  const runtimeProfile = getWizardRuntimeProfile(options.appMode ?? DEFAULT_APP_MODE, options.microphonePttMode);
   const sidesToClear =
     runtimeProfile.microphonePttMode === "single-shared" ? (["A", "B"] as const) : ([side] as const);
   const cleared = microphones.map((microphone) => ({

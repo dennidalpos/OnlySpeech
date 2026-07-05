@@ -71,8 +71,8 @@ Required values:
 
 Repository defaults:
 
-- `CHATGPT_MODEL=gpt-4.1-mini`
-- `CHATGPT_TRANSCRIBE_MODEL=gpt-4o-mini-transcribe`
+- `CHATGPT_MODEL=gpt-4o-mini`
+- `CHATGPT_TRANSCRIBE_MODEL=whisper-1`
 
 OnlySpeech uses OpenAI for transcription/translation and OpenAI TTS playback when the `chatgpt` provider is selected. Model overrides are deployment-specific and must be validated locally before handover. ChatGPT transcription uses the selected source language from the registry; OnlySpeech sends an official language hint when supported and a source-language prompt when enabled. OpenAI TTS receives language/accent instructions when enabled.
 

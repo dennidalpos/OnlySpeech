@@ -12,8 +12,6 @@ import {
 import { resolveChatGptTranscriptionLanguagePolicy } from "./provider-language-policy.js";
 import {
   REGION_REGISTRY,
-  getRegionDefinition,
-  getRegionLabel,
   type RegionId
 } from "./region-registry.js";
 import type { ProviderLanguageCapability, TranslationProvider } from "./types.js";
@@ -38,22 +36,6 @@ export interface ProviderScopedLanguageRecord extends UnifiedLanguageRecord {
   speechReady: boolean;
   translationOnly: boolean;
   unsupportedReason: string | null;
-}
-
-export interface RegionLanguageGroup {
-  regionId: RegionId;
-  label: string;
-  position: {
-    top: string;
-    left: string;
-    width: string;
-    height: string;
-    compactTop: string;
-    compactLeft: string;
-    compactWidth: string;
-    compactHeight: string;
-  };
-  languages: ProviderScopedLanguageRecord[];
 }
 
 const RTL_LANGUAGE_CODES = new Set(["ar", "fa", "he", "prs", "ps", "ur", "yi"]);
@@ -341,25 +323,3 @@ export function isLanguageSpeechReady(provider: TranslationProvider, languageId:
   return Boolean(capability?.stt && capability.translation && capability.tts);
 }
 
-export function getLanguagesByRegion(provider?: TranslationProvider, displayLanguage = "en"): RegionLanguageGroup[] {
-  const sourceLanguages = provider
-    ? INTERACTION_LANGUAGE_IDS.map((languageId) => toProviderScopedLanguage(provider, languageId))
-    : INTERACTION_LANGUAGE_IDS.map((languageId) => ({
-        ...BASE_LANGUAGE_REGISTRY[languageId],
-        providerCapability: buildProviderCapability("chatgpt", languageId),
-        speechReady: false,
-        translationOnly: false,
-        unsupportedReason: null
-      }));
-
-  return REGION_REGISTRY.map((region) => ({
-    regionId: region.id,
-    label: getRegionLabel(region.id, displayLanguage),
-    position: getRegionDefinition(region.id).position,
-    languages: sourceLanguages.filter((language) => language.visualReferences.includes(region.id))
-  })).filter((group) => group.languages.length > 0);
-}
-
-export function getVisualReferencesForRegion(regionId: RegionId): UnifiedLanguageRecord[] {
-  return Object.values(BASE_LANGUAGE_REGISTRY).filter((language) => language.visualReferences.includes(regionId));
-}

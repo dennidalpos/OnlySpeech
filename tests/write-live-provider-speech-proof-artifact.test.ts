@@ -46,8 +46,8 @@ describe("New-LiveProviderSpeechProofArtifact", () => {
       [
         "TRANSLATION_PROVIDER=chatgpt",
         "CHATGPT_API_KEY=test-key",
-        "CHATGPT_MODEL=gpt-4.1-mini",
-        "CHATGPT_TRANSCRIBE_MODEL=gpt-4o-mini-transcribe",
+        "CHATGPT_MODEL=gpt-4o-mini",
+        "CHATGPT_TRANSCRIBE_MODEL=whisper-1",
         "CHATGPT_TTS_MODEL=gpt-4o-mini-tts",
         "CHATGPT_TTS_VOICE=alloy",
         "TEXT_TO_SPEECH_ENABLED=true"
@@ -118,8 +118,8 @@ describe("New-LiveProviderSpeechProofArtifact", () => {
       [
         "TRANSLATION_PROVIDER=chatgpt",
         "CHATGPT_API_KEY=test-key",
-        "CHATGPT_MODEL=gpt-4.1-mini",
-        "CHATGPT_TRANSCRIBE_MODEL=gpt-4o-mini-transcribe"
+        "CHATGPT_MODEL=gpt-4o-mini",
+        "CHATGPT_TRANSCRIBE_MODEL=whisper-1"
       ].join("\n"),
       "utf8"
     );

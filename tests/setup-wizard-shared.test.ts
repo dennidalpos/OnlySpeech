@@ -183,8 +183,8 @@ describe("setup wizard shared state", () => {
         AZURE_SPEECH_KEY: "azure-key",
         AZURE_TRANSLATOR_KEY: "translator-key",
         CHATGPT_API_KEY: "chatgpt-key",
-        CHATGPT_MODEL: "gpt-4.1-mini",
-        CHATGPT_TRANSCRIBE_MODEL: "gpt-4o-mini-transcribe"
+        CHATGPT_MODEL: "gpt-4o-mini",
+        CHATGPT_TRANSCRIBE_MODEL: "whisper-1"
       }
     );
 
@@ -194,8 +194,8 @@ describe("setup wizard shared state", () => {
     expect(parsedEnv.AZURE_SPEECH_KEY).toBe("");
     expect(parsedEnv.AZURE_TRANSLATOR_KEY).toBe("");
     expect(parsedEnv.CHATGPT_API_KEY).toBe("");
-    expect(parsedEnv.CHATGPT_MODEL).toBe("gpt-4.1-mini");
-    expect(parsedEnv.CHATGPT_TRANSCRIBE_MODEL).toBe("gpt-4o-mini-transcribe");
+    expect(parsedEnv.CHATGPT_MODEL).toBe("gpt-4o-mini");
+    expect(parsedEnv.CHATGPT_TRANSCRIBE_MODEL).toBe("whisper-1");
     expect(envText).toContain("# Provider secrets are stored in Windows secure local storage for packaged installs.");
   });
 
@@ -334,7 +334,7 @@ describe("setup wizard shared state", () => {
         AZURE_SPEECH_REGION: "westeurope",
         TRANSLATION_PROVIDER: "azure",
         CHATGPT_API_KEY: "chatgpt-key",
-        CHATGPT_MODEL: "gpt-4.1",
+        CHATGPT_MODEL: "gpt-4o",
         CHATGPT_TRANSCRIBE_MODEL: "gpt-4o-transcribe",
         DEFAULT_TARGET_LANG_A: "fr",
         DEFAULT_TARGET_LANG_B: "de",
@@ -400,7 +400,7 @@ describe("setup wizard shared state", () => {
     expect(parsedEnv.AZURE_SPEECH_REGION).toBe("westeurope");
     expect(parsedEnv.TRANSLATION_PROVIDER).toBe("azure");
     expect(parsedEnv.CHATGPT_API_KEY).toBe("chatgpt-key");
-    expect(parsedEnv.CHATGPT_MODEL).toBe("gpt-4.1");
+    expect(parsedEnv.CHATGPT_MODEL).toBe("gpt-4o");
     expect(parsedEnv.CHATGPT_TRANSCRIBE_MODEL).toBe("gpt-4o-transcribe");
     expect(parsedEnv.DEFAULT_TARGET_LANG_A).toBe("fr");
     expect(parsedEnv.DEFAULT_TARGET_LANG_B).toBe("de");
@@ -438,7 +438,7 @@ describe("setup wizard shared state", () => {
     expect(reloadedConfig.azureSpeechRegion).toBe("westeurope");
     expect(reloadedConfig.translationProvider).toBe("azure");
     expect(reloadedConfig.chatGptApiKey).toBe("chatgpt-key");
-    expect(reloadedConfig.chatGptModel).toBe("gpt-4.1");
+    expect(reloadedConfig.chatGptModel).toBe("gpt-4o");
     expect(reloadedConfig.chatGptTranscribeModel).toBe("gpt-4o-transcribe");
     expect(reloadedConfig.defaultTargetLangA).toBe("fr");
     expect(reloadedConfig.defaultTargetLangB).toBe("de");

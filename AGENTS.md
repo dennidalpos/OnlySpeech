@@ -1,6 +1,8 @@
-# AGENTS.md — Repository Instructions
+# AGENTS.md — OnlySpeech Repository Instructions
 
-Repository-specific instructions for Codex.
+Repository-specific instructions for Codex / AI Agents.
+
+OnlySpeech is a Windows-first Electron desktop translation kiosk for two-sided live speech translation, utilizing an operator-facing display and a visitor-facing display. It is proprietary software.
 
 Primary local environment: **Windows + PowerShell**.
 
@@ -12,11 +14,12 @@ Use repository conventions when they are clear. Keep changes small, focused, ver
 
 1. Preserve user work.
 2. Make the smallest correct repository change.
-3. Keep the repository clean and navigable.
-4. Follow existing repository conventions.
-5. Verify with available repository checks.
-6. Keep `PROJECT_STATUS.json` as a todo-only file when present or requested.
-7. Report changes, checks, and remaining uncertainty.
+3. Maintain and respect the cryptographic licensing system.
+4. Keep the repository clean and navigable.
+5. Follow existing repository conventions.
+6. Verify with available repository checks (Vitest, ESLint, Electron E2E, packaging audit).
+7. Keep `PROJECT_STATUS.json` as a todo-only file when present or requested.
+8. Report changes, checks, and remaining uncertainty.
 
 Do not change unrelated files. Do not introduce dependencies, public API changes, config/deployment changes, broad refactors, migrations, or destructive operations unless the task clearly requires them.
 
@@ -119,7 +122,13 @@ Use the existing structure when coherent. For new or unclear areas, start minima
 
 Keep each source file focused on one responsibility. Split files only when responsibilities are mixed or maintenance is clearly worse without a split. Do not perform large unrelated splits.
 
-Prefer explicit names. Avoid vague folders like `misc`, `stuff`, `old`, `new`, `final`, `temp2`, `backup`; avoid vague files like `utils.*`, `helpers.*`, `common.*`, `manager.*`, or unqualified `service.*` unless already established by the repository.
+### OnlySpeech Component Boundaries:
+- `src/main`: Electron main process (bootstrap, window management, IPC, secure secrets).
+- `src/renderer`: React-based UI for operator and visitor surfaces. Do not use Node.js direct imports in the renderer; communicate with the main process exclusively via IPC preloads.
+- `src/shared`: Shared contracts, config schemas, language definitions, and licensing schemas.
+- `src/services`: Audio devices, speech translation services (Azure Speech, OpenAI Chat/TTS, Ollama).
+
+Avoid vague folders like `misc`, `stuff`, `old`, `new`, `final`, `temp2`, `backup`; avoid vague files like `utils.*`, `helpers.*`, `common.*`, `manager.*`, or unqualified `service.*` unless already established by the repository.
 
 `index.*` files should contain exports, framework-required entrypoints, or very small composition code; not substantial implementation logic.
 
@@ -139,7 +148,11 @@ Update `scripts/README.md` when public scripts are added, removed, or renamed.
 
 ## 9. Verification
 
-When behavior changes, add or update tests using the existing framework.
+When behavior changes, add or update tests using the existing framework (Vitest).
+
+- Use `npm test` to run local tests.
+- Use `npm run test:e2e` for Electron end-to-end tests.
+- Use `npm run gate -- -KeepOutputs -EnablePackagedAutomation` for production gate verification.
 
 If no test framework exists, do not install one automatically unless required. Provide a practical manual verification path instead.
 
@@ -169,7 +182,19 @@ Only stage or commit when explicitly requested.
 
 ---
 
-## 12. Final response
+## 12. Licensing and Activation Safeguards
+
+OnlySpeech uses a strict, proprietary offline cryptographic licensing and activation system. To preserve it:
+
+1. **Cryptographic Validation**: Do not modify or bypass the verification logic in `src/main/activation-validator.ts` (which validates Ed25519 signed activation tokens against public keys), `src/main/activation-state.ts`, or `src/main/activation-flow.ts`.
+2. **No Bypasses or Mocks**: Never introduce mock licenses, bypasses, or hardcoded success states in production pathways. The activation gate must block the kiosk runtime unless a valid trial is active or a cryptographically signed license is successfully loaded and validated.
+3. **Trial Tombstone & Expiry Integrity**: Preserve trial expiration logic, rollback/time-drift checking (`clock-rollback`), and the registry-based trial tombstone persistence to prevent trial reuse.
+4. **Setup Wizard & License Removal**: Keep license management intact within the Setup Wizard. The operator must only be able to clear or replace the license through official setup pathways, validating input before calling the backend.
+5. **License Keygen & Generator**: The license key generation script (`scripts/license-keygen.ps1`) and the offline activation generator located under `.local/activation-generator/` must remain untouched and fully operational.
+
+---
+
+## 13. Final response
 
 For implementation tasks, include:
 

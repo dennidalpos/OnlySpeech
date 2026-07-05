@@ -24,8 +24,8 @@ describe("loadRuntimeConfig", () => {
       AUDIO_ECHO_CANCELLATION: "false",
       AUDIO_NOISE_SUPPRESSION: "false",
       CHATGPT_API_KEY: "chatgpt-key",
-      CHATGPT_MODEL: "gpt-4.1-mini",
-      CHATGPT_TRANSCRIBE_MODEL: "gpt-4o-mini-transcribe",
+      CHATGPT_MODEL: "gpt-4o-mini",
+      CHATGPT_TRANSCRIBE_MODEL: "whisper-1",
       TRANSLATION_PROVIDER: "chatgpt",
       DEFAULT_TARGET_LANG_A: "fr",
       DEFAULT_TARGET_LANG_B: "de",
@@ -93,8 +93,8 @@ describe("loadRuntimeConfig", () => {
     const config = loadRuntimeConfig({
       TRANSLATION_PROVIDER: "chatgpt",
       CHATGPT_API_KEY: "chatgpt-key",
-      CHATGPT_MODEL: "gpt-4.1-mini",
-      CHATGPT_TRANSCRIBE_MODEL: "gpt-4o-mini-transcribe"
+      CHATGPT_MODEL: "gpt-4o-mini",
+      CHATGPT_TRANSCRIBE_MODEL: "whisper-1"
     });
 
     expect(hasSpeechRecognitionConfig(config)).toBe(true);

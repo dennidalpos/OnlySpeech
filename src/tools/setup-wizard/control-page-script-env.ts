@@ -525,10 +525,10 @@ export function getSetupWizardControlEnvScript(): string {
 
         document.getElementById("env-AZURE_SPEECH_KEY").value = state.envValues.AZURE_SPEECH_KEY || "";
         document.getElementById("env-AZURE_SPEECH_REGION").value = state.envValues.AZURE_SPEECH_REGION || "";
-        document.getElementById("env-CHATGPT_MODEL").innerHTML = genericOptionsHtml(chatGptModelOptions, state.envValues.CHATGPT_MODEL || "gpt-4.1-mini");
-        document.getElementById("env-CHATGPT_TRANSCRIBE_MODEL").innerHTML = genericOptionsHtml(chatGptTranscribeModelOptions, state.envValues.CHATGPT_TRANSCRIBE_MODEL || "gpt-4o-mini-transcribe");
-        document.getElementById("env-CHATGPT_MODEL").value = state.envValues.CHATGPT_MODEL || "gpt-4.1-mini";
-        document.getElementById("env-CHATGPT_TRANSCRIBE_MODEL").value = state.envValues.CHATGPT_TRANSCRIBE_MODEL || "gpt-4o-mini-transcribe";
+        document.getElementById("env-CHATGPT_MODEL").innerHTML = genericOptionsHtml(chatGptModelOptions, state.envValues.CHATGPT_MODEL || "gpt-4o-mini");
+        document.getElementById("env-CHATGPT_TRANSCRIBE_MODEL").innerHTML = genericOptionsHtml(chatGptTranscribeModelOptions, state.envValues.CHATGPT_TRANSCRIBE_MODEL || "whisper-1");
+        document.getElementById("env-CHATGPT_MODEL").value = state.envValues.CHATGPT_MODEL || "gpt-4o-mini";
+        document.getElementById("env-CHATGPT_TRANSCRIBE_MODEL").value = state.envValues.CHATGPT_TRANSCRIBE_MODEL || "whisper-1";
         document.getElementById("env-OLLAMA_BASE_URL").value = state.envValues.OLLAMA_BASE_URL || "http://localhost:11434/api";
         document.getElementById("env-OLLAMA_MODEL").value = state.envValues.OLLAMA_MODEL || "gemma3";
         document.getElementById("env-OLLAMA_REQUEST_TIMEOUT_MS").value = state.envValues.OLLAMA_REQUEST_TIMEOUT_MS || "45000";

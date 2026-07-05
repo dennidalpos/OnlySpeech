@@ -32,8 +32,8 @@ describe("runtime secure secrets", () => {
       getRuntimeEnvFilePath(runtimeRoot),
       [
         "TRANSLATION_PROVIDER=chatgpt",
-        "CHATGPT_MODEL=gpt-4.1-mini",
-        "CHATGPT_TRANSCRIBE_MODEL=gpt-4o-mini-transcribe",
+        "CHATGPT_MODEL=gpt-4o-mini",
+        "CHATGPT_TRANSCRIBE_MODEL=whisper-1",
         "AZURE_SPEECH_REGION=westeurope",
         ""
       ].join("\n"),
@@ -68,8 +68,8 @@ describe("runtime secure secrets", () => {
       })
     ).toMatchObject({
       TRANSLATION_PROVIDER: "chatgpt",
-      CHATGPT_MODEL: "gpt-4.1-mini",
-      CHATGPT_TRANSCRIBE_MODEL: "gpt-4o-mini-transcribe",
+      CHATGPT_MODEL: "gpt-4o-mini",
+      CHATGPT_TRANSCRIBE_MODEL: "whisper-1",
       AZURE_SPEECH_REGION: "westeurope",
       CHATGPT_API_KEY: "chatgpt-secret",
       AZURE_SPEECH_KEY: "azure-secret",
@@ -113,13 +113,13 @@ describe("runtime secure secrets", () => {
         CHATGPT_API_KEY: "chatgpt-secret",
         AZURE_SPEECH_KEY: "azure-secret",
         AZURE_TRANSLATOR_KEY: "translator-secret",
-        CHATGPT_MODEL: "gpt-4.1-mini"
+        CHATGPT_MODEL: "gpt-4o-mini"
       })
     ).toEqual({
       CHATGPT_API_KEY: "",
       AZURE_SPEECH_KEY: "",
       AZURE_TRANSLATOR_KEY: "",
-      CHATGPT_MODEL: "gpt-4.1-mini"
+      CHATGPT_MODEL: "gpt-4o-mini"
     });
   });
 });

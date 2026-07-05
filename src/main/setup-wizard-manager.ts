@@ -704,6 +704,7 @@ export class SetupWizardManager {
         this.state = {
           ...state,
           microphones: assignMicrophone(state.microphones, "A", matchingMicrophoneA.deviceId, {
+            appMode: runtimeProfile.appMode,
             microphonePttMode: runtimeProfile.microphonePttMode
           })
         };
@@ -718,6 +719,7 @@ export class SetupWizardManager {
         this.state = {
           ...updatedState,
           microphones: assignMicrophone(updatedState.microphones, "B", matchingMicrophoneB.deviceId, {
+            appMode: runtimeProfile.appMode,
             microphonePttMode: runtimeProfile.microphonePttMode
           })
         };
@@ -799,6 +801,7 @@ export class SetupWizardManager {
       this.state = {
         ...state,
         microphones: assignMicrophone(state.microphones, payload.side, payload.deviceId, {
+          appMode: state.envValues.APP_MODE,
           microphonePttMode: state.envValues.MICROPHONE_PTT_MODE
         })
       };
@@ -869,6 +872,7 @@ export class SetupWizardManager {
           null;
         microphones = sharedMicrophone
           ? assignMicrophone(state.microphones, "A", sharedMicrophone.deviceId, {
+              appMode: runtimeProfile.appMode,
               microphonePttMode: runtimeProfile.microphonePttMode
             })
           : state.microphones.map((microphone) => ({

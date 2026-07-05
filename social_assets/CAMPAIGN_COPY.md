@@ -20,7 +20,7 @@ Il valore netto è concreto: meno mediazioni manuali, meno ripetizioni e più co
 
 Una soluzione mirata per reception, sportelli e punti di assistenza che devono comunicare bene, senza trasformare ogni interazione in un processo tecnico.
 
-Scopri OnlySpeech: [INSERISCI LINK]
+Scopri OnlySpeech: https://github.com/dennidalpos/OnlySpeech
 
 #CustomerExperience #DigitalTransformation #Accessibility #HospitalityTech
 
@@ -44,7 +44,7 @@ Con OnlySpeech, ognuno usa il proprio schermo e la propria lingua. Si parla norm
 
 Nel carosello puoi seguire l’intero flusso, dalla scelta della lingua alla conferma della conversazione.
 
-Clicca qui per scoprire OnlySpeech: [INSERISCI LINK]
+Clicca qui per scoprire OnlySpeech: https://github.com/dennidalpos/OnlySpeech
 
 ## WhatsApp Stories — testo in sovraimpressione
 

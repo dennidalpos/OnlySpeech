@@ -71,8 +71,8 @@ export function createWizardState(): WizardState {
       DEFAULT_TARGET_LANG_A: "it",
       DEFAULT_TARGET_LANG_B: "en",
       CHATGPT_API_KEY: "chatgpt-key",
-      CHATGPT_MODEL: "gpt-4.1-mini",
-      CHATGPT_TRANSCRIBE_MODEL: "gpt-4o-mini-transcribe",
+      CHATGPT_MODEL: "gpt-4o-mini",
+      CHATGPT_TRANSCRIBE_MODEL: "whisper-1",
       AZURE_SPEECH_KEY: "azure-key",
       AZURE_SPEECH_REGION: "westeurope"
     }

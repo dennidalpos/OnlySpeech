@@ -54,7 +54,7 @@
         {
           id: "stations",
           durationMs: 3400,
-          image: "../../docs/product/screenshots/setup-stations.png",
+          image: "../../../docs/product/screenshots/setup-stations.png",
           title: "Two-display setup",
           description:
             "Assign both workstation screens and keep the kiosk layout aligned before go-live."
@@ -62,7 +62,7 @@
         {
           id: "languages",
           durationMs: 3200,
-          image: "../../docs/product/screenshots/setup-languages-tts.png",
+          image: "../../../docs/product/screenshots/setup-languages-tts.png",
           title: "Languages and playback",
           description:
             "Choose the provider, confirm supported languages, and validate provider-owned TTS."
@@ -70,7 +70,7 @@
         {
           id: "diagnostics",
           durationMs: 3200,
-          image: "../../docs/product/screenshots/setup-diagnostics.png",
+          image: "../../../docs/product/screenshots/setup-diagnostics.png",
           title: "Guided diagnostics",
           description:
             "Check monitors, microphones, and runtime readiness from one integrated setup wizard."
@@ -78,7 +78,7 @@
         {
           id: "operator",
           durationMs: 3500,
-          image: "../../docs/product/screenshots/runtime-operator-view.png",
+          image: "../../../docs/product/screenshots/runtime-operator-view.png",
           title: "Operator-side runtime",
           description:
             "The speaking side sees transcript, controls the session, and can reopen setup when needed."
@@ -86,7 +86,7 @@
         {
           id: "visitor",
           durationMs: 3500,
-          image: "../../docs/product/screenshots/runtime-visitor-view.png",
+          image: "../../../docs/product/screenshots/runtime-visitor-view.png",
           title: "Visitor-side runtime",
           description:
             "The opposite screen receives translated output in the same shared conversation flow."
@@ -410,12 +410,12 @@
 
       async function prepareAssets() {
         const sources = {
-          icon: "../../build/icon.png",
-          stations: "../../docs/product/screenshots/setup-stations.png",
-          languages: "../../docs/product/screenshots/setup-languages-tts.png",
-          diagnostics: "../../docs/product/screenshots/setup-diagnostics.png",
-          operator: "../../docs/product/screenshots/runtime-operator-view.png",
-          visitor: "../../docs/product/screenshots/runtime-visitor-view.png"
+          icon: "../../../build/icon.png",
+          stations: "../../../docs/product/screenshots/setup-stations.png",
+          languages: "../../../docs/product/screenshots/setup-languages-tts.png",
+          diagnostics: "../../../docs/product/screenshots/setup-diagnostics.png",
+          operator: "../../../docs/product/screenshots/runtime-operator-view.png",
+          visitor: "../../../docs/product/screenshots/runtime-visitor-view.png"
         };
 
         const entries = await Promise.all(

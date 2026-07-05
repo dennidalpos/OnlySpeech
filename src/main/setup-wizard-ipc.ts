@@ -2,7 +2,7 @@ import { z } from "zod";
 import { RUNTIME_ENV_KEY_ORDER, type RuntimeEnvKey } from "../shared/runtime-env-contract.js";
 
 const sideSchema = z.enum(["A", "B"]);
-const providerSchema = z.enum(["azure", "chatgpt"]);
+const providerSchema = z.enum(["azure", "chatgpt", "ollama"]);
 const microphoneSchema = z.object({
   deviceId: z.string(),
   groupId: z.string(),

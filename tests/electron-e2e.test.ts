@@ -264,8 +264,8 @@ describeWindows("Electron runtime end-to-end coverage", () => {
             "DEFAULT_TARGET_LANG_A=it",
             "DEFAULT_TARGET_LANG_B=en",
             "CHATGPT_API_KEY=test-key",
-            "CHATGPT_MODEL=gpt-4.1-mini",
-            "CHATGPT_TRANSCRIBE_MODEL=gpt-4o-mini-transcribe"
+            "CHATGPT_MODEL=gpt-4o-mini",
+            "CHATGPT_TRANSCRIBE_MODEL=whisper-1"
           ],
           expectedDisabled: false,
           expectedReason: null
@@ -1013,8 +1013,8 @@ describeWindows("Electron runtime end-to-end coverage", () => {
           "REQUIRED_MONITORS=2",
           "TRANSLATION_PROVIDER=chatgpt",
           "CHATGPT_API_KEY=test-key",
-          "CHATGPT_MODEL=gpt-4.1-mini",
-          "CHATGPT_TRANSCRIBE_MODEL=gpt-4o-mini-transcribe",
+          "CHATGPT_MODEL=gpt-4o-mini",
+          "CHATGPT_TRANSCRIBE_MODEL=whisper-1",
           "SETUP_UI_LANGUAGE=en",
           "DEFAULT_TARGET_LANG_A=fr",
           "DEFAULT_TARGET_LANG_B=ka"

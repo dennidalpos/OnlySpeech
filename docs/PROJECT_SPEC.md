@@ -85,7 +85,7 @@ Main process responsibilities include bootstrap, runtime root selection, activat
 
 Renderer responsibilities include the operator runtime surface, the visitor-facing session content owned by that runtime, activation UI, setup-wizard access prompts, language selection, push-to-talk controls, runtime issue banners, and localized user-facing copy.
 
-Shared and service modules define config, language policy, provider language matrix, runtime diagnostics, logging, privacy/session behavior, media-device probing, Azure/OpenAI/Ollama provider adapters, and text-to-speech provider behavior.
+Shared and service modules define config, language policy, runtime diagnostics, logging, privacy/session behavior, media-device probing, Azure/OpenAI/Ollama provider adapters, and text-to-speech provider behavior.
 
 The setup wizard persists workstation configuration, validates provider settings, manages packaged license state, manages current-user packaged autostart, and renders diagnostics. It is implemented across `src/main/setup-wizard-*` and `src/tools/setup-wizard/`.
 

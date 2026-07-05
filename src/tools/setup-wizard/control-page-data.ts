@@ -25,15 +25,11 @@ import {
 } from "./localization.js";
 
 const chatGptModelOptions = [
-  { value: "gpt-4.1-mini", label: "gpt-4.1-mini" },
-  { value: "gpt-4.1", label: "gpt-4.1" },
   { value: "gpt-4o-mini", label: "gpt-4o-mini" },
   { value: "gpt-4o", label: "gpt-4o" }
 ];
 
 const chatGptTranscribeModelOptions = [
-  { value: "gpt-4o-mini-transcribe", label: "gpt-4o-mini-transcribe" },
-  { value: "gpt-4o-transcribe", label: "gpt-4o-transcribe" },
   { value: "whisper-1", label: "whisper-1" }
 ];
 
