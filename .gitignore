@@ -38,10 +38,11 @@
 npm-debug.log*
 *.drawio.bkp
 
-# Editor and OS files
+# Editor, OS, and local agent configuration files
 .vscode/
 .idea/
 .claude/
+/.agents/
 Thumbs.db
 Desktop.ini
 .DS_Store
