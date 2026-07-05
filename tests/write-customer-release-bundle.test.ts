@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync, realpathSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
@@ -11,7 +11,7 @@ const customerBundleWriteTimeoutMs = 15000;
 const tempDirectories: string[] = [];
 
 function createTempDirectory(name: string): string {
-  const directory = mkdtempSync(join(tmpdir(), `${name}-`));
+  const directory = realpathSync(mkdtempSync(join(tmpdir(), `${name}-`)));
   tempDirectories.push(directory);
   return directory;
 }
@@ -73,6 +73,7 @@ describeWindows("write-customer-release-bundle.ps1", () => {
     writeFileSync(join(packagesRoot, "OnlySpeech-0.1.0-x64-setup.exe"), "setup", "utf8");
     writeFileSync(join(packagesRoot, "OnlySpeech-0.1.0-x64-portable.exe"), "portable", "utf8");
     writeFileSync(join(winUnpackedRoot, "OnlySpeech.exe"), "binary", "utf8");
+    writeFileSync(join(packagesRoot, "OnlySpeech-0.1.0-x64-unpacked.zip"), "zip-binary", "utf8");
     writeFileSync(join(logsRoot, "release-evidence.json"), '{"ok":true}', "utf8");
     writeFileSync(join(logsRoot, "third-party-notices.json"), '{"notices":[]}', "utf8");
     writeFileSync(join(logsRoot, "sbom.cdx.json"), '{"bomFormat":"CycloneDX"}', "utf8");
@@ -147,6 +148,7 @@ describeWindows("write-customer-release-bundle.ps1", () => {
     writeFileSync(join(packagesRoot, "OnlySpeech-0.1.0-x64-setup.exe"), "setup", "utf8");
     writeFileSync(join(packagesRoot, "OnlySpeech-0.1.0-x64-portable.exe"), "portable", "utf8");
     writeFileSync(join(winUnpackedRoot, "OnlySpeech.exe"), "binary", "utf8");
+    writeFileSync(join(packagesRoot, "OnlySpeech-0.1.0-x64-unpacked.zip"), "zip-binary", "utf8");
     writeFileSync(join(logsRoot, "release-evidence.json"), '{"ok":true}', "utf8");
     writeFileSync(join(logsRoot, "third-party-notices.json"), '{"notices":[]}', "utf8");
     writeFileSync(join(logsRoot, "sbom.cdx.json"), '{"bomFormat":"CycloneDX"}', "utf8");
@@ -225,6 +227,7 @@ describeWindows("write-customer-release-bundle.ps1", () => {
     writeFileSync(join(packagesRoot, "OnlySpeech-0.1.0-x64-setup.exe"), "setup", "utf8");
     writeFileSync(join(packagesRoot, "OnlySpeech-0.1.0-x64-portable.exe"), "portable", "utf8");
     writeFileSync(join(winUnpackedRoot, "OnlySpeech.exe"), "binary", "utf8");
+    writeFileSync(join(packagesRoot, "OnlySpeech-0.1.0-x64-unpacked.zip"), "zip-binary", "utf8");
     writeFileSync(join(logsRoot, "release-evidence.json"), '{"ok":true}', "utf8");
 
     const output = runPowerShell([

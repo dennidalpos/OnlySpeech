@@ -1,4 +1,4 @@
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync, realpathSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
@@ -9,7 +9,7 @@ const helperPath = join(repoRoot, "scripts", "support", "lib", "repo.ps1");
 const tempDirectories: string[] = [];
 
 function createTempDirectory(name: string): string {
-  const directory = mkdtempSync(join(tmpdir(), `${name}-`));
+  const directory = realpathSync(mkdtempSync(join(tmpdir(), `${name}-`)));
   tempDirectories.push(directory);
   return directory;
 }
