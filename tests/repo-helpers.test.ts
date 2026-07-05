@@ -9,7 +9,7 @@ const helperPath = join(repoRoot, "scripts", "support", "lib", "repo.ps1");
 const tempDirectories: string[] = [];
 
 function createTempDirectory(name: string): string {
-  const directory = realpathSync(mkdtempSync(join(tmpdir(), `${name}-`)));
+  const directory = realpathSync.native(mkdtempSync(join(tmpdir(), `${name}-`)));
   tempDirectories.push(directory);
   return directory;
 }
