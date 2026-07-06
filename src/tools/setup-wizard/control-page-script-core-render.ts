@@ -445,22 +445,47 @@ export function getSetupWizardControlCoreRenderScript(): string {
           busyText: copy.saveAndCloseBusy
         });
         [
-          "stations-save-btn",
-          "provider-save-btn",
-          "languages-save-btn",
-          "diagnostics-save-btn",
-          "license-save-btn"
-        ].forEach((buttonId) => {
-          updateButtonState(buttonId, {
-            busy: saveSectionBusy,
-            disabled: saveDisabled,
-            disabledReasonCode: saveDisabledState?.code,
-            disabledReasonText: saveDisabledState?.message,
-            disabledReasonTone: saveDisabledState?.tone,
-            disabledReasonNoticeId: buttonId + "-disabled-reason",
-            idleText: copy.saveSectionIdle,
-            busyText: copy.saveSectionBusy
-          });
+          ["license-save-btn", "license"],
+          ["stations-save-btn", "stations"],
+          ["provider-save-btn", "provider"],
+          ["languages-save-btn", "languages"],
+          ["diagnostics-save-btn", "diagnostics"]
+        ].forEach(([buttonId, sectionId]) => {
+          const btnEl = document.getElementById(buttonId);
+          if (btnEl) {
+            btnEl.classList.toggle("primary", initialSetupMode);
+            btnEl.classList.toggle("secondary", !initialSetupMode);
+          }
+          if (initialSetupMode) {
+            let disabled = false;
+            if (sectionId === "license") {
+              const hasLicense = licenseInfo !== null && !licenseInfo.isExpired;
+              disabled = !hasLicense;
+            } else {
+              disabled = sectionHasIssues(sectionId);
+            }
+            updateButtonState(buttonId, {
+              busy: saveSectionBusy,
+              disabled: disabled || saveSectionBusy,
+              disabledReasonCode: disabled ? "section-locked" : undefined,
+              disabledReasonText: disabled ? "" : undefined,
+              disabledReasonTone: "warn",
+              disabledReasonNoticeId: buttonId + "-disabled-reason",
+              idleText: actionsCopy.nextStep,
+              busyText: actionsCopy.nextStep
+            });
+          } else {
+            updateButtonState(buttonId, {
+              busy: saveSectionBusy,
+              disabled: saveDisabled,
+              disabledReasonCode: saveDisabledState?.code,
+              disabledReasonText: saveDisabledState?.message,
+              disabledReasonTone: saveDisabledState?.tone,
+              disabledReasonNoticeId: buttonId + "-disabled-reason",
+              idleText: copy.saveSectionIdle,
+              busyText: copy.saveSectionBusy
+            });
+          }
         });
         updateButtonState("run-provider-test", {
           busy: providerTestBusy,

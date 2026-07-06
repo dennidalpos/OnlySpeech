@@ -44,7 +44,11 @@ export function getSetupWizardReviewShellHtml(uiLanguage: SetupWizardUiLanguage 
       advancedParameters: "Advanced parameters",
       finalActions: "Final configuration actions",
       applyAndClose: "Apply and close setup",
-      envPreview: "Technical env preview"
+      envPreview: "Technical env preview",
+      passwordSetupTitle: "Setup Wizard Password",
+      passwordSetupDescription: "Choose a secure password to restrict access to this setup wizard in the future (minimum 12 characters).",
+      passwordSetupLabel: "New password",
+      passwordConfirmLabel: "Confirm password"
     },
     it: {
       save: "Salva",
@@ -81,7 +85,11 @@ export function getSetupWizardReviewShellHtml(uiLanguage: SetupWizardUiLanguage 
       advancedParameters: "Parametri avanzati",
       finalActions: "Azioni finali configurazione",
       applyAndClose: "Applica e chiudi wizard",
-      envPreview: "Anteprima tecnica env"
+      envPreview: "Anteprima tecnica env",
+      passwordSetupTitle: "Password del Setup Wizard",
+      passwordSetupDescription: "Scegli una password sicura per limitare l'accesso a questo wizard in futuro (minimo 12 caratteri).",
+      passwordSetupLabel: "Nuova password",
+      passwordConfirmLabel: "Conferma password"
     },
     es: {
       save: "Guardar",
@@ -118,7 +126,11 @@ export function getSetupWizardReviewShellHtml(uiLanguage: SetupWizardUiLanguage 
       advancedParameters: "Parametros avanzados",
       finalActions: "Acciones finales de configuracion",
       applyAndClose: "Aplicar y cerrar setup",
-      envPreview: "Vista previa tecnica env"
+      envPreview: "Vista previa tecnica env",
+      passwordSetupTitle: "Contraseña del Asistente",
+      passwordSetupDescription: "Elige una contraseña segura para restringir el acceso a este asistente en el futuro (mínimo 12 caracteres).",
+      passwordSetupLabel: "Nueva contraseña",
+      passwordConfirmLabel: "Confirmar contraseña"
     },
     fr: {
       save: "Sauvegarder",
@@ -155,7 +167,11 @@ export function getSetupWizardReviewShellHtml(uiLanguage: SetupWizardUiLanguage 
       advancedParameters: "Parametres avances",
       finalActions: "Actions finales de configuration",
       applyAndClose: "Appliquer et fermer le setup",
-      envPreview: "Apercu technique env"
+      envPreview: "Apercu technique env",
+      passwordSetupTitle: "Mot de passe de l'assistant",
+      passwordSetupDescription: "Choisissez un mot de passe sécurisé pour restreindre l'accès à cet assistant à l'avenir (minimum 12 caractères).",
+      passwordSetupLabel: "Nouveau mot de passe",
+      passwordConfirmLabel: "Confirmer le mot de passe"
     },
     de: {
       save: "Speichern",
@@ -192,7 +208,11 @@ export function getSetupWizardReviewShellHtml(uiLanguage: SetupWizardUiLanguage 
       advancedParameters: "Erweiterte Parameter",
       finalActions: "Letzte Konfigurationsaktionen",
       applyAndClose: "Anwenden und Setup schliessen",
-      envPreview: "Technische Env-Vorschau"
+      envPreview: "Technische Env-Vorschau",
+      passwordSetupTitle: "Setup-Assistent-Passwort",
+      passwordSetupDescription: "Wählen Sie ein sicheres Passwort, um den Zugriff auf diesen Assistenten in Zukunft einzuschränken (mindestens 12 Zeichen).",
+      passwordSetupLabel: "Neues Passwort",
+      passwordConfirmLabel: "Passwort bestätigen"
     },
     zh: {
       save: "保存",
@@ -228,7 +248,11 @@ export function getSetupWizardReviewShellHtml(uiLanguage: SetupWizardUiLanguage 
       advancedParameters: "高级参数",
       finalActions: "最终配置操作",
       applyAndClose: "应用并关闭 setup",
-      envPreview: "技术 env 预览"
+      envPreview: "技术 env 预览",
+      passwordSetupTitle: "设置向导密码",
+      passwordSetupDescription: "选择一个安全密码以限制将来对设置向导的访问（最少 12 个字符）。",
+      passwordSetupLabel: "新密码",
+      passwordConfirmLabel: "确认密码"
     }
   };
   const copy = copyByLanguage[normalizedLanguage];
@@ -273,6 +297,21 @@ ${getSetupWizardDisclosureHtml({
   detailsClass: "wizard-disclosure technical-disclosure",
   bodyHtml: `<pre id="env-preview" class="output"></pre>`
 })}
+          </div>
+          <div class="card settings-card full-span" id="wizard-password-setup-card" hidden>
+            <div class="card-header">
+              <span class="card-eyebrow">${copy.finalReview}</span>
+              <h3>${copy.passwordSetupTitle}</h3>
+              <p>${copy.passwordSetupDescription}</p>
+            </div>
+            <div class="form-grid">
+              <label>${copy.passwordSetupLabel}
+                <input type="password" id="wizard-password" autocomplete="new-password" />
+              </label>
+              <label>${copy.passwordConfirmLabel}
+                <input type="password" id="wizard-confirm-password" autocomplete="new-password" />
+              </label>
+            </div>
           </div>
         </div>
         <details class="card settings-card advanced-disclosure" id="advanced-settings">

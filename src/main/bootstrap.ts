@@ -128,7 +128,10 @@ function parseBootOptions(args = process.argv.slice(1)): {
 }
 
 const bootOptions = parseBootOptions();
-process.env.ONLYSPEECH_SETUP_WIZARD_SECTION = bootOptions.wizardSection;
+const hasExplicitSection = process.argv.some(arg => arg.includes("--wizard-section"));
+process.env.ONLYSPEECH_SETUP_WIZARD_SECTION = (hasRuntimeEnvFile(runtimeRoot) || hasExplicitSection)
+  ? bootOptions.wizardSection
+  : "license";
 
 function loadRuntimeEnv(): void {
   const runtimeEnv = loadRuntimeEnvironment({
@@ -393,6 +396,7 @@ function revalidatePackagedActivationStateAtRuntime(): boolean {
 const setupWizardManager = new SetupWizardManager({
   runtimeRoot,
   getAccessNotice: () => setupWizardAccessManager.getProvisioningNotice(),
+  setPassword: (password) => setupWizardAccessManager.setPassword(password),
   onEnvSaved: () => {
     if (isQuitting || isActivationGateActive) {
       return;
@@ -467,7 +471,9 @@ app.whenReady()
       return;
     }
 
-    setupWizardAccessManager.ensureInitialized();
+    setupWizardAccessManager.ensureInitialized({
+      runtimeEnvPresent: hasRuntimeEnvFile(runtimeRoot)
+    });
 
     registerIpcHandlers({
       getActivationGateState: () => activationGateState,

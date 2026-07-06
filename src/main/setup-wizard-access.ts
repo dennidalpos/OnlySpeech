@@ -99,21 +99,38 @@ export class SetupWizardAccessManager {
     private readonly nowProvider: () => number = Date.now
   ) {}
 
-  ensureInitialized(): void {
+  ensureInitialized(options: { runtimeEnvPresent: boolean } = { runtimeEnvPresent: false }): void {
     if (existsSync(this.accessFilePath)) {
       return;
     }
 
-    const temporaryPassword = createTemporaryPassword(this.randomBytesProvider);
-    this.provisioningTemporaryPassword = temporaryPassword;
-    this.writeRecord(createPasswordRecord(temporaryPassword, {
-      mustChangePassword: true,
+    if (options.runtimeEnvPresent) {
+      const temporaryPassword = createTemporaryPassword(this.randomBytesProvider);
+      this.provisioningTemporaryPassword = temporaryPassword;
+      this.writeRecord(createPasswordRecord(temporaryPassword, {
+        mustChangePassword: true,
+        randomBytesProvider: this.randomBytesProvider
+      }));
+    }
+  }
+
+  setPassword(newPassword: string): void {
+    this.writeRecord(createPasswordRecord(newPassword, {
+      mustChangePassword: false,
       randomBytesProvider: this.randomBytesProvider
     }));
+    this.provisioningTemporaryPassword = null;
   }
 
   getAccessState(options: { runtimeEnvPresent: boolean }): SetupWizardAccessState {
-    this.ensureInitialized();
+    this.ensureInitialized(options);
+    if (!existsSync(this.accessFilePath)) {
+      return {
+        requiresPassword: false,
+        mustChangePassword: false,
+        temporaryPassword: null
+      };
+    }
     const record = this.readRecord();
     return {
       requiresPassword: options.runtimeEnvPresent,
@@ -126,7 +143,13 @@ export class SetupWizardAccessManager {
     temporaryPassword: string | null;
     mustChangePassword: boolean;
   } {
-    this.ensureInitialized();
+    this.ensureInitialized({ runtimeEnvPresent: true });
+    if (!existsSync(this.accessFilePath)) {
+      return {
+        temporaryPassword: null,
+        mustChangePassword: false
+      };
+    }
     const record = this.readRecord();
     return {
       temporaryPassword: this.provisioningTemporaryPassword,
@@ -135,7 +158,10 @@ export class SetupWizardAccessManager {
   }
 
   authorize(request: SetupWizardAccessRequest): SetupWizardAccessResult {
-    this.ensureInitialized();
+    this.ensureInitialized({ runtimeEnvPresent: true });
+    if (!existsSync(this.accessFilePath)) {
+      return this.failure("invalid-password");
+    }
 
     const password = request.password.trim();
     const nextPassword = request.nextPassword?.trim() ?? "";

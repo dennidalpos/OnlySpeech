@@ -33,6 +33,12 @@ export function getSetupWizardControlCoreLocalizationIssuesScript(): string {
               message: formatCopy(copy.issueUnresolvedTargetTextToSpeech, { side: issue.code.slice(-1).toUpperCase() }),
               detail
             };
+          case "missing-wizard-password":
+            return { ...issue, message: copy.issueMissingWizardPassword };
+          case "wizard-password-too-short":
+            return { ...issue, message: copy.issueWizardPasswordTooShort };
+          case "wizard-password-mismatch":
+            return { ...issue, message: copy.issueWizardPasswordMismatch };
           default:
             return { ...issue, detail };
         }

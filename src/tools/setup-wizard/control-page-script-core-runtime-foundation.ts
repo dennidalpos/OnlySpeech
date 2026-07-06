@@ -95,11 +95,12 @@ export function getSetupWizardControlCoreRuntimeFoundationScript(data: SetupWiza
       let azureTextToSpeechCatalogRequestKey = "";
       let azureTextToSpeechCatalogInFlight = null;
       let monitorSetupSessionActive = false;
-      const supportedSections = ["stations","provider","languages","diagnostics","license"];
+      const supportedSections = ["license", "stations", "provider", "languages", "diagnostics", "save"];
       let state = null;
       let statusTone = "info";
       const sectionMap = { monitors: "stations", microphones: "stations", tests: "diagnostics", technical: "diagnostics" };
-      let activeSection = sectionMap[initialWizardSection] || (supportedSections.includes(initialWizardSection) ? initialWizardSection : "stations");
+      let activeSection = sectionMap[initialWizardSection] || (supportedSections.includes(initialWizardSection) ? initialWizardSection : "license");
+      let initialSetupMode = false;
       function normalizeBooleanEnv(value, fallback = "false") {
         const normalized = String(value || fallback).trim().toLowerCase();
         return normalized === "true" ? "true" : "false";
@@ -153,6 +154,11 @@ export function getSetupWizardControlCoreRuntimeFoundationScript(data: SetupWiza
         }
         reconcileTransientWizardUi(state, nextState);
         state = nextState;
+        initialSetupMode = state.lastSavedEnvPath === null;
+        const passwordCard = document.getElementById("wizard-password-setup-card");
+        if (passwordCard) {
+          passwordCard.hidden = !initialSetupMode;
+        }
         return state;
       }
       function runtimeMode() {

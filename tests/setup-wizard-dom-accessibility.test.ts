@@ -19,9 +19,9 @@ describe("setup wizard keyboard accessibility", () => {
     const inactiveCurrent = Array.from(buttons).filter((b) => b.getAttribute("aria-current") === "false");
 
     expect(activeCurrent).toHaveLength(1);
-    expect(activeCurrent[0].getAttribute("data-section")).toBe("stations");
+    expect(activeCurrent[0].getAttribute("data-section")).toBe("license");
     expect(activeCurrent[0].classList.contains("is-active")).toBe(true);
-    expect(inactiveCurrent).toHaveLength(4);
+    expect(inactiveCurrent).toHaveLength(5);
   });
 
   it("clicking a section nav button updates aria-current on all nav buttons", async () => {

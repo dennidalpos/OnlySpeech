@@ -126,7 +126,10 @@ export function getSetupWizardControlCoreLocalizationCopyScript(initialWizardUiL
             issueUnsupportedProvider: "provider non configurato",
             issueMissingProviderCredentials: "credenziali provider mancanti",
             issueAzureTextToSpeechCatalogUnavailable: "catalogo Azure TTS non disponibile",
-            issueUnresolvedTargetTextToSpeech: "nessuna voce Azure compatibile per la lingua iniziale {side}"
+            issueUnresolvedTargetTextToSpeech: "nessuna voce Azure compatibile per la lingua iniziale {side}",
+            issueMissingWizardPassword: "password del wizard non configurata",
+            issueWizardPasswordTooShort: "password troppo corta (minimo 12 caratteri)",
+            issueWizardPasswordMismatch: "le password non coincidono"
           },
         en: {
             envRequiredMonitors: "Required displays",
@@ -253,7 +256,10 @@ export function getSetupWizardControlCoreLocalizationCopyScript(initialWizardUiL
             issueUnsupportedProvider: "provider is not configured",
             issueMissingProviderCredentials: "provider credentials are missing",
             issueAzureTextToSpeechCatalogUnavailable: "Azure TTS catalog is unavailable",
-            issueUnresolvedTargetTextToSpeech: "no compatible Azure voice for initial language {side}"
+            issueUnresolvedTargetTextToSpeech: "no compatible Azure voice for initial language {side}",
+            issueMissingWizardPassword: "wizard password not set",
+            issueWizardPasswordTooShort: "password too short (minimum 12 characters)",
+            issueWizardPasswordMismatch: "passwords do not match"
           }
       };
       copyByLanguage.es = {

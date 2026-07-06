@@ -29,36 +29,6 @@ export function useSetupWizardAccess(options: UseSetupWizardAccessOptions) {
   const [setupAccessError, setSetupAccessError] = useState<string | null>(null);
   const [setupAccessBusy, setSetupAccessBusy] = useState(false);
   const [setupAccessPauseHeld, setSetupAccessPauseHeld] = useState(false);
-  const [setupTemporaryPassword, setSetupTemporaryPassword] = useState<string | null>(null);
-  const [dismissedTemporaryPassword, setDismissedTemporaryPassword] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (side !== "A" || !onlySpeechApi?.getSetupWizardAccessState) {
-      return;
-    }
-
-    let cancelled = false;
-
-    void onlySpeechApi.getSetupWizardAccessState()
-      .then((accessState) => {
-        if (cancelled) {
-          return;
-        }
-
-        if (accessState.requiresPassword && accessState.mustChangePassword && accessState.temporaryPassword) {
-          setSetupTemporaryPassword(accessState.temporaryPassword);
-          return;
-        }
-
-        setSetupTemporaryPassword(null);
-        setDismissedTemporaryPassword(null);
-      })
-      .catch(() => undefined);
-
-    return () => {
-      cancelled = true;
-    };
-  }, [onlySpeechApi, side]);
 
   const openSetupWizard = async (): Promise<void> => {
     if (!onlySpeechApi) {
@@ -128,8 +98,6 @@ export function useSetupWizardAccess(options: UseSetupWizardAccessOptions) {
 
       if (result.ok) {
         setSetupAccessState(null);
-        setSetupTemporaryPassword(null);
-        setDismissedTemporaryPassword(null);
         return;
       }
 
@@ -170,13 +138,10 @@ export function useSetupWizardAccess(options: UseSetupWizardAccessOptions) {
 
   return {
     cancelSetupAccess,
-    dismissTemporaryPassword: () => setDismissedTemporaryPassword(setupTemporaryPassword),
-    dismissedTemporaryPassword,
     openSetupWizard,
     setupAccessBusy,
     setupAccessError,
     setupAccessState,
-    setupTemporaryPassword,
     submitSetupAccess
   };
 }

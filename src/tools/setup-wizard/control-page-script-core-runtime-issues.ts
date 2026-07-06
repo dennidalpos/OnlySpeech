@@ -111,7 +111,33 @@ export function getSetupWizardControlCoreRuntimeIssuesScript(): string {
         });
       }
       function currentConfigurationIssues() {
-        return [...baseConfigurationIssues(), ...currentTargetLanguageIssues(), ...azureTextToSpeechMissingEntries()];
+        const issues = [...baseConfigurationIssues(), ...currentTargetLanguageIssues(), ...azureTextToSpeechMissingEntries()];
+        if (initialSetupMode) {
+          const pwdInput = document.getElementById("wizard-password");
+          const confirmInput = document.getElementById("wizard-confirm-password");
+          const pwd = pwdInput ? pwdInput.value.trim() : "";
+          const confirm = confirmInput ? confirmInput.value.trim() : "";
+          if (!pwd) {
+            issues.push({
+              code: "missing-wizard-password",
+              message: copy.issueMissingWizardPassword || "password del wizard non configurata",
+              detail: "Scegli una password per proteggere il wizard in futuro."
+            });
+          } else if (pwd.length < 12) {
+            issues.push({
+              code: "wizard-password-too-short",
+              message: copy.issueWizardPasswordTooShort || "password troppo corta",
+              detail: "La password deve contenere almeno 12 caratteri."
+            });
+          } else if (pwd !== confirm) {
+            issues.push({
+              code: "wizard-password-mismatch",
+              message: copy.issueWizardPasswordMismatch || "le password non coincidono",
+              detail: "Verifica che la password di conferma sia uguale."
+            });
+          }
+        }
+        return issues;
       }
       function selectedInitialLanguagesForProvider(selectedProvider = providerValue()) {
         const languages = ["A", "B"]
@@ -199,6 +225,13 @@ export function getSetupWizardControlCoreRuntimeIssuesScript(): string {
           ) {
             return true;
           }
+          if (
+            issue.code === "missing-wizard-password" ||
+            issue.code === "wizard-password-too-short" ||
+            issue.code === "wizard-password-mismatch"
+          ) {
+            return true;
+          }
           return false;
         });
       }
@@ -217,6 +250,13 @@ export function getSetupWizardControlCoreRuntimeIssuesScript(): string {
         }
         if (blockingIssues.some((issue) => issue.code.startsWith("unsupported-target-language-"))) {
           return "save-target-languages";
+        }
+        if (blockingIssues.some((issue) =>
+          issue.code === "missing-wizard-password" ||
+          issue.code === "wizard-password-too-short" ||
+          issue.code === "wizard-password-mismatch"
+        )) {
+          return "save-wizard-password";
         }
         return "";
       }
@@ -245,6 +285,13 @@ export function getSetupWizardControlCoreRuntimeIssuesScript(): string {
         }
         if (code === "unsupported-provider" || code === "missing-provider-credentials") {
           return { section: "provider", fieldId: "provider-select" };
+        }
+        if (
+          code === "missing-wizard-password" ||
+          code === "wizard-password-too-short" ||
+          code === "wizard-password-mismatch"
+        ) {
+          return { section: "save", fieldId: "wizard-password" };
         }
         return { section: "stations", fieldId: null };
       }

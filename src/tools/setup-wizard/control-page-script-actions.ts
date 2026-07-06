@@ -23,6 +23,7 @@ export function getSetupWizardControlActionsScript(): string {
             saveBlockedInitialLanguages: "Salvataggio bloccato: le lingue iniziali selezionate non sono valide per il catalogo condiviso attivo ({detail}).",
             saveBlockedProviderConfiguration: "Salvataggio bloccato: completa il provider selezionato e le relative credenziali runtime ({detail}).",
             saveBlockedAzureTextToSpeech: "Salvataggio bloccato: completa la copertura Azure TTS per le lingue iniziali A/B ({detail}).",
+            saveBlockedPassword: "Salvataggio bloccato: configura la password del wizard ({detail}).",
             configurationAppliedClosing: "Configurazione applicata. Chiusura setup wizard.",
             providerTestInProgress: "Test provider in corso...",
             providerTestCompleted: "Test provider completato.",
@@ -59,7 +60,12 @@ export function getSetupWizardControlActionsScript(): string {
             enterSampleTextForPlayback: "Inserisci un testo di esempio per il test di riproduzione provider.",
             startingProviderPlayback: "Avvio test riproduzione provider...",
             providerPlaybackStartedStatus: "Test riproduzione provider avviato.",
-            providerPlaybackFailed: "Test riproduzione provider fallito"
+            providerPlaybackFailed: "Test riproduzione provider fallito",
+            nextStep: "Avanti",
+            pwdRequired: "La password del setup wizard è obbligatoria.",
+            pwdTooShort: "La password deve contenere almeno 12 caratteri.",
+            pwdMismatch: "Le password non coincidono.",
+            licenseRequiredToProceed: "Attiva una licenza o la prova gratuita per procedere."
           },
         en: {
             microphoneTestStopped: "Microphone test for side {side} stopped.",
@@ -84,6 +90,7 @@ export function getSetupWizardControlActionsScript(): string {
             saveBlockedInitialLanguages: "Save blocked: the selected initial languages are not valid for the active provider language registry ({detail}).",
             saveBlockedProviderConfiguration: "Save blocked: complete the selected provider and its runtime credentials ({detail}).",
             saveBlockedAzureTextToSpeech: "Save blocked: complete Azure TTS coverage for the initial A/B languages ({detail}).",
+            saveBlockedPassword: "Save blocked: configure the setup wizard password ({detail}).",
             configurationAppliedClosing: "Configuration applied. Closing setup wizard.",
             providerTestInProgress: "Provider test in progress...",
             providerTestCompleted: "Provider test completed.",
@@ -120,7 +127,12 @@ export function getSetupWizardControlActionsScript(): string {
             enterSampleTextForPlayback: "Enter sample text for the provider playback test.",
             startingProviderPlayback: "Starting provider playback test...",
             providerPlaybackStartedStatus: "Provider playback test started.",
-            providerPlaybackFailed: "Provider playback test failed"
+            providerPlaybackFailed: "Provider playback test failed",
+            nextStep: "Next",
+            pwdRequired: "The setup wizard password is required.",
+            pwdTooShort: "The password must be at least 12 characters long.",
+            pwdMismatch: "Passwords do not match.",
+            licenseRequiredToProceed: "Activate a license or start the trial to proceed."
           }
       };
       let actionsCopy = actionsCopyByLanguage[wizardUiLanguage] || actionsCopyByLanguage.en;
@@ -260,9 +272,59 @@ export function getSetupWizardControlActionsScript(): string {
         syncStateFromApi(await api.assignMicrophone("A", singleMic.deviceId));
         syncStateFromApi(await api.assignMicrophone("B", singleMic.deviceId));
       }
-      async function persistEnv(actionKey) {
+      async function proceedToNextSection(currentSection) {
+        const flushResult = flushPendingEnvValues();
+        if (flushResult && typeof flushResult.then === "function") {
+          await flushResult;
+        }
+        if (currentSection === "license") {
+          const hasLicense = licenseInfo !== null && !licenseInfo.isExpired;
+          if (!hasLicense) {
+            setStatus(actionsCopy.licenseRequiredToProceed, "error");
+            return;
+          }
+        }
+        if (currentSection === "stations") {
+          const issues = currentConfigurationIssues().filter((issue) => 
+            issue.code.startsWith("missing-display") || issue.code.startsWith("missing-microphone") || issue.code === "distinct-microphones-required"
+          );
+          if (issues.length > 0) {
+            const localized = localizeWizardIssue(issues[0]);
+            setStatus(localized.message + (localized.detail ? ": " + localized.detail : ""), "error");
+            return;
+          }
+        }
+        if (currentSection === "provider") {
+          const issues = currentConfigurationIssues().filter((issue) =>
+            issue.code === "unsupported-provider" || issue.code === "missing-provider-credentials"
+          );
+          if (issues.length > 0) {
+            const localized = localizeWizardIssue(issues[0]);
+            setStatus(localized.message + (localized.detail ? ": " + localized.detail : ""), "error");
+            return;
+          }
+        }
+        if (currentSection === "languages") {
+          const issues = currentConfigurationIssues().filter((issue) =>
+            issue.code.startsWith("unsupported-target-language-") || issue.code.startsWith("unresolved-target-tts-")
+          );
+          if (issues.length > 0) {
+            const localized = localizeWizardIssue(issues[0]);
+            setStatus(localized.message + (localized.detail ? ": " + localized.detail : ""), "error");
+            return;
+          }
+        }
+        const currentIndex = supportedSections.indexOf(currentSection);
+        if (currentIndex !== -1 && currentIndex < supportedSections.length - 1) {
+          const nextSection = supportedSections[currentIndex + 1];
+          setActiveSection(nextSection);
+          setStatus("", "info");
+        }
+      }
+      async function persistEnv(actionKey, wizardPassword = "") {
+        const payload = wizardPassword ? { wizardPassword } : undefined;
         const result = await withUiActionState(actionKey, () => runAction(
-          () => api.saveEnv(),
+          () => api.saveEnv(payload),
           actionsCopy.environmentSavedAndApplied,
           actionsCopy.unableSaveEnvironment
         ));
@@ -296,6 +358,13 @@ export function getSetupWizardControlActionsScript(): string {
       }
       function buildSaveBlockingMessage(blockingIssues) {
         const detail = blockingIssues.map((issue) => issue.detail || issue.message).join(", ");
+        if (blockingIssues.some((issue) =>
+          issue.code === "missing-wizard-password" ||
+          issue.code === "wizard-password-too-short" ||
+          issue.code === "wizard-password-mismatch"
+        )) {
+          return formatCopy(actionsCopy.saveBlockedPassword, { detail });
+        }
         return blockingIssues.some(
           (issue) => issue.code === "unsupported-provider" || issue.code === "missing-provider-credentials"
         )
@@ -303,8 +372,8 @@ export function getSetupWizardControlActionsScript(): string {
           : blockingIssues.some(
               (issue) => issue.code === "azure-tts-catalog-unavailable" || issue.code.startsWith("unresolved-target-tts-")
             )
-            ? formatCopy(actionsCopy.saveBlockedAzureTextToSpeech, { detail })
-            : formatCopy(actionsCopy.saveBlockedInitialLanguages, { detail });
+          ? formatCopy(actionsCopy.saveBlockedAzureTextToSpeech, { detail })
+          : formatCopy(actionsCopy.saveBlockedInitialLanguages, { detail });
       }
       async function saveWizardConfiguration(options = {}) {
         const {
@@ -316,16 +385,37 @@ export function getSetupWizardControlActionsScript(): string {
         if (flushResult && typeof flushResult.then === "function") {
           await flushResult;
         }
+        let wizardPassword = "";
+        if (initialSetupMode) {
+          const pwdInput = document.getElementById("wizard-password");
+          const confirmInput = document.getElementById("wizard-confirm-password");
+          const pwd = pwdInput ? pwdInput.value.trim() : "";
+          const confirm = confirmInput ? confirmInput.value.trim() : "";
+          if (!pwd) {
+            setStatus(actionsCopy.pwdRequired, "error");
+            pwdInput?.focus();
+            return false;
+          }
+          if (pwd.length < 12) {
+            setStatus(actionsCopy.pwdTooShort, "error");
+            pwdInput?.focus();
+            return false;
+          }
+          if (pwd !== confirm) {
+            setStatus(actionsCopy.pwdMismatch, "error");
+            confirmInput?.focus();
+            return false;
+          }
+          wizardPassword = pwd;
+        }
         const blockingIssues = saveBlockingIssues();
-
         if (blockingIssues.length > 0) {
           const firstIssueTarget = issueSectionAndFieldId(blockingIssues[0].code);
           setStatus(buildSaveBlockingMessage(blockingIssues), "error");
           setActiveSection(firstIssueTarget.section, { scroll: true, focus: false });
           return false;
         }
-
-        const result = await persistEnv(actionKey);
+        const result = await persistEnv(actionKey, wizardPassword);
         const sectionLabel = sectionId ? sectionNavigationLabel(sectionId) : "";
         const feedbackMessage = sectionLabel
           ? sectionLabel + ": " + result.feedbackMessage
@@ -334,11 +424,9 @@ export function getSetupWizardControlActionsScript(): string {
         if (sectionLabel && !closeWizard) {
           setStatus(sectionLabel + ": " + actionsCopy.environmentSavedAndApplied, "info");
         }
-
         if (!closeWizard) {
           return true;
         }
-
         const persistedLicense = await api.getLicenseState();
         const trialAvailability = await api.getTrialAvailability();
         if (!persistedLicense && !trialAvailability.eligible) {
@@ -352,6 +440,10 @@ export function getSetupWizardControlActionsScript(): string {
         return result;
       }
       async function saveWizardSection(sectionId) {
+        if (initialSetupMode) {
+          await proceedToNextSection(sectionId);
+          return true;
+        }
         return saveWizardConfiguration({ actionKey: "saveSection", sectionId, closeWizard: false });
       }
       async function saveEnvAndCloseWizard() {

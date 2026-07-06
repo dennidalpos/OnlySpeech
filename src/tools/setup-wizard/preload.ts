@@ -219,8 +219,8 @@ const api = {
   previewEnv(): Promise<string> {
     return ipcRenderer.invoke("wizard:preview-env");
   },
-  saveEnv(): Promise<SaveEnvResult> {
-    return ipcRenderer.invoke("wizard:save-env");
+  saveEnv(payload?: { wizardPassword?: string }): Promise<SaveEnvResult> {
+    return ipcRenderer.invoke("wizard:save-env", payload);
   },
   getAzureTextToSpeechCatalog(): Promise<AzureTextToSpeechCatalogSnapshot> {
     return ipcRenderer.invoke("wizard:get-azure-text-to-speech-catalog");

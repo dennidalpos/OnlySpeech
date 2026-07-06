@@ -106,6 +106,8 @@ interface SetupWizardManagerOptions {
   applyAutostartSelection?: (selectedEnabled: boolean) => WizardState["autostart"];
   /** Encrypts packaged runtime secrets. Primarily injectable for tests. */
   runtimeSecretStorageAdapter?: RuntimeSecretStorageAdapter;
+  /** Sets/persists a custom setup wizard password. */
+  setPassword?: (password: string) => void;
 }
 
 function usesSecureRuntimeSecretStorage(): boolean {
@@ -1008,7 +1010,7 @@ export class SetupWizardManager {
         });
       }
     );
-    registerHandle("wizard:save-env", async () => {
+    registerHandle("wizard:save-env", async (_event, payload?: { wizardPassword?: string }) => {
       const state = this.getStateOrThrow();
       validateWizardDefaultTargetLanguages(state.envValues);
       const envPath = getRuntimeEnvFilePath(this.options.runtimeRoot);
@@ -1025,6 +1027,10 @@ export class SetupWizardManager {
         secureStorageEnabled: usesSecureRuntimeSecretStorage(),
         safeStorageAdapter: this.options.runtimeSecretStorageAdapter
       });
+
+      if (payload?.wizardPassword) {
+        this.options.setPassword?.(payload.wizardPassword);
+      }
 
       writeFileSync(envPath, preview, "utf8");
 
@@ -1048,8 +1054,8 @@ export class SetupWizardManager {
         storedSecretKeys: secretPersistence.storedKeys,
         autostartEnabled: persistedAutostart.selectedEnabled,
         autostartSupported: persistedAutostart.supported,
-        temporaryWizardPassword: this.options.getAccessNotice?.().temporaryPassword ?? null,
-        mustChangeWizardPassword: this.options.getAccessNotice?.().mustChangePassword ?? false
+        temporaryWizardPassword: null,
+        mustChangeWizardPassword: false
       };
     });
 

@@ -23,7 +23,6 @@ import { ConfirmDialog } from "../components/ConfirmDialog.js";
 import { LanguageSelection } from "../components/LanguageSelection.js";
 import { OperatorSessionScreen } from "../components/OperatorSessionScreen.js";
 import { SetupWizardAccessDialog } from "../components/SetupWizardAccessDialog.js";
-import { SetupWizardTemporaryPasswordNotice } from "../components/SetupWizardTemporaryPasswordNotice.js";
 import { TechnicalErrorView } from "../components/TechnicalErrorView.js";
 import { RuntimeIssueBanner } from "../components/RuntimeIssueBanner.js";
 import { RuntimeDisclosureCard } from "../components/RuntimeDisclosureCard.js";
@@ -168,13 +167,10 @@ export function OperatorApp() {
   });
   const {
     cancelSetupAccess,
-    dismissTemporaryPassword,
-    dismissedTemporaryPassword,
     openSetupWizard,
     setupAccessBusy,
     setupAccessError,
     setupAccessState,
-    setupTemporaryPassword,
     submitSetupAccess
   } = useSetupWizardAccess({
     appMode: appState?.appMode,
@@ -361,19 +357,6 @@ export function OperatorApp() {
     />
   ) : null;
 
-  const setupTemporaryPasswordNotice =
-    side === "A" &&
-    setupTemporaryPassword &&
-    dismissedTemporaryPassword !== setupTemporaryPassword ? (
-      <SetupWizardTemporaryPasswordNotice
-        title={labels.setupWizardTemporaryPasswordTitle}
-        description={labels.setupWizardTemporaryPasswordDescription}
-        passwordLabel={labels.setupWizardTemporaryPasswordRevealLabel}
-        temporaryPassword={setupTemporaryPassword}
-        dismissLabel={labels.dismiss}
-        onDismiss={dismissTemporaryPassword}
-      />
-    ) : null;
   const runtimeIssueBanner =
     blockingIssues.length > 0 && viewMode !== "technical-error" ? (
       <RuntimeIssueBanner
@@ -387,9 +370,8 @@ export function OperatorApp() {
         />
       ) : null;
   const topNoticeStack =
-    setupTemporaryPasswordNotice || runtimeIssueBanner ? (
+    runtimeIssueBanner ? (
       <div className="top-notice-stack">
-        {setupTemporaryPasswordNotice}
         {runtimeIssueBanner}
       </div>
     ) : null;

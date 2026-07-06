@@ -349,20 +349,6 @@ describe("operator setup access gate", () => {
     ]);
   });
 
-  it("shows the temporary setup password automatically on Station A while the first password change is required", async () => {
-    const harness = createHarness({
-      accessState: {
-        requiresPassword: true,
-        mustChangePassword: true,
-        temporaryPassword: "TEMP-PASS-01"
-      }
-    });
-
-    await renderOperatorApp(harness);
-
-    expect(bodyText()).toContain("Temporary setup password is active");
-    expect(bodyText()).toContain("TEMP-PASS-01");
-  });
 
   it("releases the demo pause when setup access is cancelled before the wizard opens", async () => {
     const harness = createHarness({

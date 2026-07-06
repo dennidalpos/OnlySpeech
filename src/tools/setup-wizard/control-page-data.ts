@@ -124,7 +124,7 @@ export function getSetupWizardControlPageData(uiLanguage: SetupWizardUiLanguage 
 
   return {
     wizardShellByLanguage: JSON.stringify(wizardShellByLanguage),
-    initialWizardSection: JSON.stringify(process.env.ONLYSPEECH_SETUP_WIZARD_SECTION ?? "stations"),
+    initialWizardSection: JSON.stringify(process.env.ONLYSPEECH_SETUP_WIZARD_SECTION ?? "license"),
     initialWizardUiLanguage: JSON.stringify(uiLanguage),
     wizardSidePresentationByLanguage: JSON.stringify(wizardSidePresentationByLanguage),
     wizardConfigurationIssuesFunction: getWizardConfigurationIssues.toString(),

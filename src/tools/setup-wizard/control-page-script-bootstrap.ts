@@ -213,7 +213,8 @@ export function getSetupWizardControlBootstrapScript(): string {
           ["provider-save-btn", "provider"],
           ["languages-save-btn", "languages"],
           ["diagnostics-save-btn", "diagnostics"],
-          ["license-save-btn", "license"]
+          ["license-save-btn", "license"],
+          ["save-section-save-btn", "save"]
         ].forEach(([buttonId, sectionId]) => {
           const button = document.getElementById(buttonId);
           if (button instanceof HTMLButtonElement) {
@@ -311,12 +312,30 @@ export function getSetupWizardControlBootstrapScript(): string {
             await refreshPreview();
           };
         }
+        const pwdInput = document.getElementById("wizard-password");
+        const confirmInput = document.getElementById("wizard-confirm-password");
+        if (pwdInput instanceof HTMLInputElement) {
+          pwdInput.oninput = () => {
+            renderHeroSummary();
+            renderChecklist();
+            renderSaveReview();
+            renderAsyncUi();
+          };
+        }
+        if (confirmInput instanceof HTMLInputElement) {
+          confirmInput.oninput = () => {
+            renderHeroSummary();
+            renderChecklist();
+            renderSaveReview();
+            renderAsyncUi();
+          };
+        }
       }
       async function initialize() {
         if (!api) {
           throw new Error(bootstrapCopy().missingWizardBridge);
         }
-        state = await api.getState();
+        syncStateFromApi(await api.getState());
         applyLocalizedResources(state.envValues.SETUP_UI_LANGUAGE || wizardUiLanguage);
         reconcileTransientWizardUi(null, state, { forceFullReset: true });
         await refreshAzureTextToSpeechCatalog();

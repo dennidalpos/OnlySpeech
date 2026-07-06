@@ -47,7 +47,10 @@ export const wizardPayloadSchemas: Readonly<Record<string, z.ZodType>> = Object.
     audioBase64: z.string().min(1),
     audioMimeType: z.string().min(1)
   }).strict(),
-  "wizard:submit-new-license": z.object({ email: z.string(), activationCode: z.string() }).strict()
+  "wizard:submit-new-license": z.object({ email: z.string(), activationCode: z.string() }).strict(),
+  "wizard:save-env": z.object({
+    wizardPassword: z.string().optional()
+  }).strict().optional()
 });
 
 export const overlayWizardChannels = new Set([

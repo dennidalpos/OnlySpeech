@@ -80,6 +80,7 @@ export function createWizardState(): WizardState {
 
   return {
     ...baseState,
+    lastSavedEnvPath: "D:\\GITHUB\\OnlySpeech\\.env",
     monitorSetupSessionActive: false,
     overlayDisplayIds: [],
     displays: assignDisplay(assignDisplay(baseState.displays, "A", 101), "B", 202),

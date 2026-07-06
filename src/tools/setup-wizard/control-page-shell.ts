@@ -153,11 +153,12 @@ export function getSetupWizardControlShellHtml(uiLanguage: SetupWizardUiLanguage
           </div>
         </div>
         <nav class="section-links" aria-label="${shellCopy.navLabel}">
-          <button class="section-link is-active" type="button" data-section="stations" aria-current="true"><span class="section-dot" data-section-dot="stations">&#9675;</span> ${shellCopy.stations}</button>
-          <button class="section-link" type="button" data-section="provider" aria-current="false"><span class="section-dot" data-section-dot="provider">&#9675;</span> ${shellCopy.provider}</button>
-          <button class="section-link" type="button" data-section="languages" aria-current="false"><span class="section-dot" data-section-dot="languages">&#9675;</span> ${shellCopy.languages}</button>
-          <button class="section-link" type="button" data-section="diagnostics" aria-current="false"><span class="section-dot" data-section-dot="diagnostics">&#9675;</span> ${shellCopy.diagnostics}</button>
-          <button class="section-link" type="button" data-section="license" aria-current="false"><span class="section-dot" data-section-dot="license">&#9675;</span> ${shellCopy.license}</button>
+          <button class="section-link is-active" type="button" data-section="license" aria-current="true"><span class="section-dot" data-section-dot="license">&#9675;</span> 1. ${shellCopy.license}</button>
+          <button class="section-link" type="button" data-section="stations" aria-current="false"><span class="section-dot" data-section-dot="stations">&#9675;</span> 2. ${shellCopy.stations}</button>
+          <button class="section-link" type="button" data-section="provider" aria-current="false"><span class="section-dot" data-section-dot="provider">&#9675;</span> 3. ${shellCopy.provider}</button>
+          <button class="section-link" type="button" data-section="languages" aria-current="false"><span class="section-dot" data-section-dot="languages">&#9675;</span> 4. ${shellCopy.languages}</button>
+          <button class="section-link" type="button" data-section="diagnostics" aria-current="false"><span class="section-dot" data-section-dot="diagnostics">&#9675;</span> 5. ${shellCopy.diagnostics}</button>
+          <button class="section-link" type="button" data-section="save" aria-current="false"><span class="section-dot" data-section-dot="save">&#9675;</span> 6. ${shellCopy.save}</button>
         </nav>
       </section>
       <section class="panel shell-overview-panel">
@@ -183,11 +184,11 @@ ${getSetupWizardDisclosureHtml({
         `
 })}
       </section>
+${getSetupWizardLicenseShellHtml(normalizedLanguage)}
 ${getSetupWizardStationsShellHtml(normalizedLanguage)}
 ${getSetupWizardProviderShellHtml(normalizedLanguage)}
 ${getSetupWizardLanguagesShellHtml(normalizedLanguage)}
 ${getSetupWizardDiagnosticsShellHtml(normalizedLanguage)}
-${getSetupWizardLicenseShellHtml(normalizedLanguage)}
 ${getSetupWizardReviewShellHtml(normalizedLanguage)}
     </div>
 `;
