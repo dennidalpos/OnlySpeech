@@ -41,7 +41,9 @@ export function useOnlySpeechRuntime(side: Side, onlySpeechApi: OnlySpeechRender
   const getTextToSpeechClient = useCallback(async (): Promise<TextToSpeechClient> => {
     if (!textToSpeechClientRef.current) {
       textToSpeechClientRef.current = new TextToSpeechClient({
-        synthesizeTextToSpeech: onlySpeechApi?.synthesizeTextToSpeech?.bind(onlySpeechApi)
+        synthesizeTextToSpeech: onlySpeechApi
+          ? onlySpeechApi.synthesizeTextToSpeech.bind(onlySpeechApi)
+          : undefined
       });
     }
 

@@ -80,8 +80,21 @@ function createApi(overrides: Partial<OnlySpeechRendererApi> = {}): OnlySpeechRe
       status: "success",
       message: "Activation successful."
     } as const)),
+    submitTrial: vi.fn(async () => ({
+      ok: true,
+      status: "success",
+      message: "Trial activation successful."
+    } as const)),
     sendOperatorAction: vi.fn(),
     openSetupWizard: vi.fn(),
+    setDemoPaused: vi.fn(async () => undefined),
+    getSetupWizardAccessState: vi.fn(async () => ({
+      requiresPassword: false,
+      mustChangePassword: false,
+      temporaryPassword: null
+    })),
+    requestSetupWizardAccess: vi.fn(async () => ({ ok: true as const })),
+    getShutdownCapability: vi.fn(async () => false),
     sendDeviceProbe: vi.fn(),
     sendSpeechEvent: vi.fn(),
     processSpeechTurn: vi.fn(),

@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { MIN_SETUP_WIZARD_PASSWORD_LENGTH } from "../../../shared/constants.js";
 import type { OnlySpeechRendererApi } from "../../../shared/onlyspeech-api.js";
-import type { AppMode, SetupWizardAccessState, Side } from "../../../shared/types.js";
+import type { AppMode, SetupWizardAccessState } from "../../../shared/types.js";
 
 interface SetupWizardAccessLabels {
   setupWizardInvalidPassword: string;
@@ -14,7 +14,6 @@ interface UseSetupWizardAccessOptions {
   appMode: AppMode | null | undefined;
   labels: SetupWizardAccessLabels;
   onlySpeechApi: OnlySpeechRendererApi | null;
-  side: Side;
 }
 
 interface SubmitSetupAccessPayload {
@@ -24,7 +23,7 @@ interface SubmitSetupAccessPayload {
 }
 
 export function useSetupWizardAccess(options: UseSetupWizardAccessOptions) {
-  const { appMode, labels, onlySpeechApi, side } = options;
+  const { appMode, labels, onlySpeechApi } = options;
   const [setupAccessState, setSetupAccessState] = useState<SetupWizardAccessState | null>(null);
   const [setupAccessError, setSetupAccessError] = useState<string | null>(null);
   const [setupAccessBusy, setSetupAccessBusy] = useState(false);
@@ -37,14 +36,9 @@ export function useSetupWizardAccess(options: UseSetupWizardAccessOptions) {
 
     setSetupAccessError(null);
 
-    if (appMode === "demo" && onlySpeechApi.setDemoPaused && !setupAccessPauseHeld) {
+    if (appMode === "demo" && !setupAccessPauseHeld) {
       await onlySpeechApi.setDemoPaused(true);
       setSetupAccessPauseHeld(true);
-    }
-
-    if (!onlySpeechApi.getSetupWizardAccessState || !onlySpeechApi.requestSetupWizardAccess) {
-      onlySpeechApi.openSetupWizard();
-      return;
     }
 
     try {
@@ -66,7 +60,7 @@ export function useSetupWizardAccess(options: UseSetupWizardAccessOptions) {
   };
 
   const submitSetupAccess = async (payload: SubmitSetupAccessPayload): Promise<void> => {
-    if (!onlySpeechApi?.requestSetupWizardAccess || !setupAccessState) {
+    if (!onlySpeechApi || !setupAccessState) {
       return;
     }
 
@@ -128,7 +122,7 @@ export function useSetupWizardAccess(options: UseSetupWizardAccessOptions) {
     }
 
     if (setupAccessPauseHeld) {
-      void onlySpeechApi?.setDemoPaused?.(false);
+      void onlySpeechApi?.setDemoPaused(false);
       setSetupAccessPauseHeld(false);
     }
 

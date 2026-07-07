@@ -21,15 +21,15 @@ import type {
 } from "./types.js";
 
 export interface OnlySpeechRendererApi {
-  getActivationGateState?(): Promise<ActivationGateState>;
-  submitActivation?(request: ActivationSubmissionRequest): Promise<ActivationSubmissionResult>;
-  submitTrial?(): Promise<ActivationSubmissionResult>;
+  getActivationGateState(): Promise<ActivationGateState>;
+  submitActivation(request: ActivationSubmissionRequest): Promise<ActivationSubmissionResult>;
+  submitTrial(): Promise<ActivationSubmissionResult>;
   sendOperatorAction(action: OperatorAction): void;
   openSetupWizard(): void;
-  setDemoPaused?(paused: boolean): Promise<void>;
-  getSetupWizardAccessState?(): Promise<SetupWizardAccessState>;
-  requestSetupWizardAccess?(request: SetupWizardAccessRequest): Promise<SetupWizardAccessResult>;
-  getShutdownCapability?(): Promise<boolean>;
+  setDemoPaused(paused: boolean): Promise<void>;
+  getSetupWizardAccessState(): Promise<SetupWizardAccessState>;
+  requestSetupWizardAccess(request: SetupWizardAccessRequest): Promise<SetupWizardAccessResult>;
+  getShutdownCapability(): Promise<boolean>;
   sendDeviceProbe(payload: DeviceProbePayload): void;
   sendSpeechEvent(payload: SpeechEventPayload): void;
   processSpeechTurn(request: SpeechTurnRequest): Promise<SpeechTurnResult>;

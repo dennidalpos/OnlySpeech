@@ -100,9 +100,14 @@ export function createInitialWizardRuntimeStateWithAutostart(
   runtimeRoot: string,
   autostart: WizardAutostartState
 ): WizardState {
+  const envPath = getRuntimeEnvFilePath(runtimeRoot);
+  const savedPreview = existsSync(envPath) ? readFileSync(envPath, "utf8") : null;
+
   return {
     ...applyStoredDisplayAssignments(createInitialWizardState(collectDisplays(), readBaseEnv(runtimeRoot))),
-    autostart
+    autostart,
+    lastSavedEnvPath: savedPreview === null ? null : envPath,
+    lastSavedPreview: savedPreview
   };
 }
 

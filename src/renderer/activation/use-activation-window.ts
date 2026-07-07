@@ -48,7 +48,7 @@ export function useActivationWindow() {
   }, []);
 
   const readGateState = useCallback(async () => {
-    if (!api?.getActivationGateState) {
+    if (!api) {
       return {
         detail: null,
         state: createFallbackActivationState(language)
@@ -101,7 +101,7 @@ export function useActivationWindow() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!api?.submitActivation) {
+    if (!api) {
       applyStatus(createFallbackActivationState(language));
       return;
     }
@@ -135,7 +135,7 @@ export function useActivationWindow() {
   }
 
   async function handleTrial() {
-    if (!api?.submitTrial) {
+    if (!api) {
       applyStatus(createFallbackActivationState(language));
       return;
     }

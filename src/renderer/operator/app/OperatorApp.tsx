@@ -163,7 +163,9 @@ export function OperatorApp() {
   const { isPttPressed, startPtt, endPtt, onPointerDown, onPointerUp } = usePushToTalk({
     side,
     canTalk: preloadedCanTalk,
-    sendOperatorAction: onlySpeechApi?.sendOperatorAction ?? (() => undefined)
+    sendOperatorAction: onlySpeechApi
+      ? onlySpeechApi.sendOperatorAction
+      : () => undefined
   });
   const {
     cancelSetupAccess,
@@ -175,8 +177,7 @@ export function OperatorApp() {
   } = useSetupWizardAccess({
     appMode: appState?.appMode,
     labels,
-    onlySpeechApi,
-    side
+    onlySpeechApi
   });
   const preloadedViewMode = resolveOperatorViewMode({
     appState,
@@ -197,7 +198,7 @@ export function OperatorApp() {
   useEffect(() => {
     let cancelled = false;
 
-    if (!onlySpeechApi?.getShutdownCapability) {
+    if (!onlySpeechApi) {
       return () => {
         cancelled = true;
       };
@@ -225,10 +226,6 @@ export function OperatorApp() {
     document.documentElement.dir = resolveDocumentDirection(normalizedDocumentLanguage);
   }, [normalizedDocumentLanguage]);
 
-  if (!appState) {
-    return <div className="boot-screen">{getUiText(fallbackUiLanguage).booting}</div>;
-  }
-
   if (!onlySpeechApi) {
     return (
       <TechnicalErrorView
@@ -243,6 +240,10 @@ export function OperatorApp() {
         onRetry={() => window.location.reload()}
       />
     );
+  }
+
+  if (!appState) {
+    return <div className="boot-screen">{getUiText(fallbackUiLanguage).booting}</div>;
   }
 
   const localSide = appState.sides[side];

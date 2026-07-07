@@ -297,6 +297,20 @@ function createOnlySpeechHarness(options?: {
       sendOperatorAction: (action: OperatorAction) => {
         actions.push(action);
       },
+      getActivationGateState: vi.fn(async () => ({
+        status: "required",
+        message: "Activation is required before startup can continue."
+      } as const)),
+      submitActivation: vi.fn(async () => ({
+        ok: true,
+        status: "success",
+        message: "Activation successful."
+      } as const)),
+      submitTrial: vi.fn(async () => ({
+        ok: true,
+        status: "success",
+        message: "Trial activation successful."
+      } as const)),
       openSetupWizard: () => {
         openSetupWizardCalls += 1;
       },
@@ -376,6 +390,21 @@ async function renderOperatorApp(side: Side, state: AppState) {
   return harness;
 }
 
+async function renderOperatorAppWithoutBridge(side: Side): Promise<void> {
+  window.history.replaceState({}, "", `/?side=${side}`);
+
+  container = document.createElement("div");
+  container.id = "root";
+  document.body.innerHTML = "";
+  document.body.appendChild(container);
+  root = ReactDOM.createRoot(container);
+
+  await act(async () => {
+    root?.render(<OperatorApp />);
+    await Promise.resolve();
+  });
+}
+
 beforeEach(() => {
   (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
   setNavigatorLanguage("en-US");
@@ -403,6 +432,13 @@ afterEach(async () => {
 });
 
 describe("operator app mounted UI smoke coverage", () => {
+  it("shows a technical error immediately when the main-process bridge is unavailable", async () => {
+    await renderOperatorAppWithoutBridge("A");
+
+    expect(bodyText()).toContain("Technical error");
+    expect(bodyText()).not.toContain(getUiText("en").booting);
+  });
+
   it("drives Station A through the mounted language selector flow", async () => {
     const harness = await renderOperatorApp("A", createAppState());
     const arabic = buildInteractionLanguageChoices().find((choice) => choice.value === "ar");

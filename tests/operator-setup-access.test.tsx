@@ -118,10 +118,6 @@ function createAppState(overrides: Partial<AppState> = {}): AppState {
   };
 }
 
-function bodyText(): string {
-  return document.body.textContent?.replace(/\s+/g, " ").trim() ?? "";
-}
-
 function findButtonByText(text: string): HTMLButtonElement {
   const normalizedText = text.replace(/\s+/g, " ").trim();
   const button = [...document.querySelectorAll("button")].find((candidate) =>
@@ -203,6 +199,20 @@ function createHarness(options: {
   return {
     requestCalls,
     api: {
+      getActivationGateState: vi.fn(async () => ({
+        status: "required",
+        message: "Activation is required before startup can continue."
+      } as const)),
+      submitActivation: vi.fn(async () => ({
+        ok: true,
+        status: "success",
+        message: "Activation successful."
+      } as const)),
+      submitTrial: vi.fn(async () => ({
+        ok: true,
+        status: "success",
+        message: "Trial activation successful."
+      } as const)),
       sendOperatorAction: vi.fn(),
       openSetupWizard: vi.fn(),
       setDemoPaused: vi.fn(async () => undefined),
@@ -226,6 +236,7 @@ function createHarness(options: {
       requestTextToSpeech: vi.fn(),
       stopTextToSpeech: vi.fn(),
       sendTextToSpeechEvent: vi.fn(),
+      getShutdownCapability: vi.fn(async () => false),
       shutdownComputer: vi.fn(),
       onState: (listener) => {
         stateListeners.add(listener);

@@ -257,7 +257,7 @@ describe("SetupWizardManager control window", () => {
     }
 
     (manager as unknown as { controlWindow: unknown }).controlWindow = electronMocks.createdWindows[0] ?? new electronMocks.BrowserWindow({});
-    const result = await (saveHandler as unknown as (event: unknown) => ReturnType<typeof saveHandler>)({
+    const result = await (saveHandler as unknown as (event: unknown) => ReturnType<NonNullable<typeof saveHandler>>)({
       sender: electronMocks.createdWindows[0].webContents
     });
 
@@ -327,12 +327,12 @@ describe("SetupWizardManager control window", () => {
       throw new Error("wizard:save-env handler not registered.");
     }
 
-    let result: Awaited<ReturnType<typeof saveHandler>> | undefined;
+    let result: Awaited<ReturnType<NonNullable<typeof saveHandler>>> | undefined;
     await electronMocks.app.getPath.withImplementation(
       () => runtimeRoot,
       async () => {
       (manager as unknown as { controlWindow: unknown }).controlWindow = electronMocks.createdWindows[0] ?? new electronMocks.BrowserWindow({});
-      result = await (saveHandler as unknown as (event: unknown) => ReturnType<typeof saveHandler>)({
+      result = await (saveHandler as unknown as (event: unknown) => ReturnType<NonNullable<typeof saveHandler>>)({
         sender: electronMocks.createdWindows[0].webContents
       });
       }
@@ -400,7 +400,7 @@ describe("SetupWizardManager control window", () => {
     }
 
     (manager as unknown as { controlWindow: unknown }).controlWindow = electronMocks.createdWindows[0] ?? new electronMocks.BrowserWindow({});
-    const result = await (saveHandler as unknown as (event: unknown) => ReturnType<typeof saveHandler>)({
+    const result = await (saveHandler as unknown as (event: unknown) => ReturnType<NonNullable<typeof saveHandler>>)({
       sender: electronMocks.createdWindows[0].webContents
     });
 

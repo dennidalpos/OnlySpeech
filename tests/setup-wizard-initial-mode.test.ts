@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getSetupWizardControlHtml } from "../src/tools/setup-wizard/pages.js";
 import {
-  click,
   createDom,
   createWizardApi,
   createWizardState,
