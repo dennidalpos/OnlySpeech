@@ -38,14 +38,25 @@ Ignored local outputs such as `.local/`, `dist/`, `artifacts/`, `node_modules/`,
 | `npm run start -- -Smoke -SmokeTimeoutMs 8000` | Direct source smoke launch. |
 | `npm run start -- -SetupWizard` | Direct source setup wizard launch. |
 | `npm run build` | Renderer and main compile. |
+| `npm run compile` | Direct renderer and main compile without the public PowerShell wrapper. |
 | `npm run lint` | ESLint checks for source, tests, and JavaScript tooling. |
 | `npm test` | Vitest without Electron e2e. |
+| `npm run test:coverage` | Thresholded security/runtime coverage suite. |
 | `npm run test:e2e` | Compile and run Electron e2e. |
+| `npm run test:packaged-lifecycle` | Packaged install/startup lifecycle validation. |
+| `npm run test:packaged-automation` | Packaged runtime automation against retained package output. |
 | `npm run gate -- -KeepOutputs -EnablePackagedAutomation` | Public local production-readiness gate. |
 | `npm run gate -- -RefreshDependencies -KeepOutputs -EnablePackagedAutomation` | Public local gate with forced deterministic dependency refresh. |
 | `npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation` | Canonical local/CI/release verification. |
 | `npm run package` | Public package build. |
+| `npm run audit:packaging` | Validate expected packaging audit state. |
+| `npm run clean` | Remove repo-local generated outputs while preserving local state. |
+| `npm run clean:workstation` | Remove packaged workstation-local OnlySpeech state. |
+| `npm run clean:repo` | Maintenance cleanup wrapper that preserves dependencies, `.env`, workstation data, and autostart. |
+| `npm run clean:reset` | Stronger maintenance reset wrapper for repository-local generated state. |
 | `npm run docs:screenshots` | Optional product screenshot regeneration. |
+| `npm run docs:social-assets` | Optional 9:16 and 4:5 campaign asset regeneration. |
+| `npm run license:keygen` | Launch the local activation key generator when present. |
 | `npm run activation:template` | Packaged activation validation template. |
 | `npm run commission:template` | Target-station and commissioning templates. |
 | `npm run commission:automation` | Target-station automation against the packaged profile. |
@@ -92,6 +103,7 @@ There is no checked-in format command. The current checked quality surface is ES
 | `scripts/support/commissioning/test-packaged-install-lifecycle.ps1` | Validate packaged install/startup lifecycle. | `npm run test:packaged-lifecycle`, `verify:repo`. |
 | `scripts/support/commissioning/test-packaged-runtime-automation.ps1` | Validate packaged runtime automation against `win-unpacked`. | `npm run test:packaged-automation`, `verify:repo -EnablePackagedAutomation`. |
 | `scripts/support/docs/write-product-screenshots.ps1` | Compile and regenerate optional product screenshots. | `npm run docs:screenshots`. |
+| `scripts/support/docs/write-social-assets.ps1` | Capture the demo flow, compose campaign PNGs, write the manifest, and validate output dimensions. | `npm run docs:social-assets`. |
 | `scripts/support/docs/write-brand-assets.ps1` | Regenerate tracked brand assets after deliberate visual changes. | Manual docs runbook. |
 | `scripts/support/docs/write-product-demo-video.ps1` | Write optional marketplace demo video and poster. | Manual docs runbook. |
 | `scripts/support/lib/repo.ps1` | Shared repo root, Node baseline, process-release, and step helpers. | Primary and support PowerShell scripts. |

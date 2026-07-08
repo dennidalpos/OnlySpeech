@@ -64,11 +64,10 @@ Not supported by the repository contract:
 - `tests`: unit, integration, DOM, script-plan, and Electron end-to-end tests.
 - `scripts/*.ps1`: stable PowerShell wrappers exposed through npm.
 - `scripts/support`: implementation scripts and helper utilities for runtime, workspace, packaging, release, docs, and commissioning flows.
-- `tools`: local or vendored tool payloads; not part of the packaged runtime contract unless a specific flow documents them.
 - `build`: icons, brand source SVGs, exported logo PNGs, and packaging assets.
 - `public`: Vite-copied static assets consumed by runtime HTML, including favicon and social metadata images.
 - `docs`: technical docs, buyer material, internal runbooks, product collateral, optional generated screenshot collateral when explicitly produced, and decisions.
-- `media`: tracked source or marketplace media that must stay versioned.
+- `social_assets`: tracked campaign collateral generated from the demo flow when intentionally prepared and reviewed.
 
 ## Toolchain Baseline
 
@@ -185,7 +184,7 @@ The test surface includes:
 - PowerShell planning and repo-helper tests;
 - packaged runtime automation tests.
 
-`npm run gate` and `npm run verify:repo` cover cleanup, bootstrap, doctor, tests, source smoke, build, Electron e2e, packaging audit, packaging, packaged lifecycle validation, optional packaged automation, release evidence generation, release compliance generation, and final cleanup unless outputs are preserved. The gate default preserves `.env`, `.local/activation-generator`, dependencies, local vendored `tools/`, workstation data, and autostart state. `-CleanWorkstationData` explicitly removes packaged workstation data through `clean:workstation`. The public `gate` wrapper uses `-RefreshDependencies`; the canonical `verify:repo` implementation uses `-ForceRefreshDependencies`.
+`npm run gate` and `npm run verify:repo` cover cleanup, bootstrap, doctor, tests, source smoke, build, Electron e2e, packaging audit, packaging, packaged lifecycle validation, optional packaged automation, release evidence generation, release compliance generation, and final cleanup unless outputs are preserved. The gate default preserves `.env`, `.local/activation-generator`, dependencies, ignored local tool payloads, workstation data, and autostart state. `-CleanWorkstationData` explicitly removes packaged workstation data through `clean:workstation`. The public `gate` wrapper uses `-RefreshDependencies`; the canonical `verify:repo` implementation uses `-ForceRefreshDependencies`.
 
 Supported verification modifiers include `-SkipInstall`, `-SkipPack`, `-SkipPackagedLifecycle`, `-EnablePackagedAutomation`, `-SkipSmokeStart`, `-KeepOutputs`, `-CleanWorkstationData`, `-ForceRefreshDependencies`, and `-DryRun`. The public `gate` wrapper exposes dependency refresh as `-RefreshDependencies`.
 
@@ -232,7 +231,7 @@ Until those conditions are met, the repository may be technically verifiable but
 - `artifacts/build/`: transient install lifecycle and script-audit working data.
 - `%LOCALAPPDATA%\OnlySpeech\logs`: workstation runtime logs.
 
-Repo-local generated outputs are ignored by `.gitignore`. Optional screenshot and marketplace-demo collateral can be regenerated through the documented scripts when that collateral is intentionally being prepared and reviewed.
+Repo-local generated outputs are ignored by `.gitignore`. Optional product screenshots, brand exports, demo video assets, and campaign social collateral can be regenerated through the documented scripts when that collateral is intentionally being prepared and reviewed. Versioned generated collateral under `docs/product/` and `social_assets/` remains tracked only after review.
 
 ## Supporting Documentation
 

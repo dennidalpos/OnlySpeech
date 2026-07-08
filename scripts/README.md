@@ -22,12 +22,14 @@ OnlySpeech scripts are Windows + PowerShell entrypoints. Run commands from the r
 | check | `npm run gate -- -KeepOutputs -EnablePackagedAutomation` | Local production-readiness gate with retained outputs and packaged automation. |
 | check | `npm run gate -- -RefreshDependencies -KeepOutputs -EnablePackagedAutomation` | Same gate with a forced deterministic dependency refresh. |
 | check | `npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation` | Canonical CI/release verification command. |
+| check | `npm run audit:packaging` | Validate expected packaging audit state. |
 | package | `npm run package` | Build public Windows installer, portable executable, and unpacked archive. |
 | cleanup | `npm run clean` | Remove repo-local generated outputs while preserving dependencies, `.env`, workstation data, and autostart. |
 | cleanup | `npm run clean:workstation` | Remove packaged workstation-local OnlySpeech state for support or reinstall. |
 | release | `npm run release:evidence` | Write retained release metadata for existing package outputs. |
 | release | `npm run release:compliance` | Write third-party notices and SBOM artifacts. |
 | release | `npm run release:customer-bundle` | Assemble the buyer-facing bundle from existing package outputs and docs. |
+| collateral | `npm run docs:screenshots` | Regenerate tracked product screenshots under `docs/product/screenshots/`. |
 | collateral | `npm run docs:social-assets` | Capture the five-step demo flow, generate 9:16 and 4:5 campaign assets under `social_assets/`, write the asset manifest, and validate PNG count/dimensions. |
 
 The checked quality surface is ESLint, TypeScript build, Vitest, Electron e2e, packaging audit, PowerShell script tests, and the Windows gate.

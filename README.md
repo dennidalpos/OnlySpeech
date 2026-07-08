@@ -102,6 +102,7 @@ The installer verifies required software before copying the app:
 | `npm run clean` | Remove repo-local generated outputs while preserving dependencies, `.env`, workstation data, and autostart state. |
 | `npm run clean:workstation` | Remove packaged workstation-local OnlySpeech data for support/reinstall flows. |
 | `npm run docs:screenshots` | Regenerate optional product screenshots after compile. |
+| `npm run docs:social-assets` | Regenerate optional 9:16 and 4:5 campaign assets under `social_assets/`. |
 | `npm run activation:template` | Write the packaged activation validation artifact template. |
 | `npm run commission:template` | Write the target-station validation template and commissioning template artifact. |
 | `npm run commission:automation` | Run target-station automation against the packaged profile when available. |
