@@ -432,10 +432,10 @@ describe("setup wizard executable DOM interactions", () => {
 
     const { window } = dom;
 
-    // These disclosures are intentionally collapsed by default
+    // Advanced tuning stays collapsed; final operational tests are visible by default.
     expect((window.document.querySelector("#advanced-settings") as HTMLDetailsElement | null)?.open).toBe(false);
-    expect((window.document.querySelector("#provider-validation-disclosure") as HTMLDetailsElement | null)?.open).toBe(false);
-    expect((window.document.querySelector("#playback-test-disclosure") as HTMLDetailsElement | null)?.open).toBe(false);
+    expect((window.document.querySelector("#provider-validation-disclosure") as HTMLDetailsElement | null)?.open).toBe(true);
+    expect((window.document.querySelector("#playback-test-disclosure") as HTMLDetailsElement | null)?.open).toBe(true);
 
     // Technical output disclosures inside provider test panels are open by default
     expect(
@@ -487,7 +487,7 @@ describe("setup wizard executable DOM interactions", () => {
 
     expect(api.saveEnv).toHaveBeenCalledTimes(2);
     expect(api.closeWizard).not.toHaveBeenCalled();
-    expect(window.document.querySelector("#save-feedback")?.textContent).toContain("Diagnostics:");
+    expect(window.document.querySelector("#save-feedback")?.textContent).toContain("Final test:");
   });
 
   it("updates the full wizard UI in real time when the operator language changes", async () => {

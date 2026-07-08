@@ -28,7 +28,7 @@ OnlySpeech scripts are Windows + PowerShell entrypoints. Run commands from the r
 | release | `npm run release:evidence` | Write retained release metadata for existing package outputs. |
 | release | `npm run release:compliance` | Write third-party notices and SBOM artifacts. |
 | release | `npm run release:customer-bundle` | Assemble the buyer-facing bundle from existing package outputs and docs. |
-| collateral | `npm run docs:social-assets` | Capture the five-step demo flow and generate 9:16 and 4:5 campaign assets under `social_assets/`. |
+| collateral | `npm run docs:social-assets` | Capture the five-step demo flow, generate 9:16 and 4:5 campaign assets under `social_assets/`, write the asset manifest, and validate PNG count/dimensions. |
 
 The checked quality surface is ESLint, TypeScript build, Vitest, Electron e2e, packaging audit, PowerShell script tests, and the Windows gate.
 

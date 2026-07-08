@@ -32,6 +32,7 @@ export function getSetupWizardControlShellHtml(uiLanguage: SetupWizardUiLanguage
     provider: string;
     languages: string;
     diagnostics: string;
+    finalTest: string;
     license: string;
     save: string;
     uiLabel: string;
@@ -47,6 +48,7 @@ export function getSetupWizardControlShellHtml(uiLanguage: SetupWizardUiLanguage
       provider: "Provider",
       languages: "Languages",
       diagnostics: "Diagnostics",
+      finalTest: "Final test",
       license: "License",
       save: "Review & Save",
       uiLabel: "Setup UI language",
@@ -62,6 +64,7 @@ export function getSetupWizardControlShellHtml(uiLanguage: SetupWizardUiLanguage
       provider: "Provider",
       languages: "Lingue",
       diagnostics: "Diagnostica",
+      finalTest: "Test finale",
       license: "Licenza",
       save: "Conferma & Salva",
       uiLabel: "Lingua UI setup",
@@ -77,6 +80,7 @@ export function getSetupWizardControlShellHtml(uiLanguage: SetupWizardUiLanguage
       provider: "Proveedor",
       languages: "Idiomas",
       diagnostics: "Diagnostico",
+      finalTest: "Prueba final",
       license: "Licencia",
       save: "Revisar y Guardar",
       uiLabel: "Idioma UI setup",
@@ -92,6 +96,7 @@ export function getSetupWizardControlShellHtml(uiLanguage: SetupWizardUiLanguage
       provider: "Fournisseur",
       languages: "Langues",
       diagnostics: "Diagnostic",
+      finalTest: "Test final",
       license: "Licence",
       save: "Verifier et Sauvegarder",
       uiLabel: "Langue UI setup",
@@ -107,6 +112,7 @@ export function getSetupWizardControlShellHtml(uiLanguage: SetupWizardUiLanguage
       provider: "Anbieter",
       languages: "Sprachen",
       diagnostics: "Diagnose",
+      finalTest: "Abschlusstest",
       license: "Lizenz",
       save: "Prufen und Speichern",
       uiLabel: "Setup-UI-Sprache",
@@ -122,6 +128,7 @@ export function getSetupWizardControlShellHtml(uiLanguage: SetupWizardUiLanguage
       provider: "服务商",
       languages: "语言",
       diagnostics: "诊断",
+      finalTest: "最终测试",
       license: "许可",
       save: "检查并保存",
       uiLabel: "设置界面语言",
@@ -157,7 +164,7 @@ export function getSetupWizardControlShellHtml(uiLanguage: SetupWizardUiLanguage
           <button class="section-link" type="button" data-section="stations" aria-current="false"><span class="section-dot" data-section-dot="stations">&#9675;</span> 2. ${shellCopy.stations}</button>
           <button class="section-link" type="button" data-section="provider" aria-current="false"><span class="section-dot" data-section-dot="provider">&#9675;</span> 3. ${shellCopy.provider}</button>
           <button class="section-link" type="button" data-section="languages" aria-current="false"><span class="section-dot" data-section-dot="languages">&#9675;</span> 4. ${shellCopy.languages}</button>
-          <button class="section-link" type="button" data-section="diagnostics" aria-current="false"><span class="section-dot" data-section-dot="diagnostics">&#9675;</span> 5. ${shellCopy.diagnostics}</button>
+          <button class="section-link" type="button" data-section="diagnostics" aria-current="false"><span class="section-dot" data-section-dot="diagnostics">&#9675;</span> 5. ${shellCopy.finalTest}</button>
           <button class="section-link" type="button" data-section="save" aria-current="false"><span class="section-dot" data-section-dot="save">&#9675;</span> 6. ${shellCopy.save}</button>
         </nav>
       </section>

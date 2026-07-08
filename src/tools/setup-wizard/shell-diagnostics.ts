@@ -11,9 +11,9 @@ export function getSetupWizardDiagnosticsShellHtml(uiLanguage: SetupWizardUiLang
   const normalizedLanguage = normalizeSetupWizardUiLanguage(uiLanguage);
   const copyByLanguage: Readonly<Record<SetupWizardUiLanguage, Record<string, string>>> = {
     en: {
-      diagnostics: "Diagnostics",
-      title: "Diagnostics and provider tests",
-      description: "Run concise validation first, then open technical output only when you need details.",
+      diagnostics: "Final test",
+      title: "Final station test",
+      description: "Run the essential checks before saving; technical output stays folded unless it is needed.",
       openLogs: "Open runtime logs folder",
       openLogsIndicator: "Opens folder",
       openLogsDescription: "Opens the runtime logs folder in the system shell.",
@@ -57,9 +57,9 @@ export function getSetupWizardDiagnosticsShellHtml(uiLanguage: SetupWizardUiLang
       technicalOutput: "Technical output"
     },
     it: {
-      diagnostics: "Diagnostica",
-      title: "Diagnostica e test provider",
-      description: "Esegui prima una validazione sintetica, poi apri l'output tecnico solo quando serve.",
+      diagnostics: "Test finale",
+      title: "Test finale postazione",
+      description: "Esegui i controlli essenziali prima del salvataggio; l'output tecnico resta chiuso finche' non serve.",
       openLogs: "Apri cartella log runtime",
       openLogsIndicator: "Apre cartella",
       openLogsDescription: "Apre la cartella dei log runtime nella shell di sistema.",
@@ -103,9 +103,9 @@ export function getSetupWizardDiagnosticsShellHtml(uiLanguage: SetupWizardUiLang
       technicalOutput: "Output tecnico"
     },
     es: {
-      diagnostics: "Diagnostico",
-      title: "Diagnostico y pruebas del proveedor",
-      description: "Ejecuta primero una validacion concisa y abre la salida tecnica solo cuando haga falta.",
+      diagnostics: "Prueba final",
+      title: "Prueba final del puesto",
+      description: "Ejecuta las comprobaciones esenciales antes de guardar; la salida tecnica queda plegada salvo que haga falta.",
       openLogs: "Abrir carpeta de logs runtime",
       openLogsIndicator: "Abre carpeta",
       openLogsDescription: "Abre la carpeta de logs runtime en la shell del sistema.",
@@ -149,9 +149,9 @@ export function getSetupWizardDiagnosticsShellHtml(uiLanguage: SetupWizardUiLang
       technicalOutput: "Salida tecnica"
     },
     fr: {
-      diagnostics: "Diagnostic",
-      title: "Diagnostic et tests du fournisseur",
-      description: "Lancez d'abord une validation concise, puis ouvrez la sortie technique seulement si necessaire.",
+      diagnostics: "Test final",
+      title: "Test final du poste",
+      description: "Lancez les controles essentiels avant la sauvegarde ; la sortie technique reste repliee sauf besoin.",
       openLogs: "Ouvrir le dossier des logs runtime",
       openLogsIndicator: "Ouvre le dossier",
       openLogsDescription: "Ouvre le dossier des logs runtime dans la shell du systeme.",
@@ -195,9 +195,9 @@ export function getSetupWizardDiagnosticsShellHtml(uiLanguage: SetupWizardUiLang
       technicalOutput: "Sortie technique"
     },
     de: {
-      diagnostics: "Diagnose",
-      title: "Diagnose und Anbieter-Tests",
-      description: "Fuehren Sie zuerst eine kompakte Validierung aus und oeffnen Sie die technische Ausgabe nur bei Bedarf.",
+      diagnostics: "Abschlusstest",
+      title: "Abschlusstest der Station",
+      description: "Fuehren Sie die wichtigsten Pruefungen vor dem Speichern aus; technische Ausgaben bleiben zunaechst eingeklappt.",
       openLogs: "Runtime-Logordner oeffnen",
       openLogsIndicator: "Oeffnet Ordner",
       openLogsDescription: "Oeffnet den Runtime-Logordner in der System-Shell.",
@@ -241,9 +241,9 @@ export function getSetupWizardDiagnosticsShellHtml(uiLanguage: SetupWizardUiLang
       technicalOutput: "Technische Ausgabe"
     },
     zh: {
-      diagnostics: "诊断",
-      title: "诊断和服务商测试",
-      description: "先运行简洁校验，需要时再展开技术输出。",
+      diagnostics: "最终测试",
+      title: "工作站最终测试",
+      description: "保存前先运行关键检查；技术输出默认折叠，需要时再展开。",
       openLogs: "打开 runtime 日志目录",
       openLogsIndicator: "打开目录",
       openLogsDescription: "在系统 shell 中打开 runtime 日志目录。",
@@ -323,7 +323,7 @@ ${getSetupWizardCardHeaderHtml({
             </article>
           </div>
         </article>
-        <details class="card settings-card wizard-disclosure" id="provider-validation-disclosure">
+        <details class="card settings-card wizard-disclosure" id="provider-validation-disclosure" open>
           <summary>
             <span class="disclosure-heading">${copy.providerValidation}</span>
           </summary>
@@ -401,7 +401,7 @@ ${getSetupWizardDisclosureHtml({
         </article>
           </div>
         </details>
-        <details class="card settings-card wizard-disclosure" id="playback-test-disclosure">
+        <details class="card settings-card wizard-disclosure" id="playback-test-disclosure" open>
           <summary>
             <span class="disclosure-heading">${copy.providerPlaybackTest}</span>
           </summary>

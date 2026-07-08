@@ -1,11 +1,9 @@
 import { useEffect, useLayoutEffect, useState } from "react";
-import { findSourceLanguageOption } from "../../../shared/language-options.js";
 import type { OnlySpeechRendererApi } from "../../../shared/onlyspeech-api.js";
 import { buildInteractionLanguageChoices } from "../../../shared/language-flow.js";
 import {
   getInteractionLanguageCurrentLabel,
-  getInteractionLanguageEnglishLabel,
-  getInteractionLanguageLabel
+  getInteractionLanguageEnglishLabel
 } from "../../../shared/language-registry.js";
 import {
   getOperatorTextToSpeechText,
@@ -17,8 +15,6 @@ import {
   getRuntimeDisclosureText
 } from "../../../shared/runtime-disclosure.js";
 import { getVisitorLocalizationBundle } from "../../../shared/visitor-localization-bundle.js";
-import { getVisitorEffectiveLanguageKey } from "../../../shared/visitor-localization.js";
-import type { Side } from "../../../shared/types.js";
 import { ConfirmDialog } from "../components/ConfirmDialog.js";
 import { LanguageSelection } from "../components/LanguageSelection.js";
 import { OperatorSessionScreen } from "../components/OperatorSessionScreen.js";
@@ -35,56 +31,20 @@ import {
   shouldShowRemoteUserLanguage
 } from "../../../shared/side-flow.js";
 import { buildPanelSpeechControl } from "./build-panel-speech-control.js";
+import {
+  getInteractionLanguageFallbackLabel,
+  getLocalizedRoleLabels,
+  getSourceLanguageLabel,
+  normalizeDocumentLanguage,
+  resolveDocumentDirection,
+  resolveSideFromLocation
+} from "./operator-app-view-model.js";
 import { useSetupWizardAccess } from "./use-setup-wizard-access.js";
 import { useOnlySpeechRuntime } from "./use-onlyspeech-runtime.js";
 import { usePushToTalk } from "./use-push-to-talk.js";
 
-function resolveSide(): Side {
-  const side = new URLSearchParams(window.location.search).get("side");
-  return side === "B" ? "B" : "A";
-}
-
-function languageLabel(languageCode: string | null): string {
-  return getInteractionLanguageLabel(languageCode);
-}
-
-function sourceLanguageLabel(languageCode: string | null): string {
-  if (!languageCode) {
-    return "-";
-  }
-
-  return findSourceLanguageOption(languageCode)?.label ?? languageCode;
-}
-
-function getLocalizedRoleLabels(language: string): { A: string; B: string } {
-  switch (language) {
-    case "it":
-      return { A: "Operatore", B: "Utente" };
-    case "es":
-      return { A: "Operador", B: "Usuario" };
-    case "fr":
-      return { A: "Operateur", B: "Utilisateur" };
-    case "de":
-      return { A: "Operator", B: "Benutzer" };
-    case "zh":
-      return { A: "操作员", B: "用户" };
-    default:
-      return { A: "Operator", B: "User" };
-  }
-}
-
-const RTL_LANGUAGE_CODES = new Set(["ar", "fa", "he", "prs", "ps", "ur", "yi"]);
-
-function normalizeDocumentLanguage(language: string | null | undefined): string {
-  return getVisitorEffectiveLanguageKey(language);
-}
-
-function resolveDocumentDirection(language: string): "ltr" | "rtl" {
-  return RTL_LANGUAGE_CODES.has(normalizeDocumentLanguage(language).split("-")[0] ?? "") ? "rtl" : "ltr";
-}
-
 export function OperatorApp() {
-  const side = resolveSide();
+  const side = resolveSideFromLocation(window.location.search);
   const fallbackUiLanguage = "en";
   const onlySpeechApi: OnlySpeechRendererApi | null = window.onlySpeech ?? null;
   const appState = useOnlySpeechRuntime(side, onlySpeechApi);
@@ -490,7 +450,7 @@ export function OperatorApp() {
         localHistoryEntries={localHistoryEntries}
         localInteractionChoice={localInteractionChoice}
         localInteractionEnglishLabel={localInteractionEnglishLabel}
-        localInteractionFallbackLabel={languageLabel(localSide.selectedTargetLanguage)}
+        localInteractionFallbackLabel={getInteractionLanguageFallbackLabel(localSide.selectedTargetLanguage)}
         localConfiguredInteractionLabel={preloadedLocalConfiguredInteractionLabel}
         localSide={localSide}
         localStatusLabel={localStatusLabel}
@@ -505,18 +465,18 @@ export function OperatorApp() {
         onPointerUp={onPointerUp}
         onResetSession={() => setConfirmAction("reset")}
         pttButtonClassName={pttButtonClassName}
-        readingLanguageLabel={languageLabel(localSide.selectedTargetLanguage)}
+        readingLanguageLabel={getInteractionLanguageFallbackLabel(localSide.selectedTargetLanguage)}
         remoteHistoryEntries={remoteHistoryEntries}
         remoteTranslationSpeechControl={translationSpeechControl}
         remoteInteractionChoice={remoteInteractionChoice}
         remoteInteractionEnglishLabel={remoteInteractionEnglishLabel}
-        remoteInteractionFallbackLabel={languageLabel(remoteSide.selectedTargetLanguage)}
+        remoteInteractionFallbackLabel={getInteractionLanguageFallbackLabel(remoteSide.selectedTargetLanguage)}
         remoteConfiguredInteractionLabel={remoteConfiguredInteractionLabel}
         remoteUiFallback={remoteSide.usesEnglishUiFallback}
         shouldShowRemoteLanguageLine={shouldShowRemoteLanguageLine}
         side={side}
         sourceLanguageFooter={
-          <span>{labels.sourceLanguage}: {sourceLanguageLabel(localSide.detectedSourceLanguage ?? localSide.sourceLanguage)}</span>
+          <span>{labels.sourceLanguage}: {getSourceLanguageLabel(localSide.detectedSourceLanguage ?? localSide.sourceLanguage)}</span>
         }
         startPtt={startPtt}
         transcriptSpeechControl={transcriptSpeechControl}

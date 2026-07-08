@@ -292,11 +292,6 @@ ${getSetupWizardCardHeaderHtml({
             </div>
             <div id="save-close-wizard-disabled-reason" class="notice warn" aria-live="polite" hidden></div>
             <div id="save-feedback" class="notice info" aria-live="polite" hidden></div>
-${getSetupWizardDisclosureHtml({
-  summary: copy.envPreview,
-  detailsClass: "wizard-disclosure technical-disclosure",
-  bodyHtml: `<pre id="env-preview" class="output"></pre>`
-})}
           </div>
           <div class="card settings-card full-span" id="wizard-password-setup-card" hidden>
             <div class="card-header">
@@ -400,6 +395,11 @@ ${getSetupWizardDisclosureHtml({
                 <h3>${copy.advancedParameters}</h3>
                 <div id="env-form" class="form-grid"></div>
               </div>
+${getSetupWizardDisclosureHtml({
+  summary: copy.envPreview,
+  detailsClass: "wizard-disclosure technical-disclosure full-span",
+  bodyHtml: `<pre id="env-preview" class="output"></pre>`
+})}
             </div>
           </div>
         </details>

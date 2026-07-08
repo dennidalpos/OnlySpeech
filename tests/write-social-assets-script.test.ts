@@ -19,5 +19,6 @@ describeWindows("write-social-assets.ps1", () => {
     expect(result.stdout).toContain("[compile] npm run compile");
     expect(result.stdout).toContain("[social-assets] node");
     expect(result.stdout).toContain("scripts\\support\\docs\\capture-social-assets.mjs");
+    expect(result.stdout).toContain("social_assets");
   });
 });

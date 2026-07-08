@@ -22,6 +22,7 @@ export function getSetupWizardStationsShellHtml(uiLanguage: SetupWizardUiLanguag
       probeDetail: "Wait for the probe to finish before assigning new devices.",
       progressValue: "In progress",
       runtimeProfile: "Runtime profile",
+      readiness: "Station readiness",
       runtimeMode: "Runtime mode",
       demoSeconds: "Seconds between demo slides",
       microphoneProfile: "Microphone profile",
@@ -42,6 +43,7 @@ export function getSetupWizardStationsShellHtml(uiLanguage: SetupWizardUiLanguag
       probeDetail: "Attendi il completamento del probe prima di assegnare i nuovi dispositivi.",
       progressValue: "In corso",
       runtimeProfile: "Profilo runtime",
+      readiness: "Stato postazione",
       runtimeMode: "Modalita runtime",
       demoSeconds: "Secondi tra slide demo",
       microphoneProfile: "Profilo microfoni",
@@ -62,6 +64,7 @@ export function getSetupWizardStationsShellHtml(uiLanguage: SetupWizardUiLanguag
       probeDetail: "Espera a que termine la deteccion antes de asignar nuevos dispositivos.",
       progressValue: "En curso",
       runtimeProfile: "Perfil runtime",
+      readiness: "Estado del puesto",
       runtimeMode: "Modo runtime",
       demoSeconds: "Segundos entre diapositivas demo",
       microphoneProfile: "Perfil de microfonos",
@@ -82,6 +85,7 @@ export function getSetupWizardStationsShellHtml(uiLanguage: SetupWizardUiLanguag
       probeDetail: "Attendez la fin de la detection avant d'assigner de nouveaux peripheriques.",
       progressValue: "En cours",
       runtimeProfile: "Profil runtime",
+      readiness: "Etat des postes",
       runtimeMode: "Mode runtime",
       demoSeconds: "Secondes entre les slides demo",
       microphoneProfile: "Profil microphones",
@@ -102,6 +106,7 @@ export function getSetupWizardStationsShellHtml(uiLanguage: SetupWizardUiLanguag
       probeDetail: "Warten Sie, bis die Erkennung abgeschlossen ist, bevor Sie neue Geraete zuweisen.",
       progressValue: "Laeuft",
       runtimeProfile: "Runtime-Profil",
+      readiness: "Stationsstatus",
       runtimeMode: "Runtime-Modus",
       demoSeconds: "Sekunden zwischen Demo-Folien",
       microphoneProfile: "Mikrofonprofil",
@@ -122,6 +127,7 @@ export function getSetupWizardStationsShellHtml(uiLanguage: SetupWizardUiLanguag
       probeDetail: "请等待探测完成后再分配新设备。",
       progressValue: "进行中",
       runtimeProfile: "runtime 配置",
+      readiness: "工作站状态",
       runtimeMode: "runtime 模式",
       demoSeconds: "演示幻灯片间隔秒数",
       microphoneProfile: "麦克风配置",
@@ -160,6 +166,13 @@ ${getSetupWizardSurfaceActionButtonHtml({
   extraAttributes: `aria-pressed="false" class="primary wizard-action stations-monitor-cta"`
 })}
         </div>
+        <article class="card settings-card station-readiness-card">
+${getSetupWizardCardHeaderHtml({
+  eyebrow: copy.readiness,
+  title: copy.readiness
+})}
+          <div id="stations-summary-grid" class="review-strip" aria-live="polite"></div>
+        </article>
         <div class="wizard-grid wizard-grid-2">
           <article class="card settings-card profile-choice-card">
 ${getSetupWizardCardHeaderHtml({

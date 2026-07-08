@@ -1,6 +1,6 @@
 import { spawn, spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -58,6 +58,11 @@ const STORYBOARD = [
   }
 ];
 
+const OUTPUT_FORMATS = [
+  { directory: "vertical", suffix: "vertical-9x16", formatLabel: "Stories 9:16", width: 1080, height: 1920 },
+  { directory: "feed", suffix: "feed-4x5", formatLabel: "Feed 4:5", width: 1080, height: 1350 }
+];
+
 function parseArgs(argv) {
   const options = { outputRoot: resolve(repoRoot, "social_assets") };
   for (let index = 0; index < argv.length; index += 1) {
@@ -109,6 +114,19 @@ async function fetchJson(port, path, body) {
 function terminateChild() {
   if (!child || child.exitCode !== null || child.killed) return;
   spawnSync("taskkill.exe", ["/PID", String(child.pid), "/T", "/F"], { stdio: "ignore" });
+}
+
+function getPngDimensions(filePath) {
+  const bytes = readFileSync(filePath);
+  const pngSignature = "89504e470d0a1a0a";
+  if (bytes.subarray(0, 8).toString("hex") !== pngSignature) {
+    throw new Error(`${filePath} is not a PNG file.`);
+  }
+
+  return {
+    width: bytes.readUInt32BE(16),
+    height: bytes.readUInt32BE(20)
+  };
 }
 
 function writeRuntimeEnv(runtimeRoot) {
@@ -212,11 +230,7 @@ async function captureStoryboard(sourceRoot) {
 
 function composeAssets(outputRoot, sourceRoot) {
   const manifestPath = join(sourceRoot, "manifest.json");
-  const formats = [
-    { directory: "vertical", suffix: "vertical-9x16", formatLabel: "Stories 9:16", width: 1080, height: 1920 },
-    { directory: "feed", suffix: "feed-4x5", formatLabel: "Feed 4:5", width: 1080, height: 1350 }
-  ];
-  const assets = STORYBOARD.flatMap((step) => formats.map((format) => ({
+  const assets = STORYBOARD.flatMap((step) => OUTPUT_FORMATS.map((format) => ({
     ...format,
     sequence: step.sequence,
     title: step.title,
@@ -228,6 +242,65 @@ function composeAssets(outputRoot, sourceRoot) {
   const helperPath = join(repoRoot, "scripts", "support", "docs", "compose-social-assets.mjs");
   const result = spawnSync(electronBinary, [helperPath, manifestPath], { cwd: repoRoot, encoding: "utf8" });
   if (result.status !== 0) throw new Error([result.stdout, result.stderr].filter(Boolean).join("\n"));
+  return assets;
+}
+
+function validateComposedAssets(outputRoot, assets) {
+  const expectedCount = STORYBOARD.length * OUTPUT_FORMATS.length;
+  if (assets.length !== expectedCount) {
+    throw new Error(`Expected ${expectedCount} social assets in the manifest, found ${assets.length}.`);
+  }
+
+  const generatedManifest = {
+    generatedBy: "npm run docs:social-assets",
+    formats: OUTPUT_FORMATS.map(({ directory, suffix, formatLabel, width, height }) => ({
+      directory,
+      suffix,
+      formatLabel,
+      width,
+      height
+    })),
+    storyboard: STORYBOARD.map(({ sequence, slug, title, benefit, side, view }) => ({
+      sequence,
+      slug,
+      title,
+      benefit,
+      side,
+      view
+    })),
+    assets: assets.map(({ sequence, directory, suffix, width, height, outputPath }) => ({
+      sequence,
+      directory,
+      fileName: outputPath.split(/[\\/]/).at(-1),
+      suffix,
+      width,
+      height
+    }))
+  };
+  writeFileSync(join(outputRoot, "manifest.json"), `${JSON.stringify(generatedManifest, null, 2)}\n`, "utf8");
+
+  const failures = [];
+  for (const asset of assets) {
+    if (!existsSync(asset.outputPath)) {
+      failures.push(`missing ${asset.outputPath}`);
+      continue;
+    }
+
+    try {
+      const dimensions = getPngDimensions(asset.outputPath);
+      if (dimensions.width !== asset.width || dimensions.height !== asset.height) {
+        failures.push(
+          `${asset.outputPath} has ${dimensions.width}x${dimensions.height}, expected ${asset.width}x${asset.height}`
+        );
+      }
+    } catch (error) {
+      failures.push(error instanceof Error ? error.message : String(error));
+    }
+  }
+
+  if (failures.length > 0) {
+    throw new Error(`Social asset validation failed:\n${failures.join("\n")}`);
+  }
 }
 
 async function main() {
@@ -238,8 +311,9 @@ async function main() {
     await captureStoryboard(sourceRoot);
     terminateChild();
     child = null;
-    composeAssets(options.outputRoot, sourceRoot);
-    console.log(`Generated ${STORYBOARD.length * 2} social assets in ${options.outputRoot}`);
+    const assets = composeAssets(options.outputRoot, sourceRoot);
+    validateComposedAssets(options.outputRoot, assets);
+    console.log(`Generated and validated ${assets.length} social assets in ${options.outputRoot}`);
   } finally {
     terminateChild();
     for (const directory of tempDirectories.splice(0)) {
