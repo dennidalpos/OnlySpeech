@@ -17,8 +17,12 @@ for (const bundle of preloadBundles) {
   await build({
     configFile: false,
     logLevel: "warn",
+    define: {
+      "import.meta": "{}"
+    },
     build: {
       emptyOutDir: false,
+      modulePreload: false,
       minify: false,
       outDir: bundle.outputDirectory,
       rollupOptions: {

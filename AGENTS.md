@@ -6,14 +6,14 @@ OnlySpeech is a Windows-first Electron desktop translation kiosk for two-sided l
 
 Primary local environment: **Windows + PowerShell**.
 
-Use repository conventions when they are clear. Keep changes small, focused, verifiable, and limited to the requested task.
+Use repository conventions when they are clear. Treat the app as a fresh product by default: remove obsolete/legacy paths when they block clarity, but keep changes focused, verifiable, and limited to the requested task.
 
 ---
 
 ## 1. Priorities
 
 1. Preserve user work.
-2. Make the smallest correct repository change.
+2. Make the smallest correct repository change, unless the user explicitly asks for cleanup/removal of legacy code.
 3. Maintain and respect the cryptographic licensing system.
 4. Keep the repository clean and navigable.
 5. Follow existing repository conventions.
@@ -21,7 +21,7 @@ Use repository conventions when they are clear. Keep changes small, focused, ver
 7. Keep `PROJECT_STATUS.json` as a todo-only file when present or requested.
 8. Report changes, checks, and remaining uncertainty.
 
-Do not change unrelated files. Do not introduce dependencies, public API changes, config/deployment changes, broad refactors, migrations, or destructive operations unless the task clearly requires them.
+Do not change unrelated files. Do not introduce dependencies, public API changes, config/deployment changes, broad refactors, migrations, or destructive operations unless the task clearly requires them. Destructive cleanup may remove obsolete repo code or generated outputs when requested, but never use destructive Git operations unless explicitly requested.
 
 Do not claim a check passed unless it was actually run and passed.
 
@@ -29,11 +29,11 @@ Do not claim a check passed unless it was actually run and passed.
 
 ## 2. Fresh project policy
 
-When creating or initializing a new project, treat it as fresh/greenfield unless the user explicitly says it must integrate with legacy systems.
+Treat OnlySpeech as fresh/greenfield unless the user explicitly says it must integrate with legacy systems or preserve an installed production contract.
 
 Do not add legacy compatibility layers, migration scaffolding, deprecated patterns, transitional folder names, backward-compatibility shims, historical cleanup work, or assumptions about previous production users/data/APIs.
 
-Prefer current conventions, clean architecture, minimal structure, and only the files needed for the requested scope.
+Prefer current conventions, clean architecture, minimal structure, and only the files needed for the requested scope. When removing legacy, remove stale references, docs, scripts, tests, and generated assumptions in the same change.
 
 ---
 
@@ -143,6 +143,16 @@ When adding Windows-first local scripts, prefer PowerShell wrappers under `scrip
 Scripts must run from the repository root, validate required tools, fail with non-zero exit codes on errors, and avoid duplicating an existing script. Keep public scripts thin; put shared script logic in `scripts/support/` when needed.
 
 Update `scripts/README.md` when public scripts are added, removed, or renamed.
+
+Script analysis and cleanup expectations:
+
+- Prefer the public npm aliases in `package.json` for normal verification.
+- For a full script cycle after cleanup, start with `npm run clean`, then run syntax checks for all `scripts/**/*.ps1` and `scripts/**/*.mjs`.
+- When available, use `Invoke-ScriptAnalyzer -Severity Error` for PowerShell scripts. Treat warnings as review items unless they indicate a real runtime defect.
+- Use `npm run start -- -Smoke -SmokeTimeoutMs 8000` for public source smoke validation.
+- Do not run `docs:screenshots` and `docs:social-assets` in parallel because both compile into `dist/renderer` and Windows file locks can create false failures.
+- `release:tag-check` requires a release tag and may fail correctly on an untagged working tree.
+- `release:signing-check` can pass with optional-signing warnings when signing environment variables are absent.
 
 ---
 

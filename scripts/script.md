@@ -20,6 +20,7 @@ Ignored local outputs such as `.local/`, `dist/`, `artifacts/`, `node_modules/`,
 | `npm run bootstrap` | `scripts/bootstrap.ps1` | Validate Node.js/npm and run deterministic dependency restore when needed. | Windows PowerShell, Node.js 22+, npm 10+, `package-lock.json`. | Developer setup, `verify:repo`. |
 | `npm run dev` | `scripts/dev.ps1` | Start renderer, main compiler, and Electron watch workspace. | Installed npm dependencies. | Local development. |
 | `npm run start` | `scripts/start.ps1` | Build stale source outputs and launch Electron locally. | Installed dependencies, runtime `.env` or setup wizard path. | Local source runtime. |
+| `npm run start -- -Smoke -SmokeTimeoutMs 8000` | `scripts/start.ps1` | Build stale source outputs and verify Electron stays alive for the smoke window. | Installed dependencies. | Local source smoke validation. |
 | `npm run build` | `scripts/build.ps1` | Compile renderer and main process output. | Installed npm dependencies. | Local build, package, gate. |
 | `npm run gate` | `scripts/gate.ps1` | Public Windows verification wrapper around `verify-repo.ps1`. | Same prerequisites as `verify:repo`. | Local release-readiness checks. |
 | `npm run package` | `scripts/package.ps1` | Build public Windows installer, portable executable, and unpacked archive. | Build outputs, electron-builder, packaging assets. | Packaging. |
@@ -34,6 +35,7 @@ Ignored local outputs such as `.local/`, `dist/`, `artifacts/`, `node_modules/`,
 | `npm run bootstrap` | Dependency restore. |
 | `npm run dev` | Watch-mode source development. |
 | `npm run start` | Direct source launch. |
+| `npm run start -- -Smoke -SmokeTimeoutMs 8000` | Direct source smoke launch. |
 | `npm run start -- -SetupWizard` | Direct source setup wizard launch. |
 | `npm run build` | Renderer and main compile. |
 | `npm run lint` | ESLint checks for source, tests, and JavaScript tooling. |
@@ -56,7 +58,7 @@ Ignored local outputs such as `.local/`, `dist/`, `artifacts/`, `node_modules/`,
 | `npm run release:tag-check` | Release tag validation. |
 | `npm run release:signing-check` | Windows signing input validation. |
 
-There is no checked-in lint or format command. The current checked quality surface is TypeScript build, Vitest, Electron e2e, packaging audit, PowerShell script tests, and the Windows gate.
+There is no checked-in format command. The current checked quality surface is ESLint, TypeScript build, Vitest, Electron e2e, packaging audit, PowerShell script tests, and the Windows gate.
 
 ## Support Scripts
 

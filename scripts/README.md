@@ -11,6 +11,7 @@ OnlySpeech scripts are Windows + PowerShell entrypoints. Run commands from the r
 | setup | `.\scripts\install-skills.ps1` | Configure AI agent skills for this workspace (creates `.agents/skills.json`). |
 | dev | `npm run dev` | Start renderer, main compiler, and Electron watchers. |
 | start | `npm run start` | Build stale source outputs and launch Electron locally. |
+| start | `npm run start -- -Smoke -SmokeTimeoutMs 8000` | Build stale outputs and verify the source Electron runtime stays alive for the smoke window. |
 | start | `npm run start -- -SetupWizard` | Open the integrated setup wizard from source. |
 | start | `npm run start -- -SetupWizard -WizardSection provider` | Open a supported wizard section: `stations`, `provider`, `languages`, `diagnostics`, or `license`. |
 | test | `npm test` | Run Vitest excluding compiled Electron e2e. |

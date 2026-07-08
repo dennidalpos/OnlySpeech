@@ -8,6 +8,7 @@ const describeWindows = process.platform === "win32" ? describe : describe.skip;
 const repoRoot = process.cwd();
 const helperPath = join(repoRoot, "scripts", "support", "lib", "plans.ps1");
 const runtimeLogsScriptPath = join(repoRoot, "scripts", "support", "runtime", "manage-runtime-logs.ps1");
+const publicStartScriptPath = join(repoRoot, "scripts", "start.ps1");
 const windowsStartScriptPath = join(repoRoot, "scripts", "support", "runtime", "run-workstation.ps1");
 const commissioningArtifactScriptPath = join(repoRoot, "scripts", "support", "commissioning", "write-commissioning-artifact.ps1");
 const workstationRuntimeDoctorScriptPath = join(repoRoot, "scripts", "support", "runtime", "workstation-runtime-doctor.ps1");
@@ -104,6 +105,24 @@ describeWindows("windows script helpers", () => {
 
     expect(output).toContain("[start] powershell.exe -ExecutionPolicy Bypass -File");
     expect(output).toContain(join(repoRoot, "scripts", "support", "runtime", "start-local.ps1"));
+  });
+
+  it("forwards smoke options through the public source launcher", () => {
+    const output = runPowerShell([
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      publicStartScriptPath,
+      "-Smoke",
+      "-SmokeTimeoutMs",
+      "4000",
+      "-DryRun"
+    ]);
+
+    expect(output).toContain("[start] powershell.exe");
+    expect(output).toContain(join(repoRoot, "scripts", "support", "runtime", "start-local.ps1"));
+    expect(output).toContain("-Smoke -SmokeTimeoutMs 4000");
   });
 
   it("launches the packaged executable without an empty ArgumentList when no wizard arguments are requested", () => {

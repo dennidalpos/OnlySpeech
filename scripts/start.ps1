@@ -1,4 +1,6 @@
 param(
+  [switch]$Smoke,
+  [int]$SmokeTimeoutMs = 8000,
   [switch]$SetupWizard,
   [ValidateSet("stations", "provider", "languages", "diagnostics", "license")]
   [string]$WizardSection,
@@ -17,6 +19,12 @@ $arguments = @(
   "-File",
   $launcherScript
 )
+
+if ($Smoke) {
+  $arguments += "-Smoke"
+  $arguments += "-SmokeTimeoutMs"
+  $arguments += $SmokeTimeoutMs
+}
 
 if ($SetupWizard) {
   $arguments += "-SetupWizard"
