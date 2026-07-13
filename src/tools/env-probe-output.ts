@@ -1,8 +1,8 @@
 import type { AudioDeviceTransport } from "../services/audio/audio-device-classification.js";
 import { enrichMicrophoneDevices } from "../services/audio/microphone-device-metadata.js";
 import { getPersistedMicrophoneId } from "../services/audio/persisted-microphone-id.js";
+import { createRuntimeEnvDefaults } from "../shared/runtime-env-normalization.js";
 import {
-  createRuntimeEnvDefaults,
   RUNTIME_ENV_KEY_ORDER,
   type RuntimeEnvKey
 } from "../shared/runtime-env-contract.js";

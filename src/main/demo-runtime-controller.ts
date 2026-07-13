@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import type { Side } from "../shared/types.js";
 import { JsonlLogger } from "../services/logging/jsonl-logger.js";
 import { SessionStore } from "../services/session/session-store.js";
@@ -22,50 +24,8 @@ interface DemoRuntimeControllerOptions {
   slideIntervalSeconds: number;
 }
 
-const DEMO_CYCLES: DemoCycle[] = [
-  {
-    sideLanguages: {
-      A: "en",
-      B: "zh-Hans"
-    },
-    visitorConversationHistoryEnabled: false,
-    exchanges: [
-      {
-        side: "A",
-        transcript: "Good morning, Ms. Chen. I found reservation OS-24817: three nights, from 21 to 24 June.",
-        translation: "早上好，陈女士。我找到了预订 OS-24817：6月21日至24日，共三晚。",
-        detectedLanguage: "en-US"
-      },
-      {
-        side: "B",
-        transcript: "谢谢。请确认包含早餐，退房时间是上午十一点。",
-        translation: "Thank you. Please confirm breakfast is included and checkout is at 11:00 a.m.",
-        detectedLanguage: "zh-CN"
-      }
-    ]
-  },
-  {
-    sideLanguages: {
-      A: "en",
-      B: "yue"
-    },
-    visitorConversationHistoryEnabled: true,
-    exchanges: [
-      {
-        side: "A",
-        transcript: "Welcome back. We can continue from your previous request.",
-        translation: "歡迎返嚟。我哋可以由你之前嘅請求繼續。",
-        detectedLanguage: "en-US"
-      },
-      {
-        side: "B",
-        transcript: "好呀，我只需要確認返探訪時間。",
-        translation: "Perfect. I only need to confirm the appointment time.",
-        detectedLanguage: "yue-HK"
-      }
-    ]
-  }
-];
+const demoCyclesPath = fileURLToPath(new URL("./demo-cycles.json", import.meta.url));
+const DEMO_CYCLES: DemoCycle[] = JSON.parse(readFileSync(demoCyclesPath, "utf8"));
 
 const DEMO_LOOP_TIMINGS = {
   resetPauseMs: 650,

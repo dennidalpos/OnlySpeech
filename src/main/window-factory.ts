@@ -1,7 +1,6 @@
 import { BrowserWindow, screen } from "electron";
 import { fileURLToPath } from "node:url";
 import type { Bounds, DisplayAssignment, Side } from "../shared/types.js";
-import { installWindowNavigationGuards } from "./window-security.js";
 
 interface CreateOperatorWindowOptions {
   side: Side;
@@ -120,4 +119,12 @@ export function syncWindowToDisplay(window: BrowserWindow, assignment: DisplayAs
   if (!window.isVisible()) {
     window.show();
   }
+}
+
+/** Blocks renderer-initiated top-level navigation and all popup creation. */
+export function installWindowNavigationGuards(window: BrowserWindow): void {
+  window.webContents.on("will-navigate", (event) => {
+    event.preventDefault();
+  });
+  window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
 }

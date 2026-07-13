@@ -20,7 +20,7 @@
     "dev:electron": "wait-on tcp:5173 file:dist/main/bootstrap.js && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5173 electron .",
     "build": "powershell -ExecutionPolicy Bypass -File ./scripts/build.ps1",
     "build:renderer": "vite build",
-    "build:main": "tsc -p tsconfig.main.json && npm run build:preloads",
+    "build:main": "tsc -p tsconfig.main.json && node -e \"import('node:fs').then(fs => fs.copyFileSync('src/main/demo-cycles.json', 'dist/main/demo-cycles.json'))\" && npm run build:preloads",
     "build:preloads": "node ./scripts/support/build-preloads.mjs",
     "gate": "powershell -ExecutionPolicy Bypass -File ./scripts/gate.ps1",
     "package": "powershell -ExecutionPolicy Bypass -File ./scripts/package.ps1",
@@ -47,7 +47,7 @@
     "test:packaged-lifecycle": "powershell -ExecutionPolicy Bypass -File ./scripts/support/commissioning/test-packaged-install-lifecycle.ps1",
     "test:packaged-automation": "powershell -ExecutionPolicy Bypass -File ./scripts/support/commissioning/test-packaged-runtime-automation.ps1",
     "test": "vitest run --exclude tests/electron-e2e.test.ts",
-    "test:coverage": "vitest run --coverage tests/activation-flow.test.ts tests/activation-state.test.ts tests/activation-storage.test.ts tests/activation-validator.test.ts tests/ipc.test.ts tests/config.test.ts tests/runtime-env-contract.test.ts tests/translation-provider-service.test.ts tests/live-speech-client.test.ts tests/runtime-secrets.test.ts tests/setup-wizard-access.test.ts"
+    "test:coverage": "vitest run --coverage tests/main/activation-flow.test.ts tests/main/activation-state.test.ts tests/main/activation-storage.test.ts tests/main/activation-validator.test.ts tests/main/ipc.test.ts tests/shared/config.test.ts tests/shared/runtime-env-contract.test.ts tests/services/translation-provider-service.test.ts tests/services/live-speech-client.test.ts tests/main/runtime-secrets.test.ts tests/main/setup-wizard-access.test.ts"
   },
   "keywords": [
     "electron",

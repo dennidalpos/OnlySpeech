@@ -9,6 +9,9 @@ These skills contain critical context, conventions, architecture guidelines, and
 - **[onlyspeech-dev](onlyspeech-dev/SKILL.md)**: Repository structure, common development commands, test scripts, and gate checks.
 - **[onlyspeech-licensing](onlyspeech-licensing/SKILL.md)**: Security guidelines, cryptographic validation rules (Ed25519), and licensing system constraints.
 - **[onlyspeech-stack](onlyspeech-stack/SKILL.md)**: Deep technical guidelines for Electron 42, React 19, TS 6, Vite 8, Vitest 4, Azure Speech SDK, OpenAI, and Ollama integration.
+- **[onlyspeech-commissioning](onlyspeech-commissioning/SKILL.md)**: Workstation licensing activation checklists, autostart configuration, and commissioning close-out evidence.
+- **[onlyspeech-release](onlyspeech-release/SKILL.md)**: Packaging pipeline, signature validation, packaging audits, SBOM/compliance generation, and customer bundle assembly.
+- **[onlyspeech-activation-generator](onlyspeech-activation-generator/SKILL.md)**: Local offline Ed25519 activation generator application and command-line usage.
 
 ---
 

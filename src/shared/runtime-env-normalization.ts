@@ -6,57 +6,13 @@ import {
   type AppMode,
   type MicrophonePttMode
 } from "./runtime-profiles.js";
-import type { RuntimeEnvKey } from "./runtime-env-contract.js";
+import { RUNTIME_ENV_FIELDS, type RuntimeEnvKey } from "./runtime-env-contract.js";
 
-const RUNTIME_ENV_DEFAULTS = Object.freeze({
-  APP_MODE: DEFAULT_APP_MODE,
-  MICROPHONE_PTT_MODE: DEFAULT_MICROPHONE_PTT_MODE,
-  SETUP_UI_LANGUAGE: "en",
-  SELECTOR_UI_LANGUAGE_A: "",
-  SELECTOR_UI_LANGUAGE_B: "",
-  DEMO_SLIDE_INTERVAL_SECONDS: "8",
-  TEXT_TO_SPEECH_ENABLED: "true",
-  RUNTIME_DISCLOSURE_MODE: "standard",
-  RUNTIME_DISCLOSURE_CUSTOM_TEXT: "",
-  REQUIRED_MONITORS: "2",
-  REQUIRED_MICROPHONES: "2",
-  DISPLAY_A_ID: "",
-  DISPLAY_B_ID: "",
-  MIC_A_ID: "",
-  MIC_B_ID: "",
-  IDLE_CLEAR_SECONDS: "60",
-  IDLE_HARD_RESET_SECONDS: "180",
-  PTT_RELEASE_GRACE_MS: "400",
-  PROVIDER_REQUEST_TIMEOUT_MS: "45000",
-  CHATGPT_SILENCE_RMS_THRESHOLD: "0.02"
-  ,
-  VISITOR_CONVERSATION_HISTORY_ENABLED: "false",
-  AUDIO_ECHO_CANCELLATION: "true",
-  AUDIO_NOISE_SUPPRESSION: "true",
-  AUDIO_CAPTURE_SETTINGS_DIAGNOSTICS_ENABLED: "false",
-  AZURE_SPEECH_KEY: "",
-  AZURE_SPEECH_REGION: "",
-  AZURE_TRANSLATOR_KEY: "",
-  AZURE_TRANSLATOR_REGION: "",
-  AZURE_TRANSLATOR_ENDPOINT: "",
-  TRANSLATION_PROVIDER: "chatgpt",
-  PROVIDER_LANGUAGE_CONTRACT_MODE: "strict",
-  CHATGPT_API_KEY: "",
-  CHATGPT_MODEL: "gpt-4o-mini",
-  CHATGPT_TRANSCRIBE_MODEL: "whisper-1",
-  CHATGPT_STT_LANGUAGE_PROMPT_ENABLED: "true",
-  CHATGPT_TRANSLATION_DETECTED_LANGUAGE_MODE: "diagnostic",
-  OPENAI_TTS_LANGUAGE_INSTRUCTIONS_ENABLED: "true",
-  AZURE_TTS_LANG_ELEMENT_ENABLED: "true",
-  OLLAMA_BASE_URL: "http://localhost:11434/api",
-  OLLAMA_MODEL: "gemma3",
-  OLLAMA_REQUEST_TIMEOUT_MS: "45000",
-  OLLAMA_STREAMING_ENABLED: "false",
-  OLLAMA_API_KEY: "",
-  DEFAULT_TARGET_LANG_A: "en",
-  DEFAULT_TARGET_LANG_B: "en",
-  LOG_LEVEL: "info"
-} satisfies Record<RuntimeEnvKey, string>);
+const RUNTIME_ENV_DEFAULTS = Object.freeze(
+  Object.fromEntries(
+    RUNTIME_ENV_FIELDS.map((field) => [field.key, field.defaultValue])
+  )
+) as Record<RuntimeEnvKey, string>;
 
 interface NumericRule {
   fallback: string;
@@ -205,4 +161,10 @@ export function normalizeRuntimeEnvValues(
   );
 
   return normalized;
+}
+
+export function createRuntimeEnvDefaults(
+  baseEnv: Partial<Record<RuntimeEnvKey, string>> = {}
+): Record<RuntimeEnvKey, string> {
+  return normalizeRuntimeEnvValues(baseEnv);
 }

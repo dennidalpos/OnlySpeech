@@ -1,5 +1,4 @@
 import { DEFAULT_APP_MODE, DEFAULT_MICROPHONE_PTT_MODE } from "./runtime-profiles.js";
-import { normalizeRuntimeEnvValues } from "./runtime-env-normalization.js";
 
 interface RuntimeEnvFieldDefinition {
   key: string;
@@ -105,12 +104,6 @@ const ENV_EXAMPLE_INLINE_COMMENTS: Readonly<Partial<Record<RuntimeEnvKey, readon
     "# Enable only when the selected Ollama workflow is ready to consume NDJSON streaming responses."
   ]
 });
-
-export function createRuntimeEnvDefaults(
-  baseEnv: Partial<Record<RuntimeEnvKey, string>> = {}
-): Record<RuntimeEnvKey, string> {
-  return normalizeRuntimeEnvValues(baseEnv);
-}
 
 export function renderDotEnvExample(): string {
   const lines: string[] = [...ENV_EXAMPLE_HEADER_COMMENTS];

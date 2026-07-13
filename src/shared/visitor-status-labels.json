@@ -1,0 +1,586 @@
+{
+  "af": {
+    "booting": "Begin",
+    "language-selection": "Taalkeuse",
+    "ready": "Gereed",
+    "listening": "Luister",
+    "translating": "Vertaal",
+    "error": "Fout"
+  },
+  "am": {
+    "booting": "በመጀመር ላይ",
+    "language-selection": "የቋንቋ ምርጫ",
+    "ready": "ዝግጁ",
+    "listening": "በማዳመጥ ላይ",
+    "translating": "በመተርጎም ላይ",
+    "error": "ስህተት"
+  },
+  "ar": {
+    "booting": "بدء",
+    "language-selection": "اختيار اللغة",
+    "ready": "جاهز",
+    "listening": "استماع",
+    "translating": "ترجمة",
+    "error": "خطأ"
+  },
+  "az": {
+    "booting": "Başlayır",
+    "language-selection": "Dil seçimi",
+    "ready": "Hazırdır",
+    "listening": "Dinləyir",
+    "translating": "Tərcümə edir",
+    "error": "Xəta"
+  },
+  "be": {
+    "booting": "Запуск",
+    "language-selection": "Выбар мовы",
+    "ready": "Гатова",
+    "listening": "Слухае",
+    "translating": "Перакладае",
+    "error": "Памылка"
+  },
+  "bg": {
+    "booting": "Стартиране",
+    "language-selection": "Избор на език",
+    "ready": "Готово",
+    "listening": "Слуша",
+    "translating": "Превежда",
+    "error": "Грешка"
+  },
+  "bn": {
+    "booting": "শুরু হচ্ছে",
+    "language-selection": "ভাষা নির্বাচন",
+    "ready": "প্রস্তুত",
+    "listening": "শুনছে",
+    "translating": "অনুবাদ করছে",
+    "error": "ত্রুটি"
+  },
+  "bs": {
+    "booting": "Pokretanje",
+    "language-selection": "Izbor jezika",
+    "ready": "Spremno",
+    "listening": "Sluša",
+    "translating": "Prevodi",
+    "error": "Greška"
+  },
+  "ca": {
+    "booting": "Iniciant",
+    "language-selection": "Selecció d'idioma",
+    "ready": "A punt",
+    "listening": "Escoltant",
+    "translating": "Traduïnt",
+    "error": "Error"
+  },
+  "cs": {
+    "booting": "Spouštění",
+    "language-selection": "Výběr jazyka",
+    "ready": "Připraveno",
+    "listening": "Naslouchá",
+    "translating": "Překládá",
+    "error": "Chyba"
+  },
+  "cy": {
+    "booting": "Yn cychwyn",
+    "language-selection": "Dewis iaith",
+    "ready": "Barod",
+    "listening": "Yn gwrando",
+    "translating": "Yn cyfieithu",
+    "error": "Gwall"
+  },
+  "da": {
+    "booting": "Starter",
+    "language-selection": "Sprogvalg",
+    "ready": "Klar",
+    "listening": "Lytter",
+    "translating": "Oversætter",
+    "error": "Fejl"
+  },
+  "de": {
+    "booting": "Startet",
+    "language-selection": "Sprachauswahl",
+    "ready": "Bereit",
+    "listening": "Hoert zu",
+    "translating": "Uebersetzt",
+    "error": "Fehler"
+  },
+  "el": {
+    "booting": "Εκκίνηση",
+    "language-selection": "Επιλογή γλώσσας",
+    "ready": "Έτοιμο",
+    "listening": "Ακρόαση",
+    "translating": "Μετάφραση",
+    "error": "Σφάλμα"
+  },
+  "en": {
+    "booting": "Starting",
+    "language-selection": "Language selection",
+    "ready": "Ready",
+    "listening": "Listening",
+    "translating": "Translating",
+    "error": "Error"
+  },
+  "es": {
+    "booting": "Iniciando",
+    "language-selection": "Seleccion de idioma",
+    "ready": "Listo",
+    "listening": "Escuchando",
+    "translating": "Traduciendo",
+    "error": "Error"
+  },
+  "et": {
+    "booting": "Käivitub",
+    "language-selection": "Keele valik",
+    "ready": "Valmis",
+    "listening": "Kuulab",
+    "translating": "Tõlgib",
+    "error": "Viga"
+  },
+  "eu": {
+    "booting": "Abiatzen",
+    "language-selection": "Hizkuntza hautapena",
+    "ready": "Prest",
+    "listening": "Entzuten",
+    "translating": "Itzultzen",
+    "error": "Errorea"
+  },
+  "fa": {
+    "booting": "در حال شروع",
+    "language-selection": "انتخاب زبان",
+    "ready": "آماده",
+    "listening": "در حال شنیدن",
+    "translating": "در حال ترجمه",
+    "error": "خطا"
+  },
+  "fi": {
+    "booting": "Käynnistyy",
+    "language-selection": "Kielen valinta",
+    "ready": "Valmis",
+    "listening": "Kuuntelee",
+    "translating": "Kääntää",
+    "error": "Virhe"
+  },
+  "fil": {
+    "booting": "Nagsisimula",
+    "language-selection": "Pagpili ng wika",
+    "ready": "Handa na",
+    "listening": "Nakikinig",
+    "translating": "Nagsasalin",
+    "error": "Error"
+  },
+  "fr": {
+    "booting": "Demarrage",
+    "language-selection": "Selection langue",
+    "ready": "Pret",
+    "listening": "En ecoute",
+    "translating": "Traduction",
+    "error": "Erreur"
+  },
+  "ga": {
+    "booting": "Ag tosú",
+    "language-selection": "Roghnú teanga",
+    "ready": "Réidh",
+    "listening": "Ag éisteacht",
+    "translating": "Ag aistriú",
+    "error": "Earráid"
+  },
+  "gl": {
+    "booting": "Iniciando",
+    "language-selection": "Selección de idioma",
+    "ready": "Listo",
+    "listening": "Escoitando",
+    "translating": "Traducindo",
+    "error": "Erro"
+  },
+  "he": {
+    "booting": "מתחיל",
+    "language-selection": "בחירת שפה",
+    "ready": "מוכן",
+    "listening": "מקשיב",
+    "translating": "מתרגם",
+    "error": "שגיאה"
+  },
+  "hi": {
+    "booting": "शुरू हो रहा है",
+    "language-selection": "भाषा चयन",
+    "ready": "तैयार",
+    "listening": "सुन रहा है",
+    "translating": "अनुवाद कर रहा है",
+    "error": "त्रुटि"
+  },
+  "hr": {
+    "booting": "Pokretanje",
+    "language-selection": "Odabir jezika",
+    "ready": "Spremno",
+    "listening": "Sluša",
+    "translating": "Prevodi",
+    "error": "Greška"
+  },
+  "hu": {
+    "booting": "Indul",
+    "language-selection": "Nyelvválasztás",
+    "ready": "Kész",
+    "listening": "Hallgat",
+    "translating": "Fordít",
+    "error": "Hiba"
+  },
+  "hy": {
+    "booting": "Մեկնարկում է",
+    "language-selection": "Լեզվի ընտրություն",
+    "ready": "Պատրաստ է",
+    "listening": "Լսում է",
+    "translating": "Թարգմանում է",
+    "error": "Սխալ"
+  },
+  "id": {
+    "booting": "Memulai",
+    "language-selection": "Pemilihan bahasa",
+    "ready": "Siap",
+    "listening": "Mendengarkan",
+    "translating": "Menerjemahkan",
+    "error": "Kesalahan"
+  },
+  "is": {
+    "booting": "Ræsir",
+    "language-selection": "Val á tungumáli",
+    "ready": "Tilbúið",
+    "listening": "Hlustar",
+    "translating": "Þýðir",
+    "error": "Villa"
+  },
+  "it": {
+    "booting": "Avvio",
+    "language-selection": "Selezione lingua",
+    "ready": "Pronto",
+    "listening": "Ascolto",
+    "translating": "Traduco",
+    "error": "Errore"
+  },
+  "ja": {
+    "booting": "起動中",
+    "language-selection": "言語選択",
+    "ready": "準備完了",
+    "listening": "聞き取り中",
+    "translating": "翻訳中",
+    "error": "エラー"
+  },
+  "ka": {
+    "booting": "იწყება",
+    "language-selection": "ენის არჩევა",
+    "ready": "მზადაა",
+    "listening": "უსმენს",
+    "translating": "თარგმნის",
+    "error": "შეცდომა"
+  },
+  "kk": {
+    "booting": "Іске қосылуда",
+    "language-selection": "Тілді таңдау",
+    "ready": "Дайын",
+    "listening": "Тыңдап тұр",
+    "translating": "Аударып тұр",
+    "error": "Қате"
+  },
+  "kn": {
+    "booting": "ಪ್ರಾರಂಭವಾಗುತ್ತಿದೆ",
+    "language-selection": "ಭಾಷೆ ಆಯ್ಕೆ",
+    "ready": "ಸಿದ್ಧ",
+    "listening": "ಕೇಳುತ್ತಿದೆ",
+    "translating": "ಅನುವಾದಿಸುತ್ತಿದೆ",
+    "error": "ದೋಷ"
+  },
+  "ko": {
+    "booting": "시작 중",
+    "language-selection": "언어 선택",
+    "ready": "준비됨",
+    "listening": "듣는 중",
+    "translating": "번역 중",
+    "error": "오류"
+  },
+  "lt": {
+    "booting": "Paleidžiama",
+    "language-selection": "Kalbos pasirinkimas",
+    "ready": "Paruošta",
+    "listening": "Klausosi",
+    "translating": "Verčia",
+    "error": "Klaida"
+  },
+  "lv": {
+    "booting": "Palaiž",
+    "language-selection": "Valodas izvēle",
+    "ready": "Gatavs",
+    "listening": "Klausās",
+    "translating": "Tulko",
+    "error": "Kļūda"
+  },
+  "mi": {
+    "booting": "E tīmata ana",
+    "language-selection": "Kōwhiri reo",
+    "ready": "Kua rite",
+    "listening": "E whakarongo ana",
+    "translating": "E whakamāori ana",
+    "error": "Hapa"
+  },
+  "mk": {
+    "booting": "Се стартува",
+    "language-selection": "Избор на јазик",
+    "ready": "Подготвено",
+    "listening": "Слуша",
+    "translating": "Преведува",
+    "error": "Грешка"
+  },
+  "mn": {
+    "booting": "Эхэлж байна",
+    "language-selection": "Хэл сонголт",
+    "ready": "Бэлэн",
+    "listening": "Сонсож байна",
+    "translating": "Орчуулж байна",
+    "error": "Алдаа"
+  },
+  "mr": {
+    "booting": "सुरू होत आहे",
+    "language-selection": "भाषा निवड",
+    "ready": "तयार",
+    "listening": "ऐकत आहे",
+    "translating": "भाषांतर करत आहे",
+    "error": "त्रुटी"
+  },
+  "ms": {
+    "booting": "Memulakan",
+    "language-selection": "Pilihan bahasa",
+    "ready": "Sedia",
+    "listening": "Mendengar",
+    "translating": "Menterjemah",
+    "error": "Ralat"
+  },
+  "mt": {
+    "booting": "Qed jibda",
+    "language-selection": "Għażla tal-lingwa",
+    "ready": "Lest",
+    "listening": "Qed jisma'",
+    "translating": "Qed jittraduċi",
+    "error": "Żball"
+  },
+  "nb": {
+    "booting": "Starter",
+    "language-selection": "Språkvalg",
+    "ready": "Klar",
+    "listening": "Lytter",
+    "translating": "Oversetter",
+    "error": "Feil"
+  },
+  "ne": {
+    "booting": "सुरु हुँदैछ",
+    "language-selection": "भाषा चयन",
+    "ready": "तयार",
+    "listening": "सुनिरहेको छ",
+    "translating": "अनुवाद गर्दैछ",
+    "error": "त्रुटि"
+  },
+  "nl": {
+    "booting": "Starten",
+    "language-selection": "Taalkeuze",
+    "ready": "Gereed",
+    "listening": "Luistert",
+    "translating": "Vertaalt",
+    "error": "Fout"
+  },
+  "pl": {
+    "booting": "Uruchamianie",
+    "language-selection": "Wybor jezyka",
+    "ready": "Gotowe",
+    "listening": "Nasluch",
+    "translating": "Tlumaczenie",
+    "error": "Blad"
+  },
+  "ps": {
+    "booting": "پيلېږي",
+    "language-selection": "د ژبې ټاکنه",
+    "ready": "چمتو",
+    "listening": "اوري",
+    "translating": "ژباړي",
+    "error": "تېروتنه"
+  },
+  "pt": {
+    "booting": "Inicializando",
+    "language-selection": "Selecao de idioma",
+    "ready": "Pronto",
+    "listening": "Ouvindo",
+    "translating": "Traduzindo",
+    "error": "Erro"
+  },
+  "ro": {
+    "booting": "Pornire",
+    "language-selection": "Selectie limba",
+    "ready": "Gata",
+    "listening": "Ascultare",
+    "translating": "Traducere",
+    "error": "Eroare"
+  },
+  "ru": {
+    "booting": "Zapusk",
+    "language-selection": "Vybor yazyka",
+    "ready": "Gotov",
+    "listening": "Slushaet",
+    "translating": "Perevodit",
+    "error": "Oshibka"
+  },
+  "si": {
+    "booting": "ආරම්භ වෙමින්",
+    "language-selection": "භාෂා තේරීම",
+    "ready": "සූදානම්",
+    "listening": "සවන් දෙයි",
+    "translating": "පරිවර්තනය කරයි",
+    "error": "දෝෂය"
+  },
+  "sk": {
+    "booting": "Spúšťa sa",
+    "language-selection": "Výber jazyka",
+    "ready": "Pripravené",
+    "listening": "Počúva",
+    "translating": "Prekladá",
+    "error": "Chyba"
+  },
+  "sl": {
+    "booting": "Zagon",
+    "language-selection": "Izbira jezika",
+    "ready": "Pripravljeno",
+    "listening": "Posluša",
+    "translating": "Prevaja",
+    "error": "Napaka"
+  },
+  "so": {
+    "booting": "Bilaabmaya",
+    "language-selection": "Doorashada luqadda",
+    "ready": "Diyaar",
+    "listening": "Dhageysanaya",
+    "translating": "Tarjumaya",
+    "error": "Khalad"
+  },
+  "sq": {
+    "booting": "Po niset",
+    "language-selection": "Zgjedhja e gjuhës",
+    "ready": "Gati",
+    "listening": "Po dëgjon",
+    "translating": "Po përkthen",
+    "error": "Gabim"
+  },
+  "sr-Cyrl": {
+    "booting": "Покретање",
+    "language-selection": "Избор језика",
+    "ready": "Спремно",
+    "listening": "Слуша",
+    "translating": "Преводи",
+    "error": "Грешка"
+  },
+  "sr-Latn": {
+    "booting": "Pokretanje",
+    "language-selection": "Izbor jezika",
+    "ready": "Spremno",
+    "listening": "Sluša",
+    "translating": "Prevodi",
+    "error": "Greška"
+  },
+  "sv": {
+    "booting": "Startar",
+    "language-selection": "Språkval",
+    "ready": "Klar",
+    "listening": "Lyssnar",
+    "translating": "Översätter",
+    "error": "Fel"
+  },
+  "sw": {
+    "booting": "Inaanza",
+    "language-selection": "Uchaguzi wa lugha",
+    "ready": "Tayari",
+    "listening": "Inasikiliza",
+    "translating": "Inatafsiri",
+    "error": "Hitilafu"
+  },
+  "ta": {
+    "booting": "தொடங்குகிறது",
+    "language-selection": "மொழி தேர்வு",
+    "ready": "தயார்",
+    "listening": "கேட்கிறது",
+    "translating": "மொழிபெயர்க்கிறது",
+    "error": "பிழை"
+  },
+  "te": {
+    "booting": "ప్రారంభమవుతోంది",
+    "language-selection": "భాష ఎంపిక",
+    "ready": "సిద్ధం",
+    "listening": "వింటోంది",
+    "translating": "అనువదిస్తోంది",
+    "error": "లోపం"
+  },
+  "th": {
+    "booting": "กําลังเริ่ม",
+    "language-selection": "เลือกภาษา",
+    "ready": "พร้อม",
+    "listening": "กําลังฟัง",
+    "translating": "กําลังแปล",
+    "error": "ข้อผิดพลาด"
+  },
+  "tr": {
+    "booting": "Basliyor",
+    "language-selection": "Dil secimi",
+    "ready": "Hazir",
+    "listening": "Dinliyor",
+    "translating": "Ceviriyor",
+    "error": "Hata"
+  },
+  "uk": {
+    "booting": "Zapusk",
+    "language-selection": "Vybir movy",
+    "ready": "Hotovo",
+    "listening": "Slukhaye",
+    "translating": "Perekladaye",
+    "error": "Pomylka"
+  },
+  "ur": {
+    "booting": "شروع ہو رہا ہے",
+    "language-selection": "زبان کا انتخاب",
+    "ready": "تیار",
+    "listening": "سن رہا ہے",
+    "translating": "ترجمہ کر رہا ہے",
+    "error": "خرابی"
+  },
+  "uz": {
+    "booting": "Ishga tushmoqda",
+    "language-selection": "Til tanlash",
+    "ready": "Tayyor",
+    "listening": "Tinglamoqda",
+    "translating": "Tarjima qilmoqda",
+    "error": "Xato"
+  },
+  "vi": {
+    "booting": "Dang khoi dong",
+    "language-selection": "Chon ngon ngu",
+    "ready": "San sang",
+    "listening": "Dang nghe",
+    "translating": "Dang dich",
+    "error": "Loi"
+  },
+  "yue": {
+    "booting": "啟動中",
+    "language-selection": "選擇語言",
+    "ready": "就緒",
+    "listening": "聆聽中",
+    "translating": "翻譯中",
+    "error": "錯誤"
+  },
+  "zh": {
+    "booting": "启动中",
+    "language-selection": "语言选择",
+    "ready": "就绪",
+    "listening": "聆听中",
+    "translating": "翻译中",
+    "error": "错误"
+  },
+  "zh-Hant": {
+    "booting": "啟動中",
+    "language-selection": "語言選擇",
+    "ready": "就緒",
+    "listening": "聆聽中",
+    "translating": "翻譯中",
+    "error": "錯誤"
+  }
+}

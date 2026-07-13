@@ -127,6 +127,9 @@ Keep each source file focused on one responsibility. Split files only when respo
 - `src/renderer`: React-based UI for operator and visitor surfaces. Do not use Node.js direct imports in the renderer; communicate with the main process exclusively via IPC preloads.
 - `src/shared`: Shared contracts, config schemas, language definitions, and licensing schemas.
 - `src/services`: Audio devices, speech translation services (Azure Speech, OpenAI Chat/TTS, Ollama).
+- `src/tools`: Setup-wizard HTML/preload fragments and helper output definitions.
+- `.local/activation-generator`: Standalone local Electron application & CLI for cryptographic trial and license token generation.
+- `tests`: Structured unit, integration, and E2E verification suites split into responsibility folders (`main/`, `renderer/`, `scripts/`, `services/`, `shared/`) with `electron-e2e.test.ts` at the root.
 
 Avoid vague folders like `misc`, `stuff`, `old`, `new`, `final`, `temp2`, `backup`; avoid vague files like `utils.*`, `helpers.*`, `common.*`, `manager.*`, or unqualified `service.*` unless already established by the repository.
 
@@ -218,3 +221,24 @@ For implementation tasks, include:
 For review-only tasks, include findings by severity, affected files/areas, suggested fixes, assumptions, and review limits.
 
 Be factual and concise. Do not claim production readiness unless relevant checks passed or limitations are clearly stated.
+
+---
+
+## 14. Workspace Custom Skills
+
+Workspace-specific AI agent skills are stored under the version-controlled `skills/` directory.
+
+### Available Skills:
+- `onlyspeech-dev`: Development commands, workflows, test runs, and quality checks.
+- `onlyspeech-licensing`: Ed25519 cryptographic token validation rules, trials, and clock rollback checking.
+- `onlyspeech-stack`: Electron 42, React 19, TS 6 module resolution, Vite 8/LightningCSS, speech providers.
+- `onlyspeech-commissioning`: Target-station validation checklists, autostart registry configuration, and commissioning close-out reports.
+- `onlyspeech-release`: Electron Builder packaging configuration, signing checks, package auditing, SBOM, and customer bundle assembly.
+- `onlyspeech-activation-generator`: Local offline Ed25519 activation generator UI & CLI usage.
+
+### Installation:
+To configure custom workspace skills on any local development PC, execute:
+```powershell
+.\scripts\install-skills.ps1
+```
+This automatically updates `.agents/skills.json` to link the version-controlled `skills/` folder.

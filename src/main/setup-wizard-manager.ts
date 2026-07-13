@@ -52,7 +52,7 @@ import {
   persistRuntimeSecrets,
   type RuntimeSecretStorageAdapter
 } from "./runtime-secrets.js";
-import { clampBoundsToVisibleArea } from "./window-factory.js";
+import { clampBoundsToVisibleArea, installWindowNavigationGuards } from "./window-factory.js";
 import { getAzureTextToSpeechCatalogSnapshotFromEnvironment } from "./azure-text-to-speech-catalog.js";
 import {
   clickBrowserWindowSelector,
@@ -70,7 +70,6 @@ import {
   applyWizardAutostartSelection,
   getWizardAutostartState
 } from "./setup-wizard-autostart.js";
-import { installWindowNavigationGuards } from "./window-security.js";
 import { overlayWizardChannels, parseWizardPayload } from "./setup-wizard-ipc.js";
 
 export { hasRuntimeEnvFile } from "./setup-wizard-runtime.js";

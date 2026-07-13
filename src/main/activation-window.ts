@@ -1,7 +1,6 @@
 import { BrowserWindow, screen } from "electron";
 import { fileURLToPath } from "node:url";
-import { clampBoundsToVisibleArea } from "./window-factory.js";
-import { installWindowNavigationGuards } from "./window-security.js";
+import { clampBoundsToVisibleArea, installWindowNavigationGuards } from "./window-factory.js";
 
 interface CreateActivationWindowOptions {
   devServerUrl?: string;
