@@ -1,92 +1,52 @@
-# AGENTS.md — Repository Instructions
+# AGENTS.md — Instructions Summary
 
-Repository-specific instructions for Codex and AI agents. 
+## 1. Scope & Principles
+* **Priority Order:** User request > Specific `AGENTS.md` > Main `AGENTS.md`. In case of conflict, choose the safest, least invasive option and report it.
+* **Principles:**
+  * Greenfield mindset: build strictly for current requirements. No speculative abstractions, shims, or temporary code.
+  * Keep the repo clean, navigable, and domain-focused.
+  * Entrypoints must remain thin; put logic in domain modules.
 
-Primary local environment: **Windows + PowerShell**.
+## 2. Environment (Windows & PowerShell)
+* Primary dev environment: **Windows / PowerShell / UTF-8**.
+* Avoid Unix-only commands/paths (`/tmp`, `chmod`, `rm -rf`, `sed -i`).
+* Use cross-platform APIs (`pathlib`), quoted paths, and repository-relative paths.
 
----
+## 3. Assessment & Working Tree
+* Read relevant `AGENTS.md` files and inspect affected areas.
+* Check git status (`git status --short`) before starting. Preserve pre-existing, unrelated work.
 
-## 1. Core Philosophy & Priorities
+## 4. Implementation Rules
+* **Architecture:** Preserve structure unless refactoring is required. Remove obsolete code completely—do not leave compatibility layers.
+* **Dependencies:** Prefer standard library or existing dependencies. Respect lockfiles; do not upgrade unrelated packages or change package managers without cause.
+* **Security:** Never expose, print, or commit secrets/tokens. Use `.env.example` and environment variables.
 
-1. **Always Greenfield:** Always treat the project as a new application. Do not assume integration with legacy systems, previous production constraints, or backward compatibility unless strictly instructed.
-2. **Zero Technical Debt:** Proactively remove legacy code, deprecated patterns, dead files, and transitional structures. There is zero tolerance for technical debt.
-3. **Architectural Authority:** You are explicitly authorized to make destructive changes, rewrite logic, and delete files to improve, modernize, or clean the architecture. 
-4. **Cleanliness:** Keep the repository clean, navigable, and strictly organized.
+## 5. Repository Structure & Scripts
+* **Naming:** Use clear, domain-specific names. Avoid generic/catch-all folders or files (`misc/`, `temp/`, `utils.*`, `common.*`).
+* **Scripts:** Place scripts in standard locations (default: `scripts/`), executable from repo root, returning non-zero exit codes on failure.
 
----
+## 6. Testing & Verification
+* Update/add tests for any behavior changes.
+* **Agent Fast Mode:** Automated tests run by AI must run in fast/summarized mode (concise output: PASS/FAIL + minimal stack trace). PowerShell test scripts must support both fast mode (default for agents) and full/manual mode (for debugging).
+* **Honesty:** Never claim a test, linter, or build was run if it was not.
 
-## 2. Windows-First Environment
+## 7. Documentation
+* Keep setup, usage, API, and architectural documentation synchronized with all code changes.
 
-Assume local development is Windows-based.
-- Use **PowerShell-compatible commands** unless repository evidence dictates otherwise (e.g., CI containers or specific deployment targets).
-- Avoid Unix/Bash-only assumptions (`/tmp`, `chmod`, `rm -rf`, `sed -i`).
-- Use repository-relative paths, quote paths that may contain spaces, and rely on cross-platform path APIs in code.
+## 8. PROJECT_STATUS.json
+* Strict active todo list (`{"todos": ["Task"]}`).
+* Add active tasks only; immediately remove completed, obsolete, or duplicate tasks. No changelogs, blockers, or notes.
 
----
+## 9. Final Verification
+* Run tests (fast mode), linters, formatters, type-checkers, and builds.
+* Review diff and `git status --short`. Clean up temporary files, logs, and stale references. Ensure `.gitignore` is updated.
+* **Forbidden Git Commands:** `git reset --hard`, `git clean`, force-push, or history rewriting.
 
-## 3. Workflow & Implementation
-
-1. **Assess & Execute:** Inspect only the files necessary for the requested scope. Check the working tree (`git status --short`) before starting.
-2. **Refactor Boldly:** Implement the highest-quality architectural solution. Do not hesitate to split, rename, or delete files if it resolves mixed responsibilities.
-3. **Verify:** Add or update tests when behavior changes. If no test framework exists, provide a manual verification path.
-4. **Document:** Update documentation (setup, commands, public APIs) whenever architectural or structural changes occur.
-
----
-
-## 4. Structure & Files
-
-- Keep files strictly focused on a single responsibility.
-- **Naming:** Prefer explicit, descriptive names. Ban vague directories (`misc`, `old`, `temp`) and catch-all files (`utils.*`, `common.*`) unless strictly required by a framework.
-- **Entrypoints:** `index.*` files must only contain exports, framework entrypoints, or lightweight composition logic—no heavy implementation.
-
----
-
-## 5. Scripts
-
-- Use repository-native scripts first. 
-- When writing local scripts, prioritize PowerShell wrappers placed in `scripts/`.
-- Scripts must run from the repository root, fail with non-zero exit codes on error, and be documented in `scripts/README.md`.
-
----
-
-## 6. Security & Dependencies
-
-- **No Secrets:** Never create, print, commit, or expose secrets, tokens, or personal data. Use `.env.example` for required variables.
-- **Dependencies:** Prefer standard libraries. Before adding a new dependency, verify if an existing one suffices. Respect the current package manager and lockfile.
-
----
-
-## 7. Cleanliness Check
-
-Before finalizing any implementation, run `git status --short` and `git ls-files` (or equivalent) to verify:
-- No temporary, debug, or build files were left behind.
-- Stale references from renamed/deleted files are cleared.
-- The `.gitignore` adequately covers any new generated outputs.
-- Formatters, linters, and type-checkers pass. (State clearly if a check was bypassed and why).
-
----
-
-## 8. PROJECT_STATUS.json (If Applicable)
-
-If `PROJECT_STATUS.json` is present or requested, it must act as a strict, active todo list.
-
-```json
-{
-  "todos": [
-    "Short actionable task"
-  ]
-}
-```
-- **Rules:** Add active tasks only. Immediately delete completed, obsolete, or duplicated items. Do not store status notes, blockers, chat history, or changelogs here.
-
----
-
-## 9. Final Response Format
-
-For implementation tasks, your final output must concisely report:
-- **What changed:** (Highlighting architectural improvements and legacy code removed).
-- **Files modified/deleted.**
-- **Checks run & results.**
-- **Cleanliness status.**
-- **Updated `PROJECT_STATUS.json`** (if applicable).
-- **Next steps or remaining architectural risks.**
+## 10. Final Response Format
+For implementation tasks, structure the response concisely into:
+1. **What changed:** Functional updates, structural improvements, removed code.
+2. **Files modified/deleted:** List of created, edited, or deleted files.
+3. **Checks run & results:** Real results for tests/lint/builds (or explicit reason if skipped).
+4. **Cleanliness status:** Confirmation that no temp/secret files remain.
+5. **Remaining limitations / risks:** Concrete risks only.
+6. **Next steps:** Immediate necessary follow-ups only.
