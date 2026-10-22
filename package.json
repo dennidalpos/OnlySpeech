@@ -91,7 +91,7 @@
     "lightningcss-win32-x64-msvc": "1.32.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.61.1",
-    "vite": "^8.0.16",
+    "vite": "^8.3.5",
     "vitest": "^4.1.9",
     "wait-on": "^9.0.10"
   },
