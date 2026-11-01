@@ -12,7 +12,7 @@ This document is the long-form technical contract for the repository. It does no
 - `docs/PROJECT_SPEC.md` is the primary technical contract; the rest of `docs/` contains the supporting runbooks, product notes, and buyer-facing collateral referenced from that contract.
 - `scripts/script.md` is the canonical script index, invocation map, and PowerShell side-effect map.
 - `.github/workflows/*.yml` are the canonical CI and tagged-release workflow definitions.
-- `PROJECT_STATUS.json` tracks only current incomplete todo tasks; it is not a changelog, report, risk register, or check log.
+- `02-areas/products/OnlySpeech/tracker.json (nel dossier SecondBrain)` tracks only current incomplete todo tasks; it is not a changelog, report, risk register, or check log.
 
 ## Product Boundary
 
@@ -216,7 +216,7 @@ Production readiness requires both repository gates and target-workstation evide
 
 - `npm run gate -- -KeepOutputs -EnablePackagedAutomation` must pass on Windows.
 - `npm audit --audit-level=moderate` and `npm run audit:packaging` must pass, or remaining findings must be explicitly accepted for the release.
-- Security hardening tasks in `PROJECT_STATUS.json` must be closed or explicitly accepted by the product owner.
+- Security hardening tasks in `02-areas/products/OnlySpeech/tracker.json (nel dossier SecondBrain)` must be closed or explicitly accepted by the product owner.
 - The package used for deployment must be generated from the verified source and signed or otherwise approved for the deployment.
 - Target hardware validation must cover packaged activation, setup commissioning, display assignment, microphone assignment, live provider speech, TTS playback, autostart at logon, and fresh install/uninstall.
 - Retained evidence must exist under `artifacts/logs/` for release metadata, notices, SBOM, activation validation, commissioning evidence, live provider speech proof, and packaged close-out validation.

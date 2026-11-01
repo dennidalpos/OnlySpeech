@@ -24,7 +24,6 @@ const removedPowerSettingsWrapperPath = join(
   "configure-power-settings.ps1"
 );
 const projectSpecPath = join(repoRoot, "docs", "PROJECT_SPEC.md");
-const projectStatusPath = join(repoRoot, "PROJECT_STATUS.json");
 const readmePath = join(repoRoot, "README.md");
 
 describeWindows("verify-repo.ps1", () => {
@@ -284,14 +283,6 @@ describeWindows("verify-repo.ps1", () => {
     expect(projectSpec).not.toContain("docs/product/Marketplace_Sales_Package.md");
   });
 
-  it("keeps PROJECT_STATUS.json limited to incomplete todo text", () => {
-    const projectStatus = JSON.parse(readFileSync(projectStatusPath, "utf8")) as {
-      todos: string[];
-    };
-
-    expect(Object.keys(projectStatus).sort()).toEqual(["todos"]);
-    expect(projectStatus.todos.every((task) => typeof task === "string" && task.trim().length > 0)).toBe(true);
-  });
 
   it("keeps the public bootstrap wrapper pointed at the deterministic npm ci flow", () => {
     const script = readFileSync(publicBootstrapScriptPath, "utf8");

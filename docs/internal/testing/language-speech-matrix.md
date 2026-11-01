@@ -76,6 +76,6 @@ The live pass must cover at least:
 
 ## Tracking Notes
 
-If this manual pass is being tracked in `PROJECT_STATUS.json`, close or update the relevant open task only after `artifacts/logs/live-provider-speech-proof.json` contains retained real-workstation proof for the end-to-end `Microphone -> STT -> translation -> TTS` path and the language/audio quality matrix.
+If this manual pass is being tracked in `02-areas/products/OnlySpeech/tracker.json (nel dossier SecondBrain)`, close or update the relevant open task only after `artifacts/logs/live-provider-speech-proof.json` contains retained real-workstation proof for the end-to-end `Microphone -> STT -> translation -> TTS` path and the language/audio quality matrix.
 
 Do not claim completion when credentials are still missing or when the retained artifact is still just a pending template.

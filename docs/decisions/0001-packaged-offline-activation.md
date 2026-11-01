@@ -4,6 +4,9 @@
 - Status: Accepted
 - Scope: packaged Windows activation only
 
+
+Contenuto datato trasferito nel dossier SecondBrain: `02-areas/products/OnlySpeech/history/imported/docs/decisions/0001-packaged-offline-activation.md`. Originale e SHA-256 nel rapporto di migrazione; questa voce conserva i riferimenti esistenti e non autorizza nuovi interventi.
+
 ## Context
 
 The repository needs a packaged-only offline activation flow based on customer email plus activation code.
@@ -118,26 +121,6 @@ Rules:
 - the packaged app may tolerate small backward clock drift, but a rollback larger than 5 minutes is treated as explicit `clock-rollback`;
 - expiry checks must compare against the effective trusted time `max(nowUtc, lastTrustedUtc)` so a license that has already crossed expiry cannot silently reopen after the workstation clock is set backward;
 - `lastValidatedAt` may record the local validation attempt time even when `lastTrustedUtc` remains higher.
-
-## Alternatives Considered
-
-### Online activation service
-
-Rejected for the current product phase because the repository target is a packaged offline-capable workstation and startup must not depend on network reachability.
-
-### Symmetric HMAC code
-
-Rejected because the packaged app would need the same shared secret used to issue codes, which would make code generation recoverable from the distributed app.
-
-### Opaque encrypted blob without explicit claims
-
-Rejected because it would make validation, support, and future key rotation harder than a signed payload with explicit typed claims.
-
-## Rationale
-
-Ed25519 gives a compact signature, is natively supported by Node crypto, and keeps verification asymmetric.
-The explicit payload keeps supportable claims visible to the app without exposing the private key or requiring a server.
-The versioned envelope plus `keyId` provides a controlled upgrade path for future contract or key changes.
 
 ## Expected Impact
 

@@ -123,7 +123,7 @@ npm run commission:handover
 
 ## Tracking Notes
 
-If this manual pass is being tracked in `PROJECT_STATUS.json`, close or update the relevant open task only after the retained evidence for that area actually exists. For activation and commissioning this usually means `artifacts/logs/activation-validation.json` and `artifacts/logs/commissioning-evidence.json`; for autostart this means `artifacts/logs/packaged-closeout-validation.json` with the relevant scenarios closed.
+If this manual pass is being tracked in `02-areas/products/OnlySpeech/tracker.json (nel dossier SecondBrain)`, close or update the relevant open task only after the retained evidence for that area actually exists. For activation and commissioning this usually means `artifacts/logs/activation-validation.json` and `artifacts/logs/commissioning-evidence.json`; for autostart this means `artifacts/logs/packaged-closeout-validation.json` with the relevant scenarios closed.
 
 Do not claim signed-release, GitHub-hosted CI, or commercial-review completion unless those external bundles are retained too.
 

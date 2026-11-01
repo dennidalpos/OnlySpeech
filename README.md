@@ -31,7 +31,7 @@ OnlySpeech is production-oriented for Windows + PowerShell, but a customer deplo
 - `npm audit --audit-level=moderate` and `npm run audit:packaging` are clean or any remaining findings are explicitly accepted for the release.
 - A signed installer or approved portable package is produced from the same verified source.
 - Packaged activation, commissioning, autostart, fresh install/uninstall, live provider speech, and audio/language validation are completed on the target workstation.
-- Open blockers in [PROJECT_STATUS.json](PROJECT_STATUS.json) are closed or explicitly accepted by the product owner.
+- Open blockers in 02-areas/products/OnlySpeech/tracker.json (nel dossier SecondBrain) (SecondBrain: `02-areas/products/OnlySpeech/tracker.json`) are closed or explicitly accepted by the product owner.
 - Retained evidence exists under `artifacts/logs/` for release, compliance, commissioning, activation, live speech, and packaged close-out checks.
 
 ## Requirements
@@ -119,7 +119,7 @@ The complete PowerShell script classification and side-effect map lives in [scri
 
 ## Project Status
 
-The repository has a Windows-first command surface and a canonical verification gate. It is not production-ready until the open blockers in [PROJECT_STATUS.json](PROJECT_STATUS.json) are closed or accepted.
+The repository has a Windows-first command surface and a canonical verification gate. It is not production-ready until the open blockers in 02-areas/products/OnlySpeech/tracker.json (nel dossier SecondBrain) (SecondBrain: `02-areas/products/OnlySpeech/tracker.json`) are closed or accepted.
 
 CI and tagged release workflows run `npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation`.
 
