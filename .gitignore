@@ -14,7 +14,6 @@
 /agent-analysis/
 /.vite/
 *.tsbuildinfo
-/build/configure-power-settings.ps1
 
 # Local runtime configuration generated or overridden per workstation
 /.env
