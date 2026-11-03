@@ -31,7 +31,7 @@ OnlySpeech is production-oriented for Windows + PowerShell, but a customer deplo
 - `npm audit --audit-level=moderate` and `npm run audit:packaging` are clean or any remaining findings are explicitly accepted for the release.
 - A signed installer or approved portable package is produced from the same verified source.
 - Packaged activation, commissioning, autostart, fresh install/uninstall, live provider speech, and audio/language validation are completed on the target workstation.
-- Open blockers in 02-areas/products/OnlySpeech/tracker.json (nel dossier SecondBrain) (SecondBrain: `02-areas/products/OnlySpeech/tracker.json`) are closed or explicitly accepted by the product owner.
+- Known open blockers are closed or explicitly accepted by the product owner.
 - Retained evidence exists under `artifacts/logs/` for release, compliance, commissioning, activation, live speech, and packaged close-out checks.
 
 ## Requirements
@@ -119,9 +119,9 @@ The complete PowerShell script classification and side-effect map lives in [scri
 
 ## Project Status
 
-The repository has a Windows-first command surface and a canonical verification gate. It is not production-ready until the open blockers in 02-areas/products/OnlySpeech/tracker.json (nel dossier SecondBrain) (SecondBrain: `02-areas/products/OnlySpeech/tracker.json`) are closed or accepted.
+The repository has a Windows-first command surface and a canonical verification gate. It is not production-ready until known open blockers are closed or accepted.
 
-CI and tagged release workflows run `npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation`.
+The CI and tagged release workflows in `.github/workflows/` run `npm run verify:repo -- -KeepOutputs -EnablePackagedAutomation`, but GitHub Actions are disabled for this repository: run the same command locally.
 
 ## Troubleshooting
 
@@ -147,3 +147,11 @@ CI and tagged release workflows run `npm run verify:repo -- -KeepOutputs -Enable
 - [docs/customer-bundle/Customer_Quick_Start.md](docs/customer-bundle/Customer_Quick_Start.md): buyer-facing packaged first-use guide.
 - [docs/internal/Privacy_and_Commercial_Distribution.md](docs/internal/Privacy_and_Commercial_Distribution.md): repository privacy and commercial-distribution boundary.
 - [docs/product/Marketplace_Sales_Package.md](docs/product/Marketplace_Sales_Package.md): seller-facing marketplace copy baseline, not buyer-bundle documentation.
+
+## Security
+
+See [SECURITY.md](SECURITY.md) to report a vulnerability.
+
+## License
+
+Proprietary software, all rights reserved. See [LICENSE](LICENSE). Third-party components are listed in [CREDITS.md](CREDITS.md).
