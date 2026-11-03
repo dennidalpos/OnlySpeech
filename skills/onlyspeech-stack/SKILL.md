@@ -14,14 +14,14 @@ This skill provides comprehensive instructions, constraints, and official refere
 OnlySpeech uses a hybrid compilation scheme to support both Node-native Electron main process capabilities and web-compliant React renderer bundles.
 
 ### Main Process & Services (`src/main`, `src/services`, `src/tools`)
-- **tsconfig**: Exclusively governed by [tsconfig.main.json](file:///d:/GITHUB/OnlySpeech/tsconfig.main.json).
+- **tsconfig**: Exclusively governed by [tsconfig.main.json](../../tsconfig.main.json).
 - **Module Resolution**: `NodeNext`.
 - **Target**: `ES2022` with `NodeNext` modules.
 - **Convention**: Imports of local TS modules must include the `.js` extension (e.g., `import { X } from "./file.js"`).
 - **Types**: Typed with `@types/node` and `electron`.
 
 ### Renderer Process & Shared Code (`src/renderer`, `src/shared`, `tests`)
-- **tsconfig**: Governed by [tsconfig.json](file:///d:/GITHUB/OnlySpeech/tsconfig.json).
+- **tsconfig**: Governed by [tsconfig.json](../../tsconfig.json).
 - **Module Resolution**: `Bundler` (Vite compatible).
 - **Target**: `ESNext` / `ES2022`.
 - **Convention**: Relative imports omit file extensions, and bundler resolves them. No native Node modules or relative Node imports are allowed.
@@ -33,12 +33,12 @@ OnlySpeech uses a hybrid compilation scheme to support both Node-native Electron
 OnlySpeech enforces high security boundaries by completely sandboxing the React renderer windows.
 
 ### Preload Script & IPC Boundary
-- All communication must flow through the preload bridge in [preload.ts](file:///d:/GITHUB/OnlySpeech/src/main/preload.ts).
+- All communication must flow through the preload bridge in [preload.ts](../../src/main/preload.ts).
 - Direct imports of Node.js modules (like `fs`, `path`, `child_process`) or Electron modules (like `ipcRenderer` directly) in the React components are strictly prohibited.
-- `contextBridge.exposeInMainWorld("onlySpeech", api)` exports a secure api surface typed in [onlyspeech-api.ts](file:///d:/GITHUB/OnlySpeech/src/shared/onlyspeech-api.ts).
+- `contextBridge.exposeInMainWorld("onlySpeech", api)` exports a secure api surface typed in [onlyspeech-api.ts](../../src/shared/onlyspeech-api.ts).
 
 ### Multi-Display Window Positioning
-- Managed via [display-manager.ts](file:///d:/GITHUB/OnlySpeech/src/main/display-manager.ts) using the Electron `screen` module.
+- Managed via [display-manager.ts](../../src/main/display-manager.ts) using the Electron `screen` module.
 - Layout coords are calculated using virtual coordinates. The primary screen top-left is `(0, 0)`.
 - Use `screen.getAllDisplays()` to identify boundaries of external screens and map them to sides `A` and `B` using `bounds` coordinates.
 - Listen to screen additions and deletions dynamically:
@@ -52,7 +52,7 @@ OnlySpeech enforces high security boundaries by completely sandboxing the React 
 
 ## 3. React 19 Renderer Architecture
 
-- **React 19 Core**: Strictly component-based composition. Since the kiosk renders two interfaces (Operator and Visitor), UI screens are isolated under [src/renderer/operator](file:///d:/GITHUB/OnlySpeech/src/renderer/operator).
+- **React 19 Core**: Strictly component-based composition. Since the kiosk renders two interfaces (Operator and Visitor), UI screens are isolated under [src/renderer/operator](../../src/renderer/operator).
 - **No Tailwind CSS**: Styled exclusively using Vanilla CSS. Global and component styles are located under `styles` subdirectories.
 - **React 19 Strict Mode**: Keeps rendering predictable and highlights unexpected side effects during hot-reload.
 
@@ -60,7 +60,7 @@ OnlySpeech enforces high security boundaries by completely sandboxing the React 
 
 ## 4. Vite 8 & LightningCSS Bundling
 
-- **Configuration**: Configured in [vite.config.ts](file:///d:/GITHUB/OnlySpeech/vite.config.ts).
+- **Configuration**: Configured in [vite.config.ts](../../vite.config.ts).
 - **LightningCSS**: Used for robust, performant CSS transformations and minification.
 - **Multi-page input**: Vite builds separate bundles for the main kiosk app (`index.html`) and the activation gate app (`activation.html`).
 - **Dev Port**: Runs strictly on `127.0.0.1:5173`. The main process waits for this port to become available (`wait-on tcp:5173`) before launching Electron.
@@ -96,7 +96,7 @@ OnlySpeech integrates three providers configured dynamically via `.env`:
 
 ## 6. Testing & Quality Gates (Vitest 4)
 
-- **Vitest 4**: Runs fast, concurrent execution. Configured in [vitest.config.ts](file:///d:/GITHUB/OnlySpeech/vitest.config.ts).
+- **Vitest 4**: Runs fast, concurrent execution. Configured in [vitest.config.ts](../../vitest.config.ts).
 - **Unit/Integration Tests**: Run `npm test`. Matches all files under `tests/**/*.test.ts` except E2E.
 - **Electron E2E Tests**: Run `npm run test:e2e`. Boots the full Electron binary and validates UI integration and IPC channels using playwright-style window automation.
 - **Coverage limits**: Coverage target configured for statements (75%), branches (65%), functions (75%), and lines (75%).

@@ -26,10 +26,10 @@ OnlySpeech uses a strict, proprietary offline cryptographic licensing and activa
 
 ## 2. Key Verification Modules
 
-- [activation-validator.ts](file:///d:/GITHUB/OnlySpeech/src/main/activation-validator.ts): Contains Ed25519 token signatures validation logic.
-- [activation-state.ts](file:///d:/GITHUB/OnlySpeech/src/main/activation-state.ts): Keeps track of the current activation state.
-- [activation-flow.ts](file:///d:/GITHUB/OnlySpeech/src/main/activation-flow.ts): Governs trial state transitions and license checks.
-- [trial-tombstone.ts](file:///d:/GITHUB/OnlySpeech/src/main/trial-tombstone.ts): Registry persistence mapping to prevent trial tampering.
+- [activation-validator.ts](../../src/main/activation-validator.ts): Contains Ed25519 token signatures validation logic.
+- [activation-state.ts](../../src/main/activation-state.ts): Keeps track of the current activation state.
+- [activation-flow.ts](../../src/main/activation-flow.ts): Governs trial state transitions and license checks.
+- [trial-tombstone.ts](../../src/main/trial-tombstone.ts): Registry persistence mapping to prevent trial tampering.
 
 ---
 
