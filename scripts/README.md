@@ -33,6 +33,12 @@ OnlySpeech scripts are Windows + PowerShell entrypoints. Run commands from the r
 
 The checked quality surface is ESLint, TypeScript build, Vitest, Electron e2e, packaging audit, PowerShell script tests, and the Windows gate.
 
+## Verification and side effects
+
+`npm test` runs the Vitest suite without the compiled Electron end-to-end test. `npm run test:e2e` compiles first and requires a usable Windows Electron runtime. Provider unit tests use controlled inputs; live Azure/OpenAI speech still needs provider credentials, supported languages and the target microphones/displays.
+
+Run checks in a disposable checkout with dedicated temporary, output and application-profile directories. The scripts normally resolve outputs relative to their checkout; changing only a cache environment variable does not relocate every build output. Do not run `clean`, `clean:workstation`, reset, signing or commissioning commands merely to validate a documentation change. Inspect their side effects and the selected workstation before using them.
+
 ## Production Gate
 
 Use this sequence before a Windows deployment candidate:

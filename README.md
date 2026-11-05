@@ -11,7 +11,7 @@ OnlySpeech is an Electron desktop application for one Windows workstation with t
 
 The product boundary is intentionally narrow: one Windows PC, guided in-person conversations, customer-owned provider credentials for live speech, and no browser/SaaS or multi-workstation orchestration mode.
 
-## Verified Features
+## Implemented Workflows
 
 - Operator and visitor runtime surfaces on the same Windows workstation.
 - Guided language confirmation before live speech starts.
@@ -113,7 +113,9 @@ The installer verifies required software before copying the app:
 | `npm run release:compliance` | Write third-party notices and SBOM artifacts. |
 | `npm run release:customer-bundle` | Assemble the customer-facing release bundle from existing package outputs and docs. |
 
-Use ESLint, TypeScript build, Vitest, Electron e2e, packaging audit, and the Windows gate as the checked quality surface.
+Use ESLint, TypeScript build, Vitest, Electron e2e, packaging audit, and the Windows gate as separate checks. Passing unit tests does not prove live speech, hardware routing, signing, activation on a customer PC, or packaged install/uninstall behavior.
+
+Build, test and packaging commands write outputs. Use a disposable checkout and a dedicated runtime/profile for automated verification. Source `dist/`, `artifacts/`, coverage and logs are local outputs; they are not release evidence merely because a command created them. Review the [script side-effect map](scripts/script.md) before running commissioning or cleanup commands. Cleanup and workstation-reset commands require a reviewed scope and are not prerequisites for normal testing.
 
 The complete PowerShell script classification and side-effect map lives in [scripts/script.md](scripts/script.md).
 
