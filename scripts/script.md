@@ -27,7 +27,6 @@ Ignored local outputs such as `.local/`, `dist/`, `artifacts/`, `node_modules/`,
 | `npm run clean` | `scripts/clean.ps1` | Remove repo-local generated outputs while preserving dependencies, `.env`, workstation data, and autostart. | PowerShell filesystem access. | Local cleanup. |
 | `npm run clean:workstation` | `scripts/clean-workstation.ps1` | Remove packaged workstation-local OnlySpeech state. | Windows user profile and optional registry access. | Support and reinstall flows. |
 | `npm run license:keygen` | `scripts/license-keygen.ps1` | Launch the local activation key generator when present. | `.local/activation-generator/launch-generator.ps1`. | License issuance workstation. |
-| `.\scripts\install-skills.ps1` | `scripts/install-skills.ps1` | Configure AI agent skills for this workspace by creating or updating the ignored `.agents/skills.json`. | PowerShell filesystem access. | Developer setup. |
 
 ## Npm Command Surface
 

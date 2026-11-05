@@ -8,7 +8,6 @@ OnlySpeech scripts are Windows + PowerShell entrypoints. Run commands from the r
 | --- | --- | --- |
 | setup | `npm run bootstrap` | Validate Node.js/npm and restore dependencies with `npm ci` when needed. |
 | setup | `npm run bootstrap -- -ForceRefresh` | Reinstall dependencies when `node_modules` is inconsistent. |
-| setup | `.\scripts\install-skills.ps1` | Configure AI agent skills for this workspace (creates `.agents/skills.json`). |
 | dev | `npm run dev` | Start renderer, main compiler, and Electron watchers. |
 | start | `npm run start` | Build stale source outputs and launch Electron locally. |
 | start | `npm run start -- -Smoke -SmokeTimeoutMs 8000` | Build stale outputs and verify the source Electron runtime stays alive for the smoke window. |
