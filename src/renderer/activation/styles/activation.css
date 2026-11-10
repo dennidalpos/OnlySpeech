@@ -1,0 +1,377 @@
+:root {
+  color-scheme: light;
+  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+  --activation-bg-strong: #15373d;
+  --activation-bg-soft: rgba(255, 250, 244, 0.94);
+  --activation-panel: rgba(255, 255, 255, 0.72);
+  --activation-panel-border: rgba(20, 32, 34, 0.12);
+  --activation-panel-shadow: 0 24px 80px rgba(20, 32, 34, 0.16);
+  --activation-text: #142022;
+  --activation-muted: rgba(20, 32, 34, 0.72);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(221, 196, 150, 0.42), transparent 34%),
+    linear-gradient(135deg, #f4efe7 0%, #d7ddd8 44%, #b9c6c6 100%);
+  color: var(--activation-text);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.activation-shell {
+  min-height: 100vh;
+  padding: 24px;
+  display: flex;
+}
+
+.activation-frame {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(300px, 0.88fr) minmax(0, 1.12fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.activation-sidebar,
+.activation-content,
+.activation-main,
+.activation-primary-grid,
+.activation-form,
+.activation-button-bar {
+  display: grid;
+  gap: 20px;
+}
+
+.activation-sidebar,
+.activation-content,
+.activation-main,
+.activation-primary-grid,
+.activation-overview,
+.activation-panel,
+.activation-status {
+  min-width: 0;
+}
+
+.activation-overview,
+.activation-panel,
+.activation-status {
+  border-radius: 28px;
+  border: 1px solid var(--activation-panel-border);
+  box-shadow: var(--activation-panel-shadow);
+  overflow: hidden;
+}
+
+.activation-overview {
+  padding: 32px;
+  background: linear-gradient(160deg, rgba(18, 78, 88, 0.96), rgba(17, 40, 44, 0.92));
+  color: #f9f2e8;
+  display: grid;
+  align-content: start;
+  gap: 20px;
+}
+
+.activation-eyebrow {
+  margin: 0;
+  font-size: 0.74rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.78;
+}
+
+.activation-overview h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 0.96;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.activation-body,
+.activation-panel-head p,
+.activation-panel p,
+.activation-status p,
+.activation-checklist {
+  margin: 0;
+  line-height: 1.5;
+  color: var(--activation-muted);
+  overflow-wrap: anywhere;
+}
+
+.activation-body {
+  color: rgba(249, 242, 232, 0.84);
+}
+
+.activation-panel {
+  padding: 28px;
+  background: var(--activation-panel);
+  display: grid;
+  gap: 18px;
+}
+
+.activation-panel-muted {
+  background: var(--activation-bg-soft);
+}
+
+.activation-panel-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.activation-panel-head > div {
+  min-width: 0;
+}
+
+.activation-panel h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.activation-field {
+  display: grid;
+  gap: 8px;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.activation-field-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.activation-field-label {
+  color: var(--activation-text);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.activation-field-action {
+  display: inline-flex;
+  max-width: 100%;
+}
+
+.activation-field input,
+.activation-field textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(20, 32, 34, 0.18);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--activation-text);
+  padding: 14px 16px;
+  font: inherit;
+  resize: vertical;
+}
+
+.activation-field input:focus,
+.activation-field textarea:focus {
+  outline: 2px solid rgba(18, 78, 88, 0.28);
+  border-color: rgba(18, 78, 88, 0.38);
+}
+
+.activation-field-valid input,
+.activation-field-valid textarea {
+  border-color: rgba(17, 112, 72, 0.4);
+  background: rgba(17, 112, 72, 0.04);
+}
+
+.activation-field-hint {
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: rgba(17, 112, 72, 0.85);
+  overflow-wrap: anywhere;
+}
+
+.activation-status {
+  padding: 24px;
+  border-radius: 28px;
+  display: grid;
+  gap: 12px;
+  background: rgba(244, 239, 231, 0.92);
+  border: 1px solid rgba(20, 32, 34, 0.12);
+}
+
+.activation-status-label {
+  display: inline-flex;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(20, 32, 34, 0.6);
+}
+
+.activation-status strong {
+  display: block;
+  font-size: 1.2rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.activation-status-message {
+  color: var(--activation-text);
+}
+
+.activation-status-suggestion {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(20, 32, 34, 0.08);
+}
+
+.activation-status-suggestion span {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(20, 32, 34, 0.6);
+}
+
+.activation-status-suggestion p {
+  color: var(--activation-text);
+}
+
+.activation-status-detail {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(20, 32, 34, 0.9);
+  color: #f6f2eb;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: 0.84rem/1.5 Consolas, "Courier New", monospace;
+}
+
+.activation-status-required {
+  background: rgba(85, 137, 176, 0.12);
+  border-color: rgba(85, 137, 176, 0.22);
+}
+
+.activation-status-invalid-code,
+.activation-status-email-mismatch,
+.activation-status-expired-license,
+.activation-status-clock-rollback,
+.activation-status-invalid-state,
+.activation-status-trial-exhausted {
+  background: rgba(148, 45, 20, 0.08);
+  border-color: rgba(148, 45, 20, 0.22);
+}
+
+.activation-status-success {
+  background: rgba(17, 112, 72, 0.1);
+  border-color: rgba(17, 112, 72, 0.22);
+}
+
+.activation-button-bar,
+.activation-actions,
+.activation-status-actions {
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+  align-items: stretch;
+}
+
+.activation-submit,
+.activation-secondary-button,
+.activation-tertiary-button,
+.activation-trial-button,
+.activation-inline-button {
+  border: none;
+  border-radius: 18px;
+  padding: 14px 18px;
+  font: inherit;
+  font-weight: 700;
+  min-width: 0;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.3;
+  cursor: pointer;
+}
+
+.activation-inline-button {
+  padding: 8px 12px;
+  border: 1px solid rgba(20, 32, 34, 0.12);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--activation-text);
+}
+
+.activation-submit {
+  color: #f9f2e8;
+  background: linear-gradient(135deg, #1a6f73, var(--activation-bg-strong));
+}
+
+.activation-secondary-button,
+.activation-tertiary-button {
+  border: 1px solid rgba(20, 32, 34, 0.14);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--activation-text);
+}
+
+.activation-trial-button {
+  color: #f9f2e8;
+  background: linear-gradient(135deg, rgba(18, 78, 88, 0.9), rgba(17, 40, 44, 0.85));
+  transition: opacity 0.2s;
+}
+
+.activation-submit:disabled,
+.activation-secondary-button:disabled,
+.activation-tertiary-button:disabled,
+.activation-trial-button:disabled,
+.activation-inline-button:disabled {
+  cursor: progress;
+  opacity: 0.72;
+}
+
+.activation-trial-button:hover:not(:disabled) {
+  opacity: 0.92;
+}
+
+.activation-checklist {
+  padding-left: 20px;
+  display: grid;
+  gap: 10px;
+}
+
+.activation-checklist li {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 980px) {
+  .activation-frame {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .activation-shell {
+    padding: 16px;
+  }
+
+  .activation-overview,
+  .activation-panel,
+  .activation-status {
+    padding: 22px;
+  }
+
+  .activation-button-bar,
+  .activation-actions,
+  .activation-status-actions {
+    grid-template-columns: 1fr;
+  }
+}

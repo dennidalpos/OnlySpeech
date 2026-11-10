@@ -1,0 +1,54 @@
+# Repo-local dependencies, caches, and cleanable outputs
+/node_modules/
+/.npm-cache/
+/dist/
+/artifacts/
+/coverage/
+/logs/
+/media/
+/screenshots/
+/test-results/
+/playwright-report/
+/blob-report/
+/agent-artifacts/
+/agent-analysis/
+/.vite/
+*.tsbuildinfo
+
+# Local runtime configuration generated or overridden per workstation
+/.env
+/.env.local
+/.env.*.local
+!/.env.example
+/.local/activation-generator/
+/.local/logs/
+
+# Sensitive local credentials and Windows signing material
+*.pem
+*.key
+*.pfx
+*.p12
+*.crt
+*.cer
+*.der
+
+# Package manager and runtime logs
+*.log
+npm-debug.log*
+*.drawio.bkp
+
+# Editor, OS, and local agent configuration files
+.vscode/
+.idea/
+.claude/
+/.agents/
+Thumbs.db
+Desktop.ini
+.DS_Store
+~$*
+
+# Generated product collateral under docs/ is intentionally versioned.
+# /tools contains ignored local or vendored payloads.
+/tools/nssm/
+/tools/wix314-binaries/
+/tools/npm/
