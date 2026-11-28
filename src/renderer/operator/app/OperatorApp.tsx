@@ -1,0 +1,537 @@
+import { useEffect, useLayoutEffect, useState } from "react";
+import type { OnlySpeechRendererApi } from "../../../shared/onlyspeech-api.js";
+import { buildInteractionLanguageChoices } from "../../../shared/language-flow.js";
+import {
+  getInteractionLanguageCurrentLabel,
+  getInteractionLanguageEnglishLabel
+} from "../../../shared/language-registry.js";
+import {
+  getOperatorTextToSpeechText,
+  getVisitorTextToSpeechText
+} from "../../../shared/text-to-speech-localization.js";
+import { getUiText, resolveUiLanguageForSide } from "../../../shared/ui-localization.js";
+import {
+  DEFAULT_RUNTIME_DISCLOSURE_SETTINGS,
+  getRuntimeDisclosureText
+} from "../../../shared/runtime-disclosure.js";
+import { getVisitorLocalizationBundle } from "../../../shared/visitor-localization-bundle.js";
+import { ConfirmDialog } from "../components/ConfirmDialog.js";
+import { LanguageSelection } from "../components/LanguageSelection.js";
+import { OperatorSessionScreen } from "../components/OperatorSessionScreen.js";
+import { SetupWizardAccessDialog } from "../components/SetupWizardAccessDialog.js";
+import { TechnicalErrorView } from "../components/TechnicalErrorView.js";
+import { RuntimeIssueBanner } from "../components/RuntimeIssueBanner.js";
+import { RuntimeDisclosureCard } from "../components/RuntimeDisclosureCard.js";
+import { VisitorLanguageSelection } from "../components/VisitorLanguageSelection.js";
+import { VisitorSessionScreen } from "../components/VisitorSessionScreen.js";
+import {
+  canSideUseSpeech,
+  hasCommittedLanguageSelection,
+  resolveOperatorViewMode,
+  shouldShowRemoteUserLanguage
+} from "../../../shared/side-flow.js";
+import { buildPanelSpeechControl } from "./build-panel-speech-control.js";
+import {
+  getInteractionLanguageFallbackLabel,
+  getLocalizedRoleLabels,
+  getSourceLanguageLabel,
+  normalizeDocumentLanguage,
+  resolveDocumentDirection,
+  resolveSideFromLocation
+} from "./operator-app-view-model.js";
+import { useSetupWizardAccess } from "./use-setup-wizard-access.js";
+import { useOnlySpeechRuntime } from "./use-onlyspeech-runtime.js";
+import { usePushToTalk } from "./use-push-to-talk.js";
+
+export function OperatorApp() {
+  const side = resolveSideFromLocation(window.location.search);
+  const fallbackUiLanguage = "en";
+  const onlySpeechApi: OnlySpeechRendererApi | null = window.onlySpeech ?? null;
+  const appState = useOnlySpeechRuntime(side, onlySpeechApi);
+  const [showLanguageSelector, setShowLanguageSelector] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<"reset" | "close" | "shutdown" | null>(null);
+  const [canShutdownComputer, setCanShutdownComputer] = useState(false);
+  const [shutdownFeedback, setShutdownFeedback] = useState<string | null>(null);
+  const preloadedLocalSide = appState?.sides[side] ?? null;
+  const preloadedRemoteSide = appState?.sides[side === "A" ? "B" : "A"] ?? null;
+  const isVisitorStation = side === "B";
+  const uiLanguage = preloadedLocalSide ? resolveUiLanguageForSide(preloadedLocalSide) : fallbackUiLanguage;
+  const operatorSelectorLanguage = preloadedLocalSide?.wizardDefaultUiLanguage ?? uiLanguage;
+  const localizedRoleLabels = getLocalizedRoleLabels(uiLanguage);
+  const labels = getUiText(uiLanguage);
+  const operatorSelectorLabels = getUiText(operatorSelectorLanguage);
+  const visitorRuntimeLocalization = getVisitorLocalizationBundle(preloadedLocalSide?.effectiveUiLanguage ?? uiLanguage);
+  const visitorLanguageLocalization = getVisitorLocalizationBundle(
+    preloadedLocalSide?.selectedTargetLanguage ?? null
+  );
+  const visitorStatusLabels = visitorRuntimeLocalization.statusLabels;
+  const visitorCurrentLanguage = visitorLanguageLocalization.currentLanguageLabel;
+  const visitorLabels = visitorRuntimeLocalization.uiText;
+  const operatorTextToSpeechText = getOperatorTextToSpeechText(uiLanguage);
+  const visitorTextToSpeechText = getVisitorTextToSpeechText(preloadedLocalSide?.effectiveUiLanguage ?? uiLanguage);
+  const visitorSelectorLanguage =
+    preloadedLocalSide?.wizardDefaultUiLanguage ?? preloadedLocalSide?.effectiveUiLanguage ?? uiLanguage;
+  const visitorSelectorLabels = getVisitorLocalizationBundle(visitorSelectorLanguage).uiText;
+  const runtimeDisclosure = appState?.runtimeDisclosure ?? DEFAULT_RUNTIME_DISCLOSURE_SETTINGS;
+  const operatorDisclosureText = getRuntimeDisclosureText(uiLanguage, runtimeDisclosure);
+  const visitorDisclosureText = getRuntimeDisclosureText(
+    preloadedLocalSide?.effectiveUiLanguage ?? visitorSelectorLanguage,
+    runtimeDisclosure
+  );
+  const operatorDisclosure = operatorDisclosureText ? (
+    <RuntimeDisclosureCard
+      title={operatorDisclosureText.title}
+      paragraphs={operatorDisclosureText.paragraphs}
+    />
+  ) : null;
+  const visitorDisclosure = visitorDisclosureText ? (
+    <RuntimeDisclosureCard
+      title={visitorDisclosureText.title}
+      paragraphs={visitorDisclosureText.paragraphs}
+    />
+  ) : null;
+  const interactionLanguageChoices = buildInteractionLanguageChoices(appState?.translationProvider, {
+    includeProviderExpansions: true
+  });
+  const interactionLanguageChoicesByValue = new Map(
+    interactionLanguageChoices.map((choice) => [choice.value, choice] as const)
+  );
+  const localInteractionChoice =
+    preloadedLocalSide?.selectedTargetLanguage
+      ? interactionLanguageChoicesByValue.get(preloadedLocalSide.selectedTargetLanguage) ?? null
+      : null;
+  const localInteractionEnglishLabel = getInteractionLanguageEnglishLabel(
+    preloadedLocalSide?.selectedTargetLanguage ?? null
+  );
+  const preloadedLocalConfiguredInteractionLabel =
+    preloadedLocalSide?.selectedInteractionLanguage &&
+    preloadedLocalSide.selectedInteractionLanguage !== preloadedLocalSide.selectedTargetLanguage
+      ? getInteractionLanguageCurrentLabel(preloadedLocalSide.selectedInteractionLanguage, appState?.translationProvider, {
+          includeProviderExpansions: true
+        })
+      : null;
+  const preloadedLocalLanguageCommitted = preloadedLocalSide ? hasCommittedLanguageSelection(preloadedLocalSide) : false;
+  const preloadedRemoteLanguageCommitted = preloadedRemoteSide
+    ? hasCommittedLanguageSelection(preloadedRemoteSide)
+    : false;
+  const preloadedCanTalk =
+    appState !== null &&
+    canSideUseSpeech(appState, side) &&
+    preloadedLocalLanguageCommitted &&
+    preloadedRemoteLanguageCommitted &&
+    (appState.activeSide === null || appState.activeSide === side);
+  const { isPttPressed, startPtt, endPtt, onPointerDown, onPointerUp } = usePushToTalk({
+    side,
+    canTalk: preloadedCanTalk,
+    sendOperatorAction: onlySpeechApi
+      ? onlySpeechApi.sendOperatorAction
+      : () => undefined
+  });
+  const {
+    cancelSetupAccess,
+    openSetupWizard,
+    setupAccessBusy,
+    setupAccessError,
+    setupAccessState,
+    submitSetupAccess
+  } = useSetupWizardAccess({
+    appMode: appState?.appMode,
+    labels,
+    onlySpeechApi
+  });
+  const preloadedViewMode = resolveOperatorViewMode({
+    appState,
+    side,
+    showLanguageSelector,
+    visitorLanguageCommitted: side === "B" ? preloadedLocalLanguageCommitted : true
+  });
+  const documentLanguage =
+    preloadedViewMode === "operator-language-selection"
+      ? operatorSelectorLanguage
+      : preloadedViewMode === "visitor-language-selection"
+        ? visitorSelectorLanguage
+        : isVisitorStation
+          ? preloadedLocalSide?.effectiveUiLanguage ?? uiLanguage
+          : uiLanguage;
+  const normalizedDocumentLanguage = normalizeDocumentLanguage(documentLanguage);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!onlySpeechApi) {
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    void onlySpeechApi.getShutdownCapability()
+      .then((available) => {
+        if (!cancelled) {
+          setCanShutdownComputer(available);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setCanShutdownComputer(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [onlySpeechApi]);
+
+  useLayoutEffect(() => {
+    document.documentElement.lang = normalizedDocumentLanguage;
+    document.documentElement.dir = resolveDocumentDirection(normalizedDocumentLanguage);
+  }, [normalizedDocumentLanguage]);
+
+  if (!onlySpeechApi) {
+    return (
+      <TechnicalErrorView
+        language={fallbackUiLanguage}
+        issues={[
+          {
+            code: "speech-stream-failure",
+            message: getUiText(fallbackUiLanguage).bridgeUnavailable,
+            retryable: true
+          }
+        ]}
+        onRetry={() => window.location.reload()}
+      />
+    );
+  }
+
+  if (!appState) {
+    return <div className="boot-screen">{getUiText(fallbackUiLanguage).booting}</div>;
+  }
+
+  const localSide = appState.sides[side];
+  const remoteSide = appState.sides[side === "A" ? "B" : "A"];
+  const localHistoryEntries = appState.conversationHistory.filter((entry) => entry.speakerSide === side);
+  const remoteHistoryEntries = appState.conversationHistory.filter((entry) => entry.speakerSide !== side);
+  const remoteInteractionChoice =
+    remoteSide.selectedTargetLanguage
+      ? interactionLanguageChoicesByValue.get(remoteSide.selectedTargetLanguage) ?? null
+      : null;
+  const remoteInteractionEnglishLabel = getInteractionLanguageEnglishLabel(remoteSide.selectedTargetLanguage ?? null);
+  const remoteConfiguredInteractionLabel =
+    remoteSide.selectedInteractionLanguage &&
+    remoteSide.selectedInteractionLanguage !== remoteSide.selectedTargetLanguage
+      ? getInteractionLanguageCurrentLabel(remoteSide.selectedInteractionLanguage, appState.translationProvider, {
+          includeProviderExpansions: true
+        })
+      : null;
+  const blockingIssues = appState.health.blockingIssues;
+  const localLanguageCommitted = hasCommittedLanguageSelection(localSide);
+  const remoteLanguageCommitted = hasCommittedLanguageSelection(remoteSide);
+  const waitingForRemoteLanguage = localLanguageCommitted && !remoteLanguageCommitted;
+  const shouldShowRemoteLanguageLine = shouldShowRemoteUserLanguage(
+    side,
+    remoteLanguageCommitted ? remoteSide.selectedTargetLanguage ?? null : null
+  );
+  const isRemoteSpeaking = remoteSide.isActiveSpeaker;
+  const localStatusLabel = labels.statusLabels[localSide.status];
+  const visibleStatusLabel = isVisitorStation ? visitorStatusLabels[localSide.status] : localStatusLabel;
+  const activeTextToSpeech = appState.textToSpeech;
+  const textToSpeechEnabled = appState.textToSpeechEnabled;
+  const textToSpeechText = isVisitorStation ? visitorTextToSpeechText : operatorTextToSpeechText;
+  const demoMode = appState.appMode === "demo";
+  const canTalk =
+    !demoMode &&
+    canSideUseSpeech(appState, side) &&
+    localLanguageCommitted &&
+    remoteLanguageCommitted &&
+    (appState.activeSide === null || appState.activeSide === side);
+  const viewMode = resolveOperatorViewMode({
+    appState,
+    side,
+    showLanguageSelector,
+    visitorLanguageCommitted: side === "B" ? localLanguageCommitted : true
+  });
+
+  const selectLanguage = (language: string) => {
+    onlySpeechApi.sendOperatorAction({
+      type: "select-target-language",
+      side,
+      targetLanguage: language
+    });
+    setShowLanguageSelector(false);
+  };
+
+  const pttButtonClassName = [
+    "ptt-button",
+    canTalk ? "" : "disabled",
+    canTalk && (isPttPressed || localSide.isActiveSpeaker) ? "active" : ""
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const transcriptSpeechControl = textToSpeechEnabled
+    ? buildPanelSpeechControl({
+        activeSide: appState.activeSide,
+        activeTextToSpeech,
+        content: "transcript",
+        language: localSide.detectedSourceLanguage ?? localSide.sourceLanguage ?? null,
+        panelText: textToSpeechText,
+        panelTitle: isVisitorStation ? visitorLabels.whatYouSay : labels.localTranscript,
+        requestTextToSpeech: onlySpeechApi.requestTextToSpeech,
+        side,
+        stopTextToSpeech: onlySpeechApi.stopTextToSpeech,
+        text: localSide.localTranscript
+      })
+    : undefined;
+
+  const translationSpeechControl = textToSpeechEnabled
+    ? buildPanelSpeechControl({
+        activeSide: appState.activeSide,
+        activeTextToSpeech,
+        content: "translation",
+        language: localSide.selectedTargetLanguage ?? null,
+        panelText: textToSpeechText,
+        panelTitle: isVisitorStation ? visitorLabels.operatorTranslation : labels.remoteTranslation,
+        requestTextToSpeech: onlySpeechApi.requestTextToSpeech,
+        side,
+        stopTextToSpeech: onlySpeechApi.stopTextToSpeech,
+        text: localSide.remoteTranslation
+      })
+    : undefined;
+
+  const setupAccessDialog = setupAccessState?.requiresPassword ? (
+    <SetupWizardAccessDialog
+      title={labels.setupWizardAccessTitle}
+      description={
+        setupAccessState.mustChangePassword
+          ? labels.setupWizardAccessChangeDescription
+          : labels.setupWizardAccessDescription
+      }
+      passwordLabel={labels.setupWizardPasswordLabel}
+      newPasswordLabel={labels.setupWizardNewPasswordLabel}
+      confirmPasswordLabel={labels.setupWizardConfirmPasswordLabel}
+      submitLabel={labels.setupWizardAccessSubmit}
+      cancelLabel={labels.cancel}
+      mustChangePassword={setupAccessState.mustChangePassword}
+      busy={setupAccessBusy}
+      errorMessage={setupAccessError}
+      onCancel={cancelSetupAccess}
+      onSubmit={submitSetupAccess}
+    />
+  ) : null;
+
+  const runtimeIssueBanner =
+    blockingIssues.length > 0 && viewMode !== "technical-error" ? (
+      <RuntimeIssueBanner
+        issues={blockingIssues}
+        language={uiLanguage}
+        visitorLanguageCode={isVisitorStation ? localSide.effectiveUiLanguage : undefined}
+        onRetry={() => {
+          onlySpeechApi.sendOperatorAction({ type: "retry-health-check", side });
+        }}
+          onOpenSetup={openSetupWizard}
+        />
+      ) : null;
+  const topNoticeStack =
+    runtimeIssueBanner ? (
+      <div className="top-notice-stack">
+        {runtimeIssueBanner}
+      </div>
+    ) : null;
+  const shutdownNotice = shutdownFeedback ? (
+    <div className="notice warn" role="alert">{shutdownFeedback}</div>
+  ) : null;
+
+  if (viewMode === "technical-error") {
+    return (
+      <>
+        {topNoticeStack}
+        {setupAccessDialog}
+        <TechnicalErrorView
+          language={uiLanguage}
+          visitorLanguageCode={isVisitorStation ? localSide.effectiveUiLanguage : undefined}
+          issues={blockingIssues}
+          onRetry={() => {
+            onlySpeechApi.sendOperatorAction({ type: "retry-health-check", side });
+          }}
+          onOpenSetup={openSetupWizard}
+        />
+      </>
+    );
+  }
+
+  if (viewMode === "operator-language-selection") {
+    return (
+      <>
+        {topNoticeStack}
+        {setupAccessDialog}
+        {shutdownNotice}
+        <LanguageSelection
+          language={operatorSelectorLanguage}
+          title={operatorSelectorLabels.selectInteractionLanguageTitle}
+          description={operatorSelectorLabels.selectInteractionLanguageDescription}
+          selectedLanguage={null}
+          initialMacroAreaLanguage={operatorSelectorLanguage}
+          appearance="tiles"
+          choices={interactionLanguageChoices}
+          confirmSelection={false}
+          preselectLanguage={false}
+          runtimeDisclosureSettings={runtimeDisclosure}
+          onSelect={selectLanguage}
+          onCancel={showLanguageSelector ? () => setShowLanguageSelector(false) : undefined}
+        />
+      </>
+    );
+  }
+
+  if (viewMode === "visitor-language-selection") {
+    return (
+      <>
+        {topNoticeStack}
+        {setupAccessDialog}
+        {shutdownNotice}
+        <VisitorLanguageSelection
+          languageCode={visitorSelectorLanguage}
+          title={visitorSelectorLabels.selectLanguageTitle}
+          description={visitorSelectorLabels.selectLanguageDescription}
+          selectedLanguage={localSide.selectedTargetLanguage}
+          choices={interactionLanguageChoices}
+          runtimeDisclosureSettings={runtimeDisclosure}
+          onSelect={selectLanguage}
+        />
+      </>
+    );
+  }
+
+  if (isVisitorStation) {
+    return (
+      <>
+        {topNoticeStack}
+        {setupAccessDialog}
+        <VisitorSessionScreen
+          appState={appState}
+          canTalk={canTalk}
+          isRemoteSpeaking={isRemoteSpeaking}
+          localHistoryEntries={localHistoryEntries}
+          localInteractionChoice={localInteractionChoice}
+          localConfiguredInteractionLabel={preloadedLocalConfiguredInteractionLabel}
+          localSide={localSide}
+          onChangeLanguage={() => setShowLanguageSelector(true)}
+          onPointerDown={onPointerDown}
+          onPointerUp={onPointerUp}
+          pttButtonClassName={pttButtonClassName}
+          remoteHistoryEntries={remoteHistoryEntries}
+          remoteTranslationSpeechControl={translationSpeechControl}
+          side={side}
+          startPtt={startPtt}
+          endPtt={endPtt}
+          transcriptSpeechControl={transcriptSpeechControl}
+          disclosure={visitorDisclosure}
+          uiFallback={localSide.usesEnglishUiFallback}
+          visibleStatusLabel={visibleStatusLabel}
+          visitorCurrentLanguage={visitorCurrentLanguage}
+          visitorLabels={visitorLabels}
+          visitorStatusLabels={visitorStatusLabels}
+        />
+      </>
+    );
+  }
+
+  return (
+    <>
+      {topNoticeStack}
+      {setupAccessDialog}
+      {shutdownNotice}
+      <OperatorSessionScreen
+        canShutdownComputer={canShutdownComputer}
+        canTalk={canTalk}
+        isRemoteSpeaking={isRemoteSpeaking}
+        labels={labels}
+        language={uiLanguage}
+        localizedRoleLabels={localizedRoleLabels}
+        localHistoryEntries={localHistoryEntries}
+        localInteractionChoice={localInteractionChoice}
+        localInteractionEnglishLabel={localInteractionEnglishLabel}
+        localInteractionFallbackLabel={getInteractionLanguageFallbackLabel(localSide.selectedTargetLanguage)}
+        localConfiguredInteractionLabel={preloadedLocalConfiguredInteractionLabel}
+        localSide={localSide}
+        localStatusLabel={localStatusLabel}
+        onChangeLanguage={() => setShowLanguageSelector(true)}
+        onCloseApp={() => setConfirmAction("close")}
+        onOpenSetupWizard={openSetupWizard}
+        onShutdownComputer={() => {
+          setShutdownFeedback(null);
+          setConfirmAction("shutdown");
+        }}
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+        onResetSession={() => setConfirmAction("reset")}
+        pttButtonClassName={pttButtonClassName}
+        readingLanguageLabel={getInteractionLanguageFallbackLabel(localSide.selectedTargetLanguage)}
+        remoteHistoryEntries={remoteHistoryEntries}
+        remoteTranslationSpeechControl={translationSpeechControl}
+        remoteInteractionChoice={remoteInteractionChoice}
+        remoteInteractionEnglishLabel={remoteInteractionEnglishLabel}
+        remoteInteractionFallbackLabel={getInteractionLanguageFallbackLabel(remoteSide.selectedTargetLanguage)}
+        remoteConfiguredInteractionLabel={remoteConfiguredInteractionLabel}
+        remoteUiFallback={remoteSide.usesEnglishUiFallback}
+        shouldShowRemoteLanguageLine={shouldShowRemoteLanguageLine}
+        side={side}
+        sourceLanguageFooter={
+          <span>{labels.sourceLanguage}: {getSourceLanguageLabel(localSide.detectedSourceLanguage ?? localSide.sourceLanguage)}</span>
+        }
+        startPtt={startPtt}
+        transcriptSpeechControl={transcriptSpeechControl}
+        endPtt={endPtt}
+        waitingForRemoteLanguage={waitingForRemoteLanguage}
+        disclosure={operatorDisclosure}
+      />
+      {confirmAction === "reset" ? (
+        <ConfirmDialog
+          title={labels.confirmReset}
+          description={labels.confirmResetDescription}
+          confirmLabel={labels.confirm}
+          cancelLabel={labels.cancel}
+          onCancel={() => setConfirmAction(null)}
+          onConfirm={() => {
+            setConfirmAction(null);
+            setShutdownFeedback(null);
+            onlySpeechApi.sendOperatorAction({ type: "request-reset", side });
+          }}
+        />
+      ) : null}
+      {confirmAction === "close" ? (
+        <ConfirmDialog
+          title={labels.confirmClose}
+          description={labels.confirmCloseDescription}
+          confirmLabel={labels.confirm}
+          cancelLabel={labels.cancel}
+          onCancel={() => setConfirmAction(null)}
+          onConfirm={() => {
+            setConfirmAction(null);
+            setShutdownFeedback(null);
+            onlySpeechApi.sendOperatorAction({ type: "request-close", side });
+          }}
+        />
+      ) : null}
+      {confirmAction === "shutdown" ? (
+        <ConfirmDialog
+          title={labels.confirmShutdown}
+          description={labels.confirmShutdownDescription}
+          confirmLabel={labels.confirm}
+          cancelLabel={labels.cancel}
+          onCancel={() => setConfirmAction(null)}
+          onConfirm={async () => {
+            setConfirmAction(null);
+            try {
+              const result = await onlySpeechApi.shutdownComputer();
+              if (!result.ok) {
+                setShutdownFeedback(result.message);
+              }
+            } catch (error) {
+              setShutdownFeedback(error instanceof Error ? error.message : String(error));
+            }
+          }}
+        />
+      ) : null}
+    </>
+  );
+}

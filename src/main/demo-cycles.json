@@ -1,0 +1,44 @@
+[
+  {
+    "sideLanguages": {
+      "A": "en",
+      "B": "zh-Hans"
+    },
+    "visitorConversationHistoryEnabled": false,
+    "exchanges": [
+      {
+        "side": "A",
+        "transcript": "Good morning, Ms. Chen. I found reservation OS-24817: three nights, from 21 to 24 June.",
+        "translation": "早上好，陈女士。我找到了预订 OS-24817：6月21日至24日，共三晚。",
+        "detectedLanguage": "en-US"
+      },
+      {
+        "side": "B",
+        "transcript": "谢谢。请确认包含早餐，退房时间是上午十一点。",
+        "translation": "Thank you. Please confirm breakfast is included and checkout is at 11:00 a.m.",
+        "detectedLanguage": "zh-CN"
+      }
+    ]
+  },
+  {
+    "sideLanguages": {
+      "A": "en",
+      "B": "yue"
+    },
+    "visitorConversationHistoryEnabled": true,
+    "exchanges": [
+      {
+        "side": "A",
+        "transcript": "Welcome back. We can continue from your previous request.",
+        "translation": "歡迎返嚟。我哋可以由你之前嘅請求繼續。",
+        "detectedLanguage": "en-US"
+      },
+      {
+        "side": "B",
+        "transcript": "好呀，我只需要確認返探訪時間。",
+        "translation": "Perfect. I only need to confirm the appointment time.",
+        "detectedLanguage": "yue-HK"
+      }
+    ]
+  }
+]

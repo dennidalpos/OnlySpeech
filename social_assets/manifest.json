@@ -1,0 +1,143 @@
+{
+  "generatedBy": "npm run docs:social-assets",
+  "formats": [
+    {
+      "directory": "vertical",
+      "suffix": "vertical-9x16",
+      "formatLabel": "Stories 9:16",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "directory": "feed",
+      "suffix": "feed-4x5",
+      "formatLabel": "Feed 4:5",
+      "width": 1080,
+      "height": 1350
+    }
+  ],
+  "storyboard": [
+    {
+      "sequence": 1,
+      "slug": "scegli-la-lingua",
+      "title": "La conversazione parte dalla lingua giusta",
+      "benefit": "L’operatore imposta la propria lingua con una selezione visuale e immediata.",
+      "side": "A",
+      "view": "visitor-language-selection"
+    },
+    {
+      "sequence": 2,
+      "slug": "lingua-del-visitatore",
+      "title": "Ogni visitatore si sente subito accolto",
+      "benefit": "Il secondo schermo guida la persona nella propria lingua, senza mediazioni tecniche.",
+      "side": "B",
+      "view": "visitor-language-selection"
+    },
+    {
+      "sequence": 3,
+      "slug": "richiesta-operatore",
+      "title": "Parla normalmente. OnlySpeech traduce.",
+      "benefit": "La prenotazione OS-24817 e le date dal 21 al 24 giugno diventano subito comprensibili.",
+      "side": "A",
+      "view": "operator-session"
+    },
+    {
+      "sequence": 4,
+      "slug": "risposta-visitatore",
+      "title": "La risposta arriva chiara, nel contesto",
+      "benefit": "Colazione inclusa e checkout alle 11:00: i dettagli importanti non si perdono.",
+      "side": "B",
+      "view": "visitor-session"
+    },
+    {
+      "sequence": 5,
+      "slug": "conversazione-completata",
+      "title": "Un dialogo completo, leggibile da entrambi",
+      "benefit": "Trascrizione, traduzione e storico restano ordinati nello stesso flusso operativo.",
+      "side": "A",
+      "view": "operator-session"
+    }
+  ],
+  "assets": [
+    {
+      "sequence": 1,
+      "directory": "vertical",
+      "fileName": "01-scegli-la-lingua-vertical-9x16.png",
+      "suffix": "vertical-9x16",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "sequence": 1,
+      "directory": "feed",
+      "fileName": "01-scegli-la-lingua-feed-4x5.png",
+      "suffix": "feed-4x5",
+      "width": 1080,
+      "height": 1350
+    },
+    {
+      "sequence": 2,
+      "directory": "vertical",
+      "fileName": "02-lingua-del-visitatore-vertical-9x16.png",
+      "suffix": "vertical-9x16",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "sequence": 2,
+      "directory": "feed",
+      "fileName": "02-lingua-del-visitatore-feed-4x5.png",
+      "suffix": "feed-4x5",
+      "width": 1080,
+      "height": 1350
+    },
+    {
+      "sequence": 3,
+      "directory": "vertical",
+      "fileName": "03-richiesta-operatore-vertical-9x16.png",
+      "suffix": "vertical-9x16",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "sequence": 3,
+      "directory": "feed",
+      "fileName": "03-richiesta-operatore-feed-4x5.png",
+      "suffix": "feed-4x5",
+      "width": 1080,
+      "height": 1350
+    },
+    {
+      "sequence": 4,
+      "directory": "vertical",
+      "fileName": "04-risposta-visitatore-vertical-9x16.png",
+      "suffix": "vertical-9x16",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "sequence": 4,
+      "directory": "feed",
+      "fileName": "04-risposta-visitatore-feed-4x5.png",
+      "suffix": "feed-4x5",
+      "width": 1080,
+      "height": 1350
+    },
+    {
+      "sequence": 5,
+      "directory": "vertical",
+      "fileName": "05-conversazione-completata-vertical-9x16.png",
+      "suffix": "vertical-9x16",
+      "width": 1080,
+      "height": 1920
+    },
+    {
+      "sequence": 5,
+      "directory": "feed",
+      "fileName": "05-conversazione-completata-feed-4x5.png",
+      "suffix": "feed-4x5",
+      "width": 1080,
+      "height": 1350
+    }
+  ]
+}
